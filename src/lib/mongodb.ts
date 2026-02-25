@@ -1,0 +1,2 @@
+import clientPromise from "@/lib/dbConnect"; // Re-use your existing promise logic logic if you have it
+// Actually, we can just rely on our manual callbacks above to keep it simple and aligned with your existing User model.

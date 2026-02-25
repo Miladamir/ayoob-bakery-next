@@ -8,13 +8,16 @@ import ProductCard from "@/components/ui/ProductCard";
 export const dynamic = 'force-dynamic';
 
 interface Props {
-    params: { id: string };
+    params: Promise<{ id: string }>; // Fix: params is a Promise
 }
 
 export default async function ProductDetailPage({ params }: Props) {
+    // Fix: Await params
+    const { id } = await params;
+
     await dbConnect();
 
-    const product = await Product.findById(params.id).populate('category').lean();
+    const product = await Product.findById(id).populate('category').lean();
 
     if (!product) {
         return (
@@ -24,12 +27,9 @@ export default async function ProductDetailPage({ params }: Props) {
         );
     }
 
-    // Fix: Cast 'category' to 'any' to access populated properties like 'name'
-    // because TS still thinks it's just an ObjectId.
     const category = product.category as any;
 
-    // Fetch related products (same category, exclude current)
-    // Use the category ID safely
+    // Fetch related products
     const relatedProducts = await Product.find({
         category: category._id || category,
         _id: { $ne: product._id }
@@ -43,7 +43,6 @@ export default async function ProductDetailPage({ params }: Props) {
     const breadcrumb = [
         { name: 'Home', href: '/' },
         { name: 'Menu', href: '/products' },
-        // Fix: Safe access using the casted variable
         { name: category?.name || 'Category', href: `/products?category=${category._id || category}` },
         { name: product.name, href: '#' }
     ];
@@ -69,21 +68,14 @@ export default async function ProductDetailPage({ params }: Props) {
             <section className="py-12 bg-white border-b border-gray-100">
                 <div className="container mx-auto px-6">
                     <div className="grid lg:grid-cols-2 gap-12 lg:gap-20">
-
-                        {/* Left: Gallery */}
                         <ProductGallery images={serializedProduct.images} />
-
-                        {/* Right: Info & Actions */}
                         <div className="flex flex-col justify-center">
-                            {/* Pass necessary props to Actions Client Component */}
                             <ProductActions product={serializedProduct} />
                         </div>
-
                     </div>
                 </div>
             </section>
 
-            {/* Tabs Section */}
             <ProductTabs product={serializedProduct} />
 
             {/* Related Products */}

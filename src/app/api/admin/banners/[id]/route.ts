@@ -1,29 +1,50 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import dbConnect from "@/lib/dbConnect";
 import Banner from "@/models/Banner";
-import { revalidatePath } from "next/cache";
+import { NextResponse } from "next/server";
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
-    const session = await getServerSession(authOptions);
-    if ((session?.user as any)?.role !== 'admin') return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+// Fix: params is now a Promise
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params; // Await params
 
-    await dbConnect();
-    const body = await request.json();
-    await Banner.findByIdAndUpdate(params.id, body);
-
-    revalidatePath('/');
-    return NextResponse.json({ success: true });
+    try {
+        await dbConnect();
+        const banner = await Banner.findById(id);
+        if (!banner) {
+            return NextResponse.json({ error: "Banner not found" }, { status: 404 });
+        }
+        return NextResponse.json(banner);
+    } catch (error) {
+        return NextResponse.json({ error: "Failed to fetch banner" }, { status: 500 });
+    }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
-    const session = await getServerSession(authOptions);
-    if ((session?.user as any)?.role !== 'admin') return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params; // Await params
 
-    await dbConnect();
-    await Banner.findByIdAndDelete(params.id);
+    try {
+        await dbConnect();
+        const body = await request.json();
+        const banner = await Banner.findByIdAndUpdate(id, body, { new: true });
+        if (!banner) {
+            return NextResponse.json({ error: "Banner not found" }, { status: 404 });
+        }
+        return NextResponse.json(banner);
+    } catch (error) {
+        return NextResponse.json({ error: "Failed to update banner" }, { status: 500 });
+    }
+}
 
-    revalidatePath('/');
-    return NextResponse.json({ success: true });
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params; // Await params
+
+    try {
+        await dbConnect();
+        const banner = await Banner.findByIdAndDelete(id);
+        if (!banner) {
+            return NextResponse.json({ error: "Banner not found" }, { status: 404 });
+        }
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        return NextResponse.json({ error: "Failed to delete banner" }, { status: 500 });
+    }
 }

@@ -3,16 +3,20 @@ import Blog from "@/models/Blog";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
+// FIX: Update Props interface
 interface Props {
-    params: { id: string };
+    params: Promise<{ id: string }>;
 }
 
 export const dynamic = 'force-dynamic';
 
 export default async function BlogDetailPage({ params }: Props) {
+    // FIX: Await params
+    const { id } = await params;
+
     await dbConnect();
 
-    const blog = await Blog.findById(params.id).lean();
+    const blog = await Blog.findById(id).lean();
 
     if (!blog) {
         notFound();
@@ -37,7 +41,6 @@ export default async function BlogDetailPage({ params }: Props) {
                         {blog.title}
                     </h1>
                     <div className="flex items-center justify-center gap-6 text-sm text-brand-200">
-                        {/* Fix: Cast to any to access createdAt safely */}
                         <span><i className="fa-solid fa-calendar-days mr-2"></i> {new Date((blog as any).createdAt || blog.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                         <span><i className="fa-solid fa-user mr-2"></i> Ayoob Bakery</span>
                     </div>
@@ -63,9 +66,6 @@ export default async function BlogDetailPage({ params }: Props) {
 
                                 {/* Article Body */}
                                 <div className="p-8 md:p-12 article-content">
-                                    {/* Render HTML content safely. 
-                      Note: In a real app, you'd want to sanitize this HTML on the server 
-                      or ensure it's safe from XSS before storing. */}
                                     <div dangerouslySetInnerHTML={{ __html: blog.content }} />
                                 </div>
                             </article>
@@ -101,7 +101,6 @@ export default async function BlogDetailPage({ params }: Props) {
                                                     <h4 className="text-gray-700 font-semibold group-hover:text-brand-600 transition-colors text-sm leading-snug">
                                                         {post.title}
                                                     </h4>
-                                                    {/* Fix: Cast to any to access createdAt safely */}
                                                     <p className="text-xs text-gray-400 mt-1">
                                                         {new Date((post as any).createdAt || post.date).toLocaleDateString()}
                                                     </p>

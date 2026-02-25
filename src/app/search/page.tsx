@@ -4,20 +4,17 @@ import Category from "@/models/Category";
 import ProductCard from "@/components/ui/ProductCard";
 import Link from "next/link";
 
-interface SearchParams {
-    q?: string;
-}
-
 interface Props {
-    searchParams: SearchParams;
+    searchParams: Promise<{ q?: string }>;
 }
 
 export const dynamic = 'force-dynamic';
 
 export default async function SearchPage({ searchParams }: Props) {
-    const query = searchParams.q || "";
+    // 1. Await searchParams (CRITICAL FIX for Next.js 15+)
+    const resolvedParams = await searchParams;
+    const query = resolvedParams.q || "";
 
-    // Fix: Explicitly type products as any[]
     let products: any[] = [];
 
     await dbConnect();
@@ -36,7 +33,7 @@ export default async function SearchPage({ searchParams }: Props) {
     // Fetch categories for sidebar
     const categories = await Category.find({ parent: null }).lean();
 
-    // Serialize for client components
+    // Serialize data for client components
     const serializedProducts = JSON.parse(JSON.stringify(products));
     const serializedCategories = JSON.parse(JSON.stringify(categories));
 

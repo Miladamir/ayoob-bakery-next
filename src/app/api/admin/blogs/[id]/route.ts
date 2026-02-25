@@ -5,24 +5,32 @@ import dbConnect from "@/lib/dbConnect";
 import Blog from "@/models/Blog";
 import { revalidatePath } from "next/cache";
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+// FIX: Changed params type to Promise
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
+    // FIX: Await params
+    const { id } = await params;
+
     const session = await getServerSession(authOptions);
     if ((session?.user as any)?.role !== 'admin') return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     await dbConnect();
     const body = await request.json();
-    await Blog.findByIdAndUpdate(params.id, body);
+    await Blog.findByIdAndUpdate(id, body);
 
     revalidatePath('/blogs');
     return NextResponse.json({ success: true });
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+// FIX: Changed params type to Promise
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+    // FIX: Await params
+    const { id } = await params;
+
     const session = await getServerSession(authOptions);
     if ((session?.user as any)?.role !== 'admin') return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     await dbConnect();
-    await Blog.findByIdAndDelete(params.id);
+    await Blog.findByIdAndDelete(id);
 
     revalidatePath('/blogs');
     return NextResponse.json({ success: true });

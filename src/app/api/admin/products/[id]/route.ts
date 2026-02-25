@@ -1,48 +1,40 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import dbConnect from "@/lib/dbConnect";
 import Product from "@/models/Product";
-import { revalidatePath } from "next/cache";
+import { NextResponse } from "next/server";
 
-// Update Product
-export async function POST(request: Request, { params }: { params: { id: string } }) {
-    const session = await getServerSession(authOptions);
-    if ((session?.user as any)?.role !== 'admin') {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+// Fix: params is Promise
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+    try {
+        await dbConnect();
+        const product = await Product.findById(id).populate('category');
+        if (!product) return NextResponse.json({ error: "Product not found" }, { status: 404 });
+        return NextResponse.json(product);
+    } catch (error) {
+        return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 });
     }
+}
 
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     try {
         await dbConnect();
         const body = await request.json();
-
-        await Product.findByIdAndUpdate(params.id, body, { new: true });
-
-        // Revalidate
-        revalidatePath('/');
-        revalidatePath('/products');
-        revalidatePath(`/product/${params.id}`);
-
-        return NextResponse.json({ success: true });
+        if (body.category === "") body.category = null;
+        const product = await Product.findByIdAndUpdate(id, body, { new: true });
+        if (!product) return NextResponse.json({ error: "Product not found" }, { status: 404 });
+        return NextResponse.json(product);
     } catch (error) {
         return NextResponse.json({ error: "Failed to update product" }, { status: 500 });
     }
 }
 
-// Delete Product
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
-    const session = await getServerSession(authOptions);
-    if ((session?.user as any)?.role !== 'admin') {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     try {
         await dbConnect();
-        await Product.findByIdAndDelete(params.id);
-
-        revalidatePath('/');
-        revalidatePath('/products');
-
+        const product = await Product.findByIdAndDelete(id);
+        if (!product) return NextResponse.json({ error: "Product not found" }, { status: 404 });
         return NextResponse.json({ success: true });
     } catch (error) {
         return NextResponse.json({ error: "Failed to delete product" }, { status: 500 });

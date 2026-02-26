@@ -91,8 +91,6 @@ export default function Header({ nestedCategories }: HeaderProps) {
                         : "text-white"
                     }`}
             >
-                {/* Main Flex Container: w-full ensures it spans edge to edge. 
-                    px-4 or px-6 adds slight breathing room from screen edges. */}
                 <div className="w-full px-6 flex justify-between items-center">
 
                     {/* LEFT SIDE: LOGO & TITLE */}
@@ -115,7 +113,6 @@ export default function Header({ nestedCategories }: HeaderProps) {
                     </Link>
 
                     {/* RIGHT SIDE: LINKS & ICONS */}
-                    {/* This div groups all navigation items together and pushes them to the right as one block */}
                     <div className="hidden lg:flex items-center space-x-8">
                         {[
                             { href: "/", label: "Home" },
@@ -134,7 +131,7 @@ export default function Header({ nestedCategories }: HeaderProps) {
                             </Link>
                         ))}
 
-                        {/* Utility Icons - Grouped tightly at the far right */}
+                        {/* Utility Icons */}
                         <div className="flex items-center gap-4 pl-8 border-l border-white/20">
                             <button onClick={openSearch} className="relative hover:text-brand-500 transition-colors focus:outline-none">
                                 <i className="fa-solid fa-magnifying-glass text-lg"></i>
@@ -195,7 +192,6 @@ export default function Header({ nestedCategories }: HeaderProps) {
                     id="mobile-menu"
                     className={`lg:hidden absolute top-full left-0 w-full bg-white text-gray-800 shadow-2xl border-t border-gray-100 ${isMobileMenuOpen ? 'open' : ''}`}
                 >
-                    {/* ... Mobile Menu Content ... */}
                     <div className="flex flex-col py-4 px-6">
                         {[
                             { href: "/", label: "Home", icon: "fa-home" },
@@ -215,13 +211,21 @@ export default function Header({ nestedCategories }: HeaderProps) {
                             </Link>
                         ))}
 
+                        {/* Mobile Quick Actions */}
                         <div className="mt-6 px-4 space-y-3">
+                            {/* Cart Button */}
                             <Link href="/cart" onClick={() => setIsMobileMenuOpen(false)} className="w-full flex items-center justify-center gap-2 bg-brand-500 text-white py-3 rounded-full font-bold shadow-md">
                                 <i className="fa-solid fa-shopping-bag"></i> View Cart
                             </Link>
+
+                            {/* Wishlist Button (Added for Mobile) */}
+                            <Link href="/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="w-full flex items-center justify-center gap-2 border border-brand-500 text-brand-500 py-3 rounded-full font-bold hover:bg-brand-50">
+                                <i className="fa-solid fa-heart"></i> Wishlist
+                            </Link>
+
                             {session ? (
                                 <>
-                                    <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)} className="w-full flex items-center justify-center gap-2 border border-brand-500 text-brand-500 py-3 rounded-full font-bold hover:bg-brand-50">
+                                    <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)} className="w-full flex items-center justify-center gap-2 border border-gray-200 text-gray-700 py-3 rounded-full font-bold hover:bg-gray-50">
                                         <i className="fa-solid fa-user"></i> My Profile
                                     </Link>
                                     <button onClick={() => signOut()} className="w-full flex items-center justify-center gap-2 text-gray-500 py-2 text-sm">
@@ -229,7 +233,7 @@ export default function Header({ nestedCategories }: HeaderProps) {
                                     </button>
                                 </>
                             ) : (
-                                <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="w-full flex items-center justify-center gap-2 border border-brand-500 text-brand-500 py-3 rounded-full font-bold hover:bg-brand-50">
+                                <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="w-full flex items-center justify-center gap-2 text-gray-500 py-2 text-sm hover:text-brand-600">
                                     <i className="fa-solid fa-sign-in-alt"></i> Login / Sign Up
                                 </Link>
                             )}
@@ -252,9 +256,11 @@ export default function Header({ nestedCategories }: HeaderProps) {
                         </button>
                     </div>
 
-                    <div className="relative">
+                    {/* FIX: Added Form Tag with Action and Name */}
+                    <form action="/search" method="GET" className="relative">
                         <input
                             type="text"
+                            name="q"
                             ref={searchInputRef}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
@@ -262,10 +268,13 @@ export default function Header({ nestedCategories }: HeaderProps) {
                             placeholder="Search for breads, pastries..."
                             autoComplete="off"
                         />
-                        <button className="absolute right-4 top-1/2 -translate-y-1/2 text-brand-500 hover:text-brand-600">
+                        <button
+                            type="submit"
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-brand-500 hover:text-brand-600"
+                        >
                             <i className="fa-solid fa-search text-xl"></i>
                         </button>
-                    </div>
+                    </form>
 
                     <div className="border-t border-gray-100 max-h-96 overflow-y-auto">
                         {searchQuery.length < 2 ? (

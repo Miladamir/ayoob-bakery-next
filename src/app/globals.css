@@ -455,6 +455,7 @@
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
+  /* Keeps parallax on Desktop */
   height: 100vh;
   display: flex;
   align-items: center;
@@ -462,6 +463,14 @@
   text-align: center;
   color: white;
   position: relative;
+}
+
+/* MOBILE FIX: Disable fixed background on mobile for smooth scrolling */
+@media (max-width: 768px) {
+  .hero-index {
+    background-attachment: scroll;
+    /* Image scrolls normally on mobile */
+  }
 }
 
 /* Special Offer Section */

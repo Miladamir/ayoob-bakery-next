@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import User from "@/models/User";
-import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
     try {
@@ -14,17 +13,20 @@ export async function POST(request: Request) {
             return NextResponse.json({ message: "User already exists" }, { status: 400 });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        await User.create({
+        // FIX: Do NOT hash the password here.
+        // The User model's pre-save hook will hash it automatically.
+        const newUser = new User({
             name,
             email,
-            password: hashedPassword,
+            password: password,
             role: "user"
         });
 
+        await newUser.save();
+
         return NextResponse.json({ message: "User created" }, { status: 201 });
     } catch (error) {
+        console.error("Register Error:", error);
         return NextResponse.json({ message: "Internal server error" }, { status: 500 });
     }
 }

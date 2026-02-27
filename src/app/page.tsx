@@ -11,29 +11,24 @@ export const dynamic = 'force-dynamic';
 export default async function Home() {
   await dbConnect();
 
-  // 1. Fetch Banners
-  const banners = await Banner.find({ isActive: true }).sort({ order: 1 }).lean();
-
-  // 2. Fetch Products by Badge
-  const bestSelling = await Product.find({ badge: 'Bestseller' }).limit(4).populate('category').lean();
-  const newArrivals = await Product.find({ badge: 'New' }).limit(4).populate('category').lean();
-  const popular = await Product.find({ badge: 'Popular' }).limit(4).populate('category').lean();
-  const featured = await Product.find({ badge: 'Featured' }).limit(4).populate('category').lean();
+  // OPTIMIZATION: Run all independent database queries in parallel
+  // This changes the load time from Sum(Query Times) to Max(Query Time)
+  const [banners, bestSelling, newArrivals, popular, featured] = await Promise.all([
+    Banner.find({ isActive: true }).sort({ order: 1 }).lean(),
+    Product.find({ badge: 'Bestseller' }).limit(4).populate('category').lean(),
+    Product.find({ badge: 'New' }).limit(4).populate('category').lean(),
+    Product.find({ badge: 'Popular' }).limit(4).populate('category').lean(),
+    Product.find({ badge: 'Featured' }).limit(4).populate('category').lean(),
+  ]);
 
   // Serialize data for client components
   const serialize = (data: any[]) => JSON.parse(JSON.stringify(data));
 
   return (
-    <main>
-      {/* 
-         Note: The specific CSS classes (like .hero-index, .products-grid, etc.) 
-         that were in the <style> block are missing from globals.css.
-         We will add them in the NEXT step to fix the layout perfectly.
-      */}
-
+    <>
       <HeroSection />
 
-      {/* Features Section is inside MarketingSections now, or we add it here */}
+      {/* Features Section */}
       <section className="section-padding" style={{ background: "white", marginTop: "-50px", borderRadius: "30px 30px 0 0", position: "relative", zIndex: 5 }}>
         <div className="container">
           <div className="grid grid-3 text-center">
@@ -75,7 +70,6 @@ export default async function Home() {
 
       {/* Marketing Sections (Process, Team, Catering, etc.) */}
       <MarketingSections />
-
-    </main>
+    </>
   );
 }

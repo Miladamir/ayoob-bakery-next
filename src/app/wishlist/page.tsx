@@ -19,8 +19,9 @@ export default function WishlistPage() {
                 return;
             }
 
+            setLoading(true);
             try {
-                // We need an API endpoint to fetch products by array of IDs
+                // Use the API we created earlier to get details for IDs
                 const res = await fetch(`/api/products/by-ids?ids=${wishlistIds.join(',')}`);
                 if (res.ok) {
                     const data = await res.json();
@@ -33,7 +34,13 @@ export default function WishlistPage() {
             }
         };
 
-        fetchProducts();
+        // Only fetch if wishlistIds is populated (avoids flash of empty state on load)
+        // A simple check to ensure we don't fetch with empty array on first render
+        if (wishlistIds.length > 0 || !loading) {
+            fetchProducts();
+        } else {
+            setLoading(false);
+        }
     }, [wishlistIds]);
 
     return (
@@ -55,7 +62,7 @@ export default function WishlistPage() {
             <section className="py-16">
                 <div className="container mx-auto px-6">
                     {loading ? (
-                        <div className="text-center text-gray-500">Loading favorites...</div>
+                        <div className="text-center text-gray-500 py-20">Loading favorites...</div>
                     ) : products.length === 0 ? (
                         <div className="text-center py-20">
                             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
@@ -68,8 +75,7 @@ export default function WishlistPage() {
                             </Link>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8">
-                            {/* Fix: Convert _id to string for the React key */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                             {products.map((product) => (
                                 <ProductCard key={product._id.toString()} product={product} />
                             ))}

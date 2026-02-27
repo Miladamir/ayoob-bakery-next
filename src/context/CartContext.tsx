@@ -1,8 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { useSession } from "next-auth/react";
 
-// Define types
 interface CartItem {
     _id: string;
     name: string;
@@ -15,8 +15,8 @@ interface CartItem {
 
 interface CartContextType {
     cartItems: CartItem[];
-    cartTotal: number;
     cartCount: number;
+    cartTotal: number;
     addToCart: (product: any, quantity: number) => Promise<void>;
     updateQuantity: (productId: string, quantity: number) => Promise<void>;
     removeItem: (productId: string) => Promise<void>;
@@ -26,108 +26,128 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
+    const { status } = useSession(); // Use only status
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
-    const [cartTotal, setCartTotal] = useState(0);
-    const [cartCount, setCartCount] = useState(0);
+    const [isInitialized, setIsInitialized] = useState(false);
 
-    // Fetch initial cart from server (session/db)
+    const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    const cartTotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    // 1. Consolidated Initialization
     useEffect(() => {
-        const fetchCart = async () => {
-            try {
-                const res = await fetch("/api/cart");
-                if (res.ok) {
-                    const data = await res.json();
-                    setCartItems(data.items || []);
+        if (status === "loading" || isInitialized) return;
+
+        const initializeCart = async () => {
+            const localData = localStorage.getItem("cart_guest");
+            const localItems: CartItem[] = localData ? JSON.parse(localData) : [];
+
+            if (status === "authenticated") {
+                try {
+                    if (localItems.length > 0) {
+                        await fetch("/api/cart/merge", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ items: localItems }),
+                        });
+                        localStorage.removeItem("cart_guest");
+                    }
+
+                    const res = await fetch("/api/cart");
+                    if (res.ok) {
+                        const data = await res.json();
+                        setCartItems(data.items || []);
+                    }
+                } catch (e) {
+                    console.error("Cart init failed", e);
+                    setCartItems(localItems);
                 }
-            } catch (error) {
-                console.error("Failed to fetch cart", error);
+            } else {
+                setCartItems(localItems);
             }
-        };
-        fetchCart();
-    }, []);
 
-    // Recalculate totals whenever cartItems change
-    useEffect(() => {
-        const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-        const count = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-        setCartTotal(total);
-        setCartCount(count);
-    }, [cartItems]);
+            setIsInitialized(true);
+        };
+
+        initializeCart();
+    }, [status, isInitialized]);
+
+    const updateLocal = (items: CartItem[]) => {
+        if (status !== "authenticated") {
+            localStorage.setItem("cart_guest", JSON.stringify(items));
+        }
+    };
 
     const addToCart = async (product: any, quantity: number) => {
-        // 1. Optimistic UI Update
-        const existingItem = cartItems.find(item => item._id === product._id);
+        const existingIndex = cartItems.findIndex(item => item._id === product._id);
+        let newItems: CartItem[];
 
-        let newItems;
-        if (existingItem) {
-            newItems = cartItems.map(item =>
-                item._id === product._id
-                    ? { ...item, quantity: item.quantity + quantity }
-                    : item
-            );
+        if (existingIndex > -1) {
+            newItems = [...cartItems];
+            newItems[existingIndex].quantity += quantity;
         } else {
             const newItem: CartItem = {
                 _id: product._id,
                 name: product.name,
-                price: product.price, // Note: Logic for discount/variants should happen before passing here
+                price: product.price,
                 images: product.images,
                 unit: product.unit,
-                quantity
+                quantity: quantity
             };
             newItems = [...cartItems, newItem];
         }
-        setCartItems(newItems);
 
-        // 2. Server Sync
-        try {
-            await fetch(`/api/cart/add/${product._id}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ quantity })
-            });
-        } catch (error) {
-            console.error("Failed to add to cart", error);
-            // Revert on failure if needed
+        setCartItems(newItems);
+        updateLocal(newItems);
+
+        if (status === "authenticated") {
+            try {
+                await fetch(`/api/cart/add/${product._id}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ quantity }),
+                });
+            } catch (e) {
+                console.error("Add to cart failed", e);
+            }
         }
     };
 
     const updateQuantity = async (productId: string, quantity: number) => {
-        // Optimistic Update
-        const prevItems = cartItems;
         const newItems = cartItems.map(item =>
             item._id === productId ? { ...item, quantity } : item
         );
         setCartItems(newItems);
+        updateLocal(newItems);
 
-        try {
+        if (status === "authenticated") {
             await fetch(`/api/cart/update/${productId}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ quantity })
+                body: JSON.stringify({ quantity }),
             });
-        } catch (error) {
-            setCartItems(prevItems); // Revert
         }
     };
 
     const removeItem = async (productId: string) => {
-        const prevItems = cartItems;
-        setCartItems(cartItems.filter(item => item._id !== productId));
+        const newItems = cartItems.filter(item => item._id !== productId);
+        setCartItems(newItems);
+        updateLocal(newItems);
 
-        try {
+        if (status === "authenticated") {
             await fetch(`/api/cart/remove/${productId}`, { method: "POST" });
-        } catch (error) {
-            setCartItems(prevItems);
         }
     };
 
     const clearCart = async () => {
         setCartItems([]);
-        await fetch("/api/cart/clear", { method: "POST" });
+        updateLocal([]);
+        if (status === "authenticated") {
+            await fetch("/api/cart/clear", { method: "POST" });
+        }
     };
 
     return (
-        <CartContext.Provider value={{ cartItems, cartTotal, cartCount, addToCart, updateQuantity, removeItem, clearCart }}>
+        <CartContext.Provider value={{ cartItems, cartCount, cartTotal, addToCart, updateQuantity, removeItem, clearCart }}>
             {children}
         </CartContext.Provider>
     );
@@ -135,6 +155,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
 export const useCart = () => {
     const context = useContext(CartContext);
-    if (!context) throw new Error("useCart must be used within a CartProvider");
+    if (!context) throw new Error("useCart must be used within CartProvider");
     return context;
 };

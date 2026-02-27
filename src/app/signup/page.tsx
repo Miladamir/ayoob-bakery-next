@@ -16,26 +16,44 @@ export default function SignupPage() {
         setError("");
 
         const formData = new FormData(e.currentTarget);
-        const data = Object.fromEntries(formData.entries());
+        const name = formData.get("name") as string;
+        const email = formData.get("email") as string;
+        const password = formData.get("password") as string;
+        const confirmPassword = formData.get("confirmPassword") as string;
 
-        if (data.password !== data.confirmPassword) {
+        if (password !== confirmPassword) {
             setError("Passwords do not match");
             setLoading(false);
             return;
         }
 
         try {
+            // 1. Create the user
             const res = await fetch("/api/auth/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
+                body: JSON.stringify({ name, email, password }),
             });
 
             if (res.ok) {
-                router.push("/login?registered=true");
+                // 2. Automatically log them in
+                const signInResult = await signIn("credentials", {
+                    email,
+                    password,
+                    redirect: false, // Handle redirect manually
+                });
+
+                if (signInResult?.ok) {
+                    router.push("/");
+                    router.refresh();
+                } else {
+                    // If auto-login fails, send them to login page
+                    setError("Account created, but auto-login failed. Please log in.");
+                    router.push("/login");
+                }
             } else {
-                const errData = await res.json();
-                setError(errData.message || "Registration failed");
+                const data = await res.json();
+                setError(data.message || "Registration failed");
             }
         } catch (err) {
             setError("Something went wrong");
@@ -46,7 +64,7 @@ export default function SignupPage() {
 
     return (
         <div className="min-h-screen flex flex-col md:flex-row">
-            {/* Left Side: Form (Visible 2nd on Mobile, 1st on Desktop) */}
+            {/* Left Side Form */}
             <div className="w-full md:w-1/2 flex items-center justify-center p-8 bg-white order-2 md:order-1">
                 <div className="w-full max-w-md">
                     <div className="text-center mb-8">
@@ -55,57 +73,27 @@ export default function SignupPage() {
                     </div>
 
                     {error && (
-                        <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
-                            <p>{error}</p>
-                        </div>
+                        <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">{error}</div>
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
                             <label className="block text-sm font-semibold text-gray-600 mb-2">Full Name</label>
-                            <input
-                                type="text"
-                                name="name"
-                                required
-                                className="input-field w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 px-4 focus:outline-none focus:bg-white transition-all"
-                                placeholder="John Doe"
-                            />
+                            <input type="text" name="name" required className="input-field w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 focus:outline-none focus:bg-white transition-all" placeholder="John Doe" />
                         </div>
                         <div>
                             <label className="block text-sm font-semibold text-gray-600 mb-2">Email Address</label>
-                            <input
-                                type="email"
-                                name="email"
-                                required
-                                className="input-field w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 px-4 focus:outline-none focus:bg-white transition-all"
-                                placeholder="you@example.com"
-                            />
+                            <input type="email" name="email" required className="input-field w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 focus:outline-none focus:bg-white transition-all" placeholder="you@example.com" />
                         </div>
                         <div>
                             <label className="block text-sm font-semibold text-gray-600 mb-2">Password</label>
-                            <input
-                                type="password"
-                                name="password"
-                                required
-                                className="input-field w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 px-4 focus:outline-none focus:bg-white transition-all"
-                                placeholder="Min. 8 characters"
-                            />
+                            <input type="password" name="password" required className="input-field w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 focus:outline-none focus:bg-white transition-all" placeholder="Min. 8 characters" />
                         </div>
                         <div>
                             <label className="block text-sm font-semibold text-gray-600 mb-2">Confirm Password</label>
-                            <input
-                                type="password"
-                                name="confirmPassword"
-                                required
-                                className="input-field w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 px-4 focus:outline-none focus:bg-white transition-all"
-                                placeholder="Repeat password"
-                            />
+                            <input type="password" name="confirmPassword" required className="input-field w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 focus:outline-none focus:bg-white transition-all" placeholder="Repeat password" />
                         </div>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full bg-brand-600 text-white py-4 rounded-xl font-bold uppercase tracking-wider hover:bg-brand-700 transition-colors shadow-lg hover:shadow-xl disabled:opacity-50 mt-4"
-                        >
+                        <button type="submit" disabled={loading} className="w-full bg-brand-600 text-white py-4 rounded-xl font-bold uppercase tracking-wider hover:bg-brand-700 transition-colors shadow-lg hover:shadow-xl disabled:opacity-50 mt-4">
                             {loading ? "Creating Account..." : "Create Account"}
                         </button>
                     </form>
@@ -116,10 +104,7 @@ export default function SignupPage() {
                         <div className="flex-grow h-px bg-gray-200"></div>
                     </div>
 
-                    <button
-                        onClick={() => signIn('google', { callbackUrl: '/' })}
-                        className="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 rounded-xl py-3.5 px-4 font-semibold text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-colors shadow-sm"
-                    >
+                    <button onClick={() => signIn('google', { callbackUrl: '/' })} className="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 rounded-xl py-3 px-4 font-semibold text-gray-600 hover:bg-gray-50 transition-colors shadow-sm">
                         <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google" />
                         Sign up with Google
                     </button>
@@ -130,22 +115,13 @@ export default function SignupPage() {
                 </div>
             </div>
 
-            {/* Right Side: Branding (Visible 1st on Mobile, 2nd on Desktop) */}
+            {/* Right Side Branding */}
             <div className="hidden md:flex md:w-1/2 bg-brand-900 relative overflow-hidden order-1 md:order-2">
-                {/* Background Image */}
-                <img
-                    src="https://images.unsplash.com/photo-1517433670267-08bbd4be890f?q=80&w=2070&auto=format&fit=crop"
-                    className="absolute inset-0 w-full h-full object-cover z-0 opacity-50"
-                    alt="Background"
-                />
-
-                {/* Content Overlay */}
+                <img src="https://images.unsplash.com/photo-1517433670267-08bbd4be890f?q=80&w=2070&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover z-0 opacity-30" alt="Background" />
                 <div className="relative z-20 flex flex-col justify-center p-12 text-white">
-                    <h1 className="font-serif text-5xl font-bold leading-tight mb-6">
-                        Start Your<br /> Journey Today
-                    </h1>
+                    <h1 className="font-serif text-5xl font-bold leading-tight mb-6">Start Your Journey Today</h1>
                     <p className="text-brand-200 text-lg max-w-md leading-relaxed">
-                        Join our community to access exclusive recipes, early bird discounts on seasonal pastries, and faster checkout.
+                        Sign up to track your orders, save your favorite artisan loaves, and enjoy exclusive member discounts.
                     </p>
                 </div>
             </div>

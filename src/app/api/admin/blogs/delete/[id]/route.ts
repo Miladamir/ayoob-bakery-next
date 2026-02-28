@@ -3,24 +3,21 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import dbConnect from "@/lib/dbConnect";
 import Blog from "@/models/Blog";
-import { sanitizeHTML } from "@/lib/sanitize"; // Import sanitizer
 import { revalidatePath } from "next/cache";
 
-export async function POST(request: Request) {
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
     const session = await getServerSession(authOptions);
     if ((session?.user as any)?.role !== 'admin') return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    await dbConnect();
-    const body = await request.json();
+    const { id } = await params;
 
-    // SECURITY: Sanitize HTML content to prevent XSS
-    if (body.content) {
-        body.content = sanitizeHTML(body.content);
+    try {
+        await dbConnect();
+        await Blog.findByIdAndDelete(id);
+
+        revalidatePath('/blogs');
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        return NextResponse.json({ error: "Failed to delete blog" }, { status: 500 });
     }
-
-    const newBlog = await Blog.create(body);
-
-    revalidatePath('/blogs');
-
-    return NextResponse.json({ success: true, id: newBlog._id });
 }

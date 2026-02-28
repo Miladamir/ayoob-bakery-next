@@ -3,10 +3,11 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import dbConnect from "@/lib/dbConnect";
 import Blog from "@/models/Blog";
+import { sanitizeHTML } from "@/lib/sanitize"; // Import sanitizer
 import { revalidatePath } from "next/cache";
 
-// FIX: Changed params type to Promise
-export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
+// FIX: Changed params type to Promise for Next.js 15+
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
     // FIX: Await params
     const { id } = await params;
 
@@ -15,13 +16,19 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
     await dbConnect();
     const body = await request.json();
+
+    // SECURITY: Sanitize HTML content to prevent XSS
+    if (body.content) {
+        body.content = sanitizeHTML(body.content);
+    }
+
     await Blog.findByIdAndUpdate(id, body);
 
     revalidatePath('/blogs');
     return NextResponse.json({ success: true });
 }
 
-// FIX: Changed params type to Promise
+// FIX: Changed params type to Promise for Next.js 15+
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
     // FIX: Await params
     const { id } = await params;

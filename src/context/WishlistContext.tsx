@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from "react";
 import { useSession } from "next-auth/react";
 
 interface WishlistContextType {
@@ -12,26 +12,25 @@ interface WishlistContextType {
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
 
 export const WishlistProvider = ({ children }: { children: ReactNode }) => {
-    const { status } = useSession(); // Only use status, not session object to prevent re-renders
+    const { status } = useSession();
     const [wishlistIds, setWishlistIds] = useState<string[]>([]);
-    const [isInitialized, setIsInitialized] = useState(false);
 
-    // 1. Consolidated Initialization Effect
+    // Track processed state to handle Login transitions
+    const processedAuthState = useRef<string | null>(null);
+
     useEffect(() => {
-        // Do not run if loading or already initialized
-        if (status === "loading" || isInitialized) return;
+        if (status === "loading") return;
+        if (processedAuthState.current === status) return;
+
+        processedAuthState.current = status;
 
         const initializeWishlist = async () => {
-            // 1. Load Local (Guest) Data first
-            const localData = localStorage.getItem("wishlist_guest");
-            const localIds: string[] = localData ? JSON.parse(localData) : [];
-
-            // 2. Handle Logged In User
             if (status === "authenticated") {
+                const localData = localStorage.getItem("wishlist_guest");
+                const localIds: string[] = localData ? JSON.parse(localData) : [];
+
                 try {
-                    // Check if we need to merge
                     if (localIds.length > 0) {
-                        // Merge local data with DB
                         await fetch("/api/wishlist/merge", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
@@ -40,7 +39,6 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
                         localStorage.removeItem("wishlist_guest");
                     }
 
-                    // Fetch final state from DB
                     const res = await fetch("/api/wishlist");
                     if (res.ok) {
                         const data = await res.json();
@@ -48,20 +46,17 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
                     }
                 } catch (e) {
                     console.error("Init failed", e);
-                    setWishlistIds(localIds); // Fallback to local
                 }
-            } else {
-                // 3. Handle Guest
+            } else if (status === "unauthenticated") {
+                const localData = localStorage.getItem("wishlist_guest");
+                const localIds: string[] = localData ? JSON.parse(localData) : [];
                 setWishlistIds(localIds);
             }
-
-            setIsInitialized(true); // Mark as done
         };
 
         initializeWishlist();
-    }, [status, isInitialized]); // Dependencies
+    }, [status]);
 
-    // Helper to update LocalStorage
     const updateLocal = (ids: string[]) => {
         if (status !== "authenticated") {
             localStorage.setItem("wishlist_guest", JSON.stringify(ids));
@@ -71,22 +66,26 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
     const isInWishlist = (productId: string) => wishlistIds.includes(productId);
 
     const toggleWishlist = async (productId: string) => {
-        // Optimistic Update
         let newIds: string[];
-        if (wishlistIds.includes(productId)) {
+        const wasInWishlist = wishlistIds.includes(productId);
+
+        if (wasInWishlist) {
             newIds = wishlistIds.filter(id => id !== productId);
         } else {
             newIds = [...wishlistIds, productId];
         }
+
         setWishlistIds(newIds);
         updateLocal(newIds);
 
-        // Server Sync
         if (status === "authenticated") {
             try {
                 await fetch(`/api/wishlist/toggle/${productId}`, { method: "POST" });
             } catch (e) {
-                console.error("Toggle failed", e);
+                console.error("Toggle failed, reverting", e);
+                // Revert on failure
+                setWishlistIds(wishlistIds);
+                updateLocal(wishlistIds);
             }
         }
     };

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image"; // Import Image
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { IProduct } from "@/models/Product";
@@ -17,7 +18,6 @@ export default function ProductCard({ product }: ProductCardProps) {
     const isInCart = cartItems.some(item => item._id === productId);
     const isWishlisted = isInWishlist(productId);
 
-    // Price display logic
     const displayPrice = product.discount > 0
         ? (product.price * (1 - product.discount / 100)).toFixed(2)
         : product.price.toFixed(2);
@@ -38,11 +38,14 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="product-card bg-white rounded-2xl shadow-lg overflow-hidden group cursor-pointer relative border border-transparent hover:shadow-xl transition-all duration-300">
             {/* Image Container */}
             <div className="relative h-72 overflow-hidden">
-                <Link href={`/product/${productId}`}>
-                    <img
+                <Link href={`/product/${productId}`} className="block w-full h-full">
+                    <Image
                         src={product.images[0] || 'https://via.placeholder.com/400'}
                         alt={product.name}
-                        className="img-zoom w-full h-full object-cover"
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        priority={false} // Lazy load by default
                     />
                 </Link>
 

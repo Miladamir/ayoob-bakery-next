@@ -45,36 +45,26 @@ export const authOptions: NextAuthOptions = {
 
     callbacks: {
         async jwt({ token, user, account }) {
-            // Persist the user id and role to the token right after signin
             if (user) {
                 token.id = user.id;
                 token.role = (user as any).role;
             }
 
-            // Google Login Logic
             if (account?.provider === "google") {
                 await dbConnect();
-
-                // Ensure we have an email from the Google token
                 if (token.email) {
-                    // Fix: Assign to variable to satisfy TypeScript strict checks for Mongoose query
                     const email = token.email;
-
                     const existingUser = await User.findOne({ email: email });
 
                     if (existingUser) {
                         token.id = existingUser._id.toString();
                         token.role = existingUser.role;
-                        // Link googleId if not present
                         if (!existingUser.googleId) {
                             existingUser.googleId = account.providerAccountId;
                             await existingUser.save();
                         }
                     } else {
-                        // Create new user
-                        // Fix: Ensure 'name' is a string. token.name can be null/undefined.
                         const newName = token.name || "Google User";
-
                         const newUser = await User.create({
                             name: newName,
                             email: email,
@@ -85,11 +75,9 @@ export const authOptions: NextAuthOptions = {
                     }
                 }
             }
-
             return token;
         },
         async session({ session, token }) {
-            // Send properties to the client (like user id)
             if (session.user) {
                 (session.user as any).id = token.id;
                 (session.user as any).role = token.role;
@@ -99,8 +87,8 @@ export const authOptions: NextAuthOptions = {
     },
 
     pages: {
-        signIn: '/login', // Custom login page
-        error: '/login', // Redirect errors to login
+        signIn: '/login',
+        error: '/login',
     },
 
     session: {

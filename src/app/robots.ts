@@ -8,7 +8,17 @@ export default function robots(): MetadataRoute.Robots {
             {
                 userAgent: '*',
                 allow: '/',
-                disallow: ['/admin/', '/profile/', '/api/', '/cart/', '/checkout'],
+                // Block sensitive areas from being indexed
+                disallow: [
+                    '/admin/',
+                    '/profile/',
+                    '/api/',
+                    '/cart/',
+                    '/checkout',
+                    '/login',
+                    '/signup',
+                    '/search' // Usually we don't want search pages indexed as they create infinite loops
+                ],
             },
         ],
         sitemap: `${baseUrl}/sitemap.xml`,

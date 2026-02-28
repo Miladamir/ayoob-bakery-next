@@ -6,6 +6,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("q");
 
+    // Hard limit for performance
     if (!query || query.length < 2) {
         return NextResponse.json([]);
     }
@@ -13,19 +14,23 @@ export async function GET(request: Request) {
     try {
         await dbConnect();
 
-        // Find products where name matches the query (case-insensitive)
+        // Use a simple regex search on 'name' only (indexed field ideally)
+        // Limit strictly to 5 results for speed
         const products = await Product.find({
             name: { $regex: query, $options: "i" }
         })
-            .select("name") // Only select the name field for performance
-            .limit(10);
+            .select("name -_id") // Only return name, exclude _id to save bytes
+            .limit(5)
+            .lean();
 
-        // Return just an array of names
+        // Return just an array of strings
         const suggestions = products.map(p => p.name);
 
         return NextResponse.json(suggestions);
+
     } catch (error) {
         console.error("Search suggest error:", error);
+        // Return empty array on error so UI doesn't break
         return NextResponse.json([], { status: 500 });
     }
 }

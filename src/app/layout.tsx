@@ -1,43 +1,72 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import Sidebar from "@/components/layout/Sidebar";
-import { getNestedCategories } from "@/lib/data";
 import Providers from "./providers";
+import { lato, playfair } from "@/lib/fonts";
+
+// Define your production URL here
+const siteUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
 
 export const metadata: Metadata = {
-  title: "Ayoob Bakery Australia",
-  description: "Premium Artisan Breads & Pastries",
+  metadataBase: new URL(siteUrl), // FIX: Added metadataBase
+  title: {
+    default: "Ayoob Bakery Australia | Premium Artisan Breads",
+    template: "%s | Ayoob Bakery"
+  },
+  description: "Premium Artisan Breads & Pastries. Handcrafted daily using organic flour, natural yeast, and patience. Experience the warmth of fresh baking in every bite.",
+  keywords: ["Bakery", "Artisan Bread", "Sourdough", "Pastries", "Australia", "Organic"],
+  authors: [{ name: "Ayoob Bakery" }],
+  creator: "Ayoob Bakery",
+  openGraph: {
+    type: "website",
+    locale: "en_AU",
+    url: siteUrl,
+    siteName: "Ayoob Bakery Australia",
+    title: "Ayoob Bakery Australia | Premium Artisan Breads",
+    description: "Handcrafted daily using organic flour and natural yeast. Experience the warmth of fresh baking.",
+    images: [
+      {
+        url: "/images/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Freshly baked artisan bread at Ayoob Bakery",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ayoob Bakery Australia",
+    description: "Premium Artisan Breads & Pastries.",
+    images: ["/images/og-image.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // Fetch categories on the server
-  const nestedCategories = await getNestedCategories();
-
   return (
-    <html lang="en">
+    <html lang="en" className={`${lato.variable} ${playfair.variable}`}>
       <head>
-        {/* Font Awesome CDN */}
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
       </head>
-      <body>
-        {/* 
-           FIX: All components using Context (Cart, Wishlist, Session) 
-           must be children of <Providers>. 
-           We wrap the entire body structure here.
-        */}
+      <body className={lato.className}>
         <Providers>
-          <Sidebar />
-          <Header nestedCategories={JSON.parse(JSON.stringify(nestedCategories))} />
-
-          <main>{children}</main>
-
-          <Footer nestedCategories={JSON.parse(JSON.stringify(nestedCategories))} />
+          {children}
         </Providers>
       </body>
     </html>

@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 
 export default function ProfilePage() {
@@ -10,13 +10,7 @@ export default function ProfilePage() {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState("profile");
 
-    // Redirect if not authenticated
-    useEffect(() => {
-        if (status === "unauthenticated") {
-            router.push("/login");
-        }
-    }, [status, router]);
-
+    // We keep this loading state for UX, but Middleware handles the auth check.
     if (status === "loading") {
         return (
             <div className="min-h-screen flex items-center justify-center bg-brand-50">
@@ -130,7 +124,6 @@ export default function ProfilePage() {
                                                 <div>
                                                     <label className="text-xs uppercase tracking-widest text-gray-400 font-bold block mb-1">Member Since</label>
                                                     <p className="text-gray-800 font-medium text-lg">N/A</p>
-                                                    {/* Note: To get the exact date, we would need to fetch the User from DB using the ID in session */}
                                                 </div>
                                             </div>
                                         </div>

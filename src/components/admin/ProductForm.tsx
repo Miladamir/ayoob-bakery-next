@@ -160,6 +160,18 @@ export default function ProductForm({ initialData, categories, isEdit = false }:
                 <input name="images" value={formData.images} onChange={handleChange} className="w-full border p-2 rounded-lg" />
             </div>
 
+            {/* ADDED: Short Description Field */}
+            <div>
+                <label className="block text-sm font-semibold text-gray-600 mb-1">Short Description</label>
+                <input
+                    name="shortDescription"
+                    value={formData.shortDescription}
+                    onChange={handleChange}
+                    className="w-full border p-2 rounded-lg"
+                    placeholder="Brief summary shown on product cards"
+                />
+            </div>
+
             <div>
                 <label className="block text-sm font-semibold text-gray-600 mb-1">Description</label>
                 <textarea name="description" value={formData.description} onChange={handleChange} rows={3} className="w-full border p-2 rounded-lg"></textarea>

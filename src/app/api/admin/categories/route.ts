@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import dbConnect from "@/lib/dbConnect";
 import Category from "@/models/Category";
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 
 export async function POST(request: Request) {
     const session = await getServerSession(authOptions);
@@ -11,10 +11,15 @@ export async function POST(request: Request) {
 
     await dbConnect();
     const body = await request.json();
-    const newCat = await Category.create(body);
 
-    revalidatePath('/');
-    revalidatePath('/categories');
+    try {
+        const newCat = await Category.create(body);
 
-    return NextResponse.json({ success: true, id: newCat._id });
+        // Clear the categories cache
+        revalidateTag('categories');
+
+        return NextResponse.json({ success: true, id: newCat._id });
+    } catch (error) {
+        return NextResponse.json({ error: "Failed to create category" }, { status: 500 });
+    }
 }

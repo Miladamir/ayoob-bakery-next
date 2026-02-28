@@ -1,20 +1,32 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
+
+// Define schema for strict validation
+const contactSchema = z.object({
+    firstName: z.string().min(2).max(50),
+    lastName: z.string().min(2).max(50),
+    email: z.string().email(),
+    subject: z.string().min(3).max(100),
+    message: z.string().min(10).max(1000),
+});
 
 export async function POST(request: Request) {
     try {
-        const data = await request.json();
-        const { firstName, lastName, email, subject, message } = data;
+        const body = await request.json();
 
-        // In a real application, you would send an email here using
-        // a service like Resend, SendGrid, or Nodemailer.
-        // For now, we just log it to the console.
-        console.log("Contact Form Submission:");
-        console.log(`Name: ${firstName} ${lastName}`);
-        console.log(`Email: ${email}`);
-        console.log(`Subject: ${subject}`);
-        console.log(`Message: ${message}`);
+        // Validate input
+        const result = contactSchema.safeParse(body);
+        if (!result.success) {
+            return NextResponse.json({ success: false, message: "Invalid input data." }, { status: 400 });
+        }
 
-        return NextResponse.json({ success: true });
+        const { firstName, lastName, email, subject, message } = result.data;
+
+        // In production: Send email using Resend, SendGrid, or save to DB.
+        console.log(`Contact Form: ${firstName} ${lastName} (${email}) - ${subject}`);
+
+        return NextResponse.json({ success: true, message: "Message sent successfully!" });
+
     } catch (error) {
         return NextResponse.json({ success: false, message: "Server error" }, { status: 500 });
     }

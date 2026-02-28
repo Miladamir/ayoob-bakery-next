@@ -15,7 +15,8 @@ export default function BannerForm({ initialData, isEdit = false }: BannerFormPr
         subtitle: "",
         image: "",
         link: "",
-        isActive: true
+        isActive: true,
+        expiryDate: "" // Added
     });
 
     useEffect(() => {
@@ -25,7 +26,11 @@ export default function BannerForm({ initialData, isEdit = false }: BannerFormPr
                 subtitle: initialData.subtitle || "",
                 image: initialData.image || "",
                 link: initialData.link || "",
-                isActive: initialData.isActive ?? true
+                isActive: initialData.isActive ?? true,
+                // Format date for datetime-local input
+                expiryDate: initialData.expiryDate
+                    ? new Date(initialData.expiryDate).toISOString().slice(0, 16)
+                    : ""
             });
         }
     }, [initialData]);
@@ -39,11 +44,17 @@ export default function BannerForm({ initialData, isEdit = false }: BannerFormPr
         e.preventDefault();
         const url = isEdit ? `/api/admin/banners/${initialData._id}` : '/api/admin/banners';
 
+        // Prepare payload, converting empty date string to null
+        const payload = {
+            ...formData,
+            expiryDate: formData.expiryDate ? new Date(formData.expiryDate) : null
+        };
+
         try {
             const res = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(payload)
             });
 
             if (res.ok) {
@@ -79,9 +90,22 @@ export default function BannerForm({ initialData, isEdit = false }: BannerFormPr
                 <input name="link" value={formData.link} onChange={handleChange} placeholder="/products" className="w-full border p-2 rounded-lg" />
             </div>
 
+            {/* ADDED: Expiry Date for Countdown Timer */}
+            <div>
+                <label className="block text-sm font-semibold text-gray-600 mb-1">Offer End Date (Optional)</label>
+                <input
+                    type="datetime-local"
+                    name="expiryDate"
+                    value={formData.expiryDate}
+                    onChange={handleChange}
+                    className="w-full border p-2 rounded-lg"
+                />
+                <p className="text-xs text-gray-400 mt-1">Set this to enable a countdown timer on the homepage banner.</p>
+            </div>
+
             <div className="flex items-center gap-3">
-                <input type="checkbox" name="isActive" checked={formData.isActive} onChange={handleChange} id="isActive" className="w-5 h-5 accent-brand-600" />
                 <label htmlFor="isActive" className="font-semibold text-gray-600">Active (Visible on site)</label>
+                <input type="checkbox" name="isActive" checked={formData.isActive} onChange={handleChange} id="isActive" className="w-5 h-5 accent-brand-600" />
             </div>
 
             <button type="submit" className="bg-brand-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-brand-700 transition-colors">

@@ -3,6 +3,7 @@ import Product from "@/models/Product";
 import Blog from "@/models/Blog";
 import Banner from "@/models/Banner";
 import Category from "@/models/Category";
+import Subscriber from "@/models/Subscriber";
 import Link from "next/link";
 
 export const dynamic = 'force-dynamic';
@@ -15,6 +16,7 @@ export default async function AdminDashboard() {
     const blogCount = await Blog.countDocuments();
     const bannerCount = await Banner.countDocuments();
     const categoryCount = await Category.countDocuments();
+    const subscriberCount = await Subscriber.countDocuments();
 
     // Fetch recent products (last 5)
     const recentProducts = await Product.find().sort({ createdAt: -1 }).limit(5).populate('category').lean();
@@ -69,6 +71,18 @@ export default async function AdminDashboard() {
                         </div>
                         <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600">
                             <i className="fa-solid fa-images text-xl"></i>
+                        </div>
+                    </div>
+                </Link>
+
+                <Link href="/admin/subscribers" className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <p className="text-gray-500 text-sm font-semibold uppercase tracking-wide">Subscribers</p>
+                            <p className="text-3xl font-bold text-gray-800 mt-2">{subscriberCount}</p>
+                        </div>
+                        <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600">
+                            <i className="fa-solid fa-envelope text-xl"></i>
                         </div>
                     </div>
                 </Link>

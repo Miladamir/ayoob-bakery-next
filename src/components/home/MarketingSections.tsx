@@ -1,3 +1,5 @@
+import NewsletterForm from "@/components/ui/NewsletterForm";
+
 export default function MarketingSections() {
     return (
         <>
@@ -124,19 +126,16 @@ export default function MarketingSections() {
             {/* Newsletter Section */}
             <section className="section-padding bg-brand-50">
                 <div className="container mx-auto px-6">
-                    {/* FIX: Responsive padding p-6 on mobile */}
                     <div className="bg-white rounded-3xl shadow-xl p-6 md:p-8 lg:p-12 grid md:grid-cols-2 gap-8 items-center">
                         <div>
                             <h2 className="text-2xl md:text-3xl font-bold mb-4">Join the Bread Club</h2>
                             <p className="text-gray-500 mb-6 text-sm md:text-base">Sign up for our newsletter to get fresh updates, secret recipes, and an exclusive <span className="text-brand-600 font-bold">15% off</span> your first order.</p>
 
-                            {/* FIX: Stack form elements on mobile (flex-col), row on tablet (sm:flex-row) */}
-                            <form className="flex flex-col sm:flex-row gap-3">
-                                <input type="email" placeholder="Your email address" className="flex-grow px-6 py-3 rounded-full border border-gray-200 focus:outline-none focus:border-brand-500 w-full" />
-                                <button className="btn btn-primary w-full sm:w-auto whitespace-nowrap">SUBSCRIBE</button>
-                            </form>
+                            {/* REPLACE the old form with this component */}
+                            <NewsletterForm />
 
                             <div className="mt-8 grid grid-cols-2 gap-8 text-sm text-gray-600 border-t pt-8">
+                                {/* ... existing address/hours info ... */}
                                 <div>
                                     <h5 className="font-bold mb-1">Visit Us</h5>
                                     <p>123 Bread Street<br />Culinary District, NY 10012</p>

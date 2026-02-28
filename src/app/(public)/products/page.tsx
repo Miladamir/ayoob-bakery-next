@@ -11,7 +11,6 @@ export const dynamic = 'force-dynamic';
 
 // Update the Props interface for Next.js 15+
 interface Props {
-    params: { id: string };
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 

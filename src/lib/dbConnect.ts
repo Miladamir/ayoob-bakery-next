@@ -11,7 +11,6 @@ if (!cached) {
 }
 
 async function dbConnect() {
-  // MOVE THE CHECK HERE: Only check when the function runs, not at build time
   const MONGODB_URI = process.env.MONGODB_URI;
 
   if (!MONGODB_URI) {
@@ -33,20 +32,15 @@ async function dbConnect() {
       return mongoose;
     });
   }
-  cached.conn = await cached.promise;
+  
+  try {
+    cached.conn = await cached.promise;
+  } catch (e) {
+    cached.promise = null;
+    throw e;
+  }
+
   return cached.conn;
-}
-
-export default dbConnect;    // 3. Await the promise and cache the result
-    try {
-        cached.conn = await cached.promise;
-    } catch (e) {
-        // If connection fails, clear the promise so it can retry next time
-        cached.promise = null;
-        throw e;
-    }
-
-    return cached.conn;
 }
 
 export default dbConnect;

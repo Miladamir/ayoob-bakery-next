@@ -3,14 +3,20 @@ import Category from "@/models/Category";
 import CategoryForm from "@/components/admin/CategoryForm";
 import { notFound } from "next/navigation";
 
-interface Props { params: { id: string } }
+// FIX: Update Props interface
+interface Props {
+    params: Promise<{ id: string }>;
+}
 
 export default async function EditCategoryPage({ params }: Props) {
+    // FIX: Await params
+    const { id } = await params;
+
     await dbConnect();
-    const category = await Category.findById(params.id).lean();
+    const category = await Category.findById(id).lean();
     if (!category) notFound();
 
-    const categories = await Category.find({ _id: { $ne: params.id } }).lean(); // Exclude self
+    const categories = await Category.find({ _id: { $ne: id } }).lean(); // Exclude self
 
     return (
         <div>

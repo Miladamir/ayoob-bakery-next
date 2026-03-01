@@ -3,11 +3,17 @@ import Blog from "@/models/Blog";
 import BlogForm from "@/components/admin/BlogForm";
 import { notFound } from "next/navigation";
 
-interface Props { params: { id: string } }
+// FIX: Update Props interface
+interface Props {
+    params: Promise<{ id: string }>;
+}
 
 export default async function EditBlogPage({ params }: Props) {
+    // FIX: Await params
+    const { id } = await params;
+
     await dbConnect();
-    const blog = await Blog.findById(params.id).lean();
+    const blog = await Blog.findById(id).lean();
     if (!blog) notFound();
 
     return (

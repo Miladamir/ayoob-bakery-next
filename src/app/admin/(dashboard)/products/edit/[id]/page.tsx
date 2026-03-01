@@ -4,14 +4,20 @@ import Category from "@/models/Category";
 import ProductForm from "@/components/admin/ProductForm";
 import { notFound } from "next/navigation";
 
-interface Props { params: { id: string } }
+// FIX: Update Props interface
+interface Props {
+    params: Promise<{ id: string }>;
+}
 
 export const dynamic = 'force-dynamic';
 
 export default async function EditProductPage({ params }: Props) {
+    // FIX: Await params
+    const { id } = await params;
+
     await dbConnect();
 
-    const product = await Product.findById(params.id).lean();
+    const product = await Product.findById(id).lean();
     if (!product) notFound();
 
     const categories = await Category.find().lean();

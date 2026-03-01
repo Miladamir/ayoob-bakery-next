@@ -3,11 +3,17 @@ import Banner from "@/models/Banner";
 import BannerForm from "@/components/admin/BannerForm";
 import { notFound } from "next/navigation";
 
-interface Props { params: { id: string } }
+// FIX: Update Props interface for Next.js 15
+interface Props {
+    params: Promise<{ id: string }>;
+}
 
 export default async function EditBannerPage({ params }: Props) {
+    // FIX: Await params
+    const { id } = await params;
+
     await dbConnect();
-    const banner = await Banner.findById(params.id).lean();
+    const banner = await Banner.findById(id).lean();
     if (!banner) notFound();
 
     return (

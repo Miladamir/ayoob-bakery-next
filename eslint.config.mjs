@@ -1,20 +1,18 @@
 import { dirname } from "path";
 import { fileURLToPath } from "url";
-import { includeIgnoreFile } from "eslint/config";
+import { FlatCompat } from "@eslint/eslintrc";
 
-// Create a minimal config that fixes the iterable error
-const config = [
-  // Include the next config but ensure it's imported correctly
-  // Using a flat config object to avoid the 'not iterable' issue
-  {
-    files: ["**/*.{js,ts,jsx,tsx,md,mdx}"],
-    ignores: ["node_modules/**", ".next/**", "out/**"],
-    rules: {
-      "react/no-unescaped-entities": "off",
-      "react/react-in-jsx-scope": "off",
-      "@next/next/no-html-link-for-pages": "off"
-    }
-  }
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+});
+
+const eslintConfig = [
+  ...compat.extends({
+    extends: ["next/core-web-vitals", "next/typescript"],
+  }),
 ];
 
-export default config;
+export default eslintConfig;

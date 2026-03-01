@@ -1,40 +1,43 @@
 import mongoose from "mongoose";
 
 declare global {
-    var mongoose: any; // eslint-disable-line no-var
-}
-
-const MONGODB_URI = process.env.MONGODB_URI || "";
-
-if (!MONGODB_URI) {
-    throw new Error("Please define the MONGODB_URI environment variable inside .env.local");
+  var mongoose: any;
 }
 
 let cached = global.mongoose;
 
 if (!cached) {
-    cached = global.mongoose = { conn: null, promise: null };
+  cached = global.mongoose = { conn: null, promise: null };
 }
 
 async function dbConnect() {
-    // 1. If connection exists, return it immediately
-    if (cached.conn) return cached.conn;
+  // MOVE THE CHECK HERE: Only check when the function runs, not at build time
+  const MONGODB_URI = process.env.MONGODB_URI;
 
-    // 2. If no promise exists, create one
-    if (!cached.promise) {
-        const opts = {
-            bufferCommands: false,
-            // These options help with serverless timeouts
-            serverSelectionTimeoutMS: 5000,
-            connectTimeoutMS: 10000,
-        };
+  if (!MONGODB_URI) {
+    throw new Error(
+      "Please define the MONGODB_URI environment variable inside .env.local"
+    );
+  }
 
-        cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-            return mongoose;
-        });
-    }
+  if (cached.conn) {
+    return cached.conn;
+  }
 
-    // 3. Await the promise and cache the result
+  if (!cached.promise) {
+    const opts = {
+      bufferCommands: false,
+    };
+
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+      return mongoose;
+    });
+  }
+  cached.conn = await cached.promise;
+  return cached.conn;
+}
+
+export default dbConnect;    // 3. Await the promise and cache the result
     try {
         cached.conn = await cached.promise;
     } catch (e) {

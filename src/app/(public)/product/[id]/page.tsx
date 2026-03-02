@@ -4,15 +4,40 @@ import ProductGallery from "@/components/product/ProductGallery";
 import ProductActions from "@/components/product/ProductActions";
 import ProductTabs from "@/components/product/ProductTabs";
 import ProductCard from "@/components/ui/ProductCard";
+import { Metadata } from "next"; // Added import
 
 export const dynamic = 'force-dynamic';
 
 interface Props {
-    params: Promise<{ id: string }>; // Fix: params is a Promise
+    params: Promise<{ id: string }>;
+}
+
+// ADDED: Dynamic SEO Metadata Generator
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const { id } = await params;
+    await dbConnect();
+
+    const product = await Product.findById(id).select('name shortDescription description images').lean();
+
+    if (!product) {
+        return { title: 'Product Not Found' };
+    }
+
+    const description = product.shortDescription || (product.description ? product.description.replace(/<[^>]*>?/gm, '').substring(0, 150) : 'Delicious freshly baked item.');
+
+    return {
+        title: product.name,
+        description: description,
+        openGraph: {
+            title: product.name,
+            description: description,
+            images: product.images?.length > 0 ? [product.images[0]] : [],
+            type: 'article',
+        },
+    };
 }
 
 export default async function ProductDetailPage({ params }: Props) {
-    // Fix: Await params
     const { id } = await params;
 
     await dbConnect();

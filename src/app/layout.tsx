@@ -7,7 +7,7 @@ import { lato, playfair } from "@/lib/fonts";
 const siteUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl), // FIX: Added metadataBase
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Ayoob Bakery Australia | Premium Artisan Breads",
     template: "%s | Ayoob Bakery"
@@ -49,8 +49,14 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  // FIX: Added Logo as Favicon
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: '/images/logo.png', type: 'image/png' }
+    ],
+    apple: [
+      { url: '/images/logo.png', type: 'image/png' }
+    ],
   },
 };
 

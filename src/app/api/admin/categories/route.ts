@@ -16,7 +16,7 @@ export async function POST(request: Request) {
         const newCat = await Category.create(body);
 
         // Clear the categories cache
-        revalidateTag('categories');
+        revalidateTag('categories', 'max');
 
         return NextResponse.json({ success: true, id: newCat._id });
     } catch (error) {

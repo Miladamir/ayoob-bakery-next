@@ -38,5 +38,5 @@ export const getNestedCategories = unstable_cache(
 export async function revalidateCategoriesCache() {
     'use server';
     const { revalidateTag } = await import('next/cache');
-    revalidateTag('categories');
+    revalidateTag('categories', 'max');
 }

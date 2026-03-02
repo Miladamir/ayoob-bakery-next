@@ -2,16 +2,42 @@ import dbConnect from "@/lib/dbConnect";
 import Blog from "@/models/Blog";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { Metadata } from "next"; // Added import
 
-// FIX: Update Props interface
 interface Props {
     params: Promise<{ id: string }>;
 }
 
 export const dynamic = 'force-dynamic';
 
+// ADDED: Dynamic SEO Metadata Generator
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const { id } = await params;
+    await dbConnect();
+
+    const blog = await Blog.findById(id).select('title content image').lean();
+
+    if (!blog) {
+        return { title: 'Post Not Found' };
+    }
+
+    // Strip HTML for description
+    const plainTextContent = blog.content ? blog.content.replace(/<[^>]*>?/gm, '') : '';
+
+    return {
+        title: blog.title,
+        description: plainTextContent.substring(0, 150),
+        openGraph: {
+            title: blog.title,
+            description: plainTextContent.substring(0, 150),
+            images: blog.image ? [blog.image] : [],
+            type: 'article',
+            publishedTime: (blog as any).createdAt || blog.date,
+        },
+    };
+}
+
 export default async function BlogDetailPage({ params }: Props) {
-    // FIX: Await params
     const { id } = await params;
 
     await dbConnect();

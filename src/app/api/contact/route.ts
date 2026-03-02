@@ -26,7 +26,7 @@ export async function POST(request: Request) {
         // Send email to the Bakery Owner
         await resend.emails.send({
             from: 'onboarding@resend.dev', // Change this to your verified domain later (e.g., info@ayoobbakery.com)
-            to: 'your-email@example.com', // CHANGE THIS to your personal email to receive messages
+            to: 'miladamiri201a@gmail.com', // CHANGE THIS to your personal email to receive messages
             subject: `New Contact: ${subject}`,
             html: `
         <h2>New Contact Form Submission</h2>

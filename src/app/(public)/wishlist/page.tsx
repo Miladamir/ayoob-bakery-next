@@ -7,9 +7,10 @@ import { useEffect, useState } from "react";
 import { IProduct } from "@/models/Product";
 
 export default function WishlistPage() {
-    const { wishlistIds, refreshWishlist } = useWishlist(); // Get refreshWishlist
+    const { wishlistIds, refreshWishlist } = useWishlist();
     const [products, setProducts] = useState<IProduct[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false); // Track fetch errors
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -20,38 +21,39 @@ export default function WishlistPage() {
             }
 
             setLoading(true);
+            setError(false);
+
             try {
                 const res = await fetch(`/api/products/by-ids?ids=${wishlistIds.join(',')}`);
+
                 if (res.ok) {
                     const data = await res.json();
                     setProducts(data);
 
-                    // FIX: CLEANUP LOGIC
-                    // Compare fetched IDs with requested IDs
+                    // CLEANUP LOGIC:
+                    // Only remove IDs if the fetch was successful (res.ok)
                     const fetchedIds = data.map((p: any) => p._id.toString());
-
-                    // Find IDs that were in wishlist but NOT in DB (Ghost IDs)
                     const ghostIds = wishlistIds.filter(id => !fetchedIds.includes(id));
 
-                    // If we found ghost IDs, refresh the context to remove them
                     if (ghostIds.length > 0) {
                         console.log("Cleaning invalid wishlist IDs:", ghostIds);
                         refreshWishlist(fetchedIds);
                     }
+                } else {
+                    // If fetch fails (e.g. 500 error), DO NOT clear the wishlist.
+                    // Just show error. This prevents deleting valid items due to server glitch.
+                    console.error("Failed to fetch wishlist products");
+                    setError(true);
                 }
             } catch (error) {
-                console.error("Failed to fetch wishlist products", error);
+                console.error("Network error fetching wishlist", error);
+                setError(true);
             } finally {
                 setLoading(false);
             }
         };
 
-        // Only fetch if wishlistIds is populated (avoids flash of empty state on first render)
-        if (wishlistIds.length > 0 || !loading) {
-            fetchProducts();
-        } else {
-            setLoading(false);
-        }
+        fetchProducts();
     }, [wishlistIds]); // Dependency is fine, logic handles the rest
 
     return (
@@ -74,6 +76,11 @@ export default function WishlistPage() {
                 <div className="container mx-auto px-6">
                     {loading ? (
                         <div className="text-center text-gray-500 py-20">Loading favorites...</div>
+                    ) : error ? (
+                        <div className="text-center py-20">
+                            <h2 className="font-serif text-2xl font-bold text-gray-800 mb-2">Connection Error</h2>
+                            <p className="text-gray-500 mb-6">Could not load your favorites. Please check your connection.</p>
+                        </div>
                     ) : products.length === 0 ? (
                         <div className="text-center py-20">
                             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">

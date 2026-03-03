@@ -14,21 +14,27 @@ export async function GET(request: Request) {
     try {
         await dbConnect();
 
-        // Convert strings to ObjectIDs safely
-        const idArray = ids.split(",").map(id => {
-            try {
-                return new mongoose.Types.ObjectId(id);
-            } catch {
-                return null; // Handle invalid IDs
+        // FIX: Strictly sanitize and validate IDs
+        const rawIds = ids.split(",");
+        const idArray: mongoose.Types.ObjectId[] = [];
+
+        for (const id of rawIds) {
+            const trimmed = id.trim(); // Remove accidental spaces
+            // Validate it's a 24-char hex string (MongoDB ObjectId)
+            if (trimmed && /^[a-fA-F0-9]{24}$/.test(trimmed)) {
+                try {
+                    idArray.push(new mongoose.Types.ObjectId(trimmed));
+                } catch (e) {
+                    console.warn(`Invalid ObjectId skipped: ${trimmed}`);
+                }
             }
-        }).filter(id => id !== null);
+        }
 
         if (idArray.length === 0) return NextResponse.json([]);
 
-        // Single query with $in
         const products = await Product.find({ _id: { $in: idArray } })
-            .select('name price images unit category badge discount') // Only necessary fields
-            .populate('category', 'name') // Populate only category name
+            .select('name price images unit category badge discount')
+            .populate('category', 'name')
             .lean();
 
         return NextResponse.json(JSON.parse(JSON.stringify(products)));

@@ -26,11 +26,28 @@ export default function SpecialOffers({ offers }: SpecialOffersProps) {
             {offers.map((offer) => (
                 <section
                     key={offer._id}
-                    className="section-padding promo-special"
-                    // FIX: Pass image via CSS variable to the pseudo-element
-                    style={{ '--bg-image': `url('${offer.image}')` } as React.CSSProperties}
+                    className="relative section-padding overflow-hidden"
                 >
-                    <div className="container text-center">
+                    {/* High Performance Background Image */}
+                    <div
+                        className="absolute inset-0 z-0"
+                        style={{
+                            backgroundImage: `url('${offer.image}')`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            // Fixed attachment usually causes lag on mobile, removed.
+                            // Background-attachement: fixed is the #1 cause of mobile scroll lag.
+                        }}
+                    />
+
+                    {/* Gradient Overlay - Sits on top of image */}
+                    <div
+                        className="absolute inset-0 z-[1]"
+                        style={{ background: 'linear-gradient(rgba(195, 117, 96, 0.92), rgba(195, 117, 96, 0.92))' }}
+                    />
+
+                    {/* Content */}
+                    <div className="container text-center relative z-10">
                         <span style={{ border: '1px solid rgba(255,255,255,0.4)', padding: '5px 15px', borderRadius: '50px', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
                             Limited Time Offer
                         </span>
@@ -84,9 +101,9 @@ function CountdownTimer({ expiryDate, id }: { expiryDate: Date, id: string }) {
 
     const TimeBlock = ({ value, label }: { value: number, label: string }) => (
         <div className="text-center">
-            {/* FIX: Added font-variant-numeric: tabular-nums to stop width jumping */}
+            {/* REMOVED backdrop-blur-sm for mobile performance */}
             <div
-                className="text-2xl md:text-4xl font-bold bg-white/20 backdrop-blur-sm p-3 md:p-4 rounded-lg shadow min-w-[70px] md:min-w-[90px]"
+                className="text-2xl md:text-4xl font-bold bg-white/20 p-3 md:p-4 rounded-lg shadow min-w-[70px] md:min-w-[90px]"
                 style={{ fontVariantNumeric: 'tabular-nums' }}
             >
                 {String(value).padStart(2, '0')}

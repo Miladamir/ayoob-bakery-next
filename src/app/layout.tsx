@@ -49,14 +49,11 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  // FIX: Added Logo as Favicon
+  // FIX: Updated to point to the file you placed in the app folder
+  // Since it is in 'app/favicon.ico', the public URL is just '/favicon.ico'
   icons: {
-    icon: [
-      { url: '/images/logo.png', type: 'image/png' }
-    ],
-    apple: [
-      { url: '/images/logo.png', type: 'image/png' }
-    ],
+    icon: '/favicon.ico',
+    apple: '/favicon.ico',
   },
 };
 

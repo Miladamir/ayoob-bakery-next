@@ -9,18 +9,15 @@ interface Props {
 }
 
 export default async function EditCategoryPage({ params }: Props) {
-    // FIX: Await params
     const { id } = await params;
-
     await dbConnect();
     const category = await Category.findById(id).lean();
     if (!category) notFound();
-
-    const categories = await Category.find({ _id: { $ne: id } }).lean(); // Exclude self
+    const categories = await Category.find({ _id: { $ne: id } }).lean();
 
     return (
         <div>
-            <h1 className="text-3xl font-bold font-serif text-gray-800 mb-6">Edit Category</h1>
+            <h1 className="text-2xl md:text-3xl font-bold font-serif text-gray-800 mb-6">Edit Category</h1>
             <CategoryForm initialData={JSON.parse(JSON.stringify(category))} categories={JSON.parse(JSON.stringify(categories))} isEdit />
         </div>
     );

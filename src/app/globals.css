@@ -474,11 +474,56 @@
 }
 
 /* Special Offer Section */
+/* ... existing css ... */
+
+/* ========================================== */
+/* SPECIAL OFFER SECTION (PERFORMANT)        */
+/* ========================================== */
 .promo-special {
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
+  position: relative;
+  /* Context for the pseudo-element */
+  overflow: hidden;
   color: white;
+  /* Remove 'background-attachment: fixed' entirely */
+}
+
+/* The Magic: Pseudo-element for fixed background without the lag */
+.promo-special::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  top: -50%;
+  /* Extend top */
+  left: -50%;
+  /* Extend left */
+  width: 200%;
+  /* Double size */
+  height: 200%;
+  /* Double size */
+  z-index: -2;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-image: var(--bg-image);
+  /* Hardware acceleration for smooth scrolling */
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Overlay gradient on top of the image */
+.promo-special::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(195, 117, 96, 0.9), rgba(195, 117, 96, 0.9));
+  z-index: -1;
+}
+
+/* Ensure content sits on top */
+.promo-special .container {
+  position: relative;
+  z-index: 1;
 }
 
 /* Gallery Grid */

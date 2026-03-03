@@ -12,19 +12,15 @@ interface Props {
 export const dynamic = 'force-dynamic';
 
 export default async function EditProductPage({ params }: Props) {
-    // FIX: Await params
     const { id } = await params;
-
     await dbConnect();
-
     const product = await Product.findById(id).lean();
     if (!product) notFound();
-
     const categories = await Category.find().lean();
 
     return (
         <div>
-            <h1 className="text-3xl font-bold font-serif text-gray-800 mb-6">Edit: {product.name}</h1>
+            <h1 className="text-2xl md:text-3xl font-bold font-serif text-gray-800 mb-6">Edit: {product.name}</h1>
             <ProductForm
                 initialData={JSON.parse(JSON.stringify(product))}
                 categories={JSON.parse(JSON.stringify(categories))}

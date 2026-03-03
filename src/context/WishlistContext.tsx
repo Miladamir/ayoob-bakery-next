@@ -7,6 +7,7 @@ interface WishlistContextType {
     wishlistIds: string[];
     isInWishlist: (productId: string) => boolean;
     toggleWishlist: (productId: string) => Promise<void>;
+    refreshWishlist: (validIds: string[]) => void; // NEW: Allow page to sync valid IDs
 }
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
@@ -14,8 +15,6 @@ const WishlistContext = createContext<WishlistContextType | undefined>(undefined
 export const WishlistProvider = ({ children }: { children: ReactNode }) => {
     const { status } = useSession();
     const [wishlistIds, setWishlistIds] = useState<string[]>([]);
-
-    // Track processed state to handle Login transitions
     const processedAuthState = useRef<string | null>(null);
 
     useEffect(() => {
@@ -25,10 +24,13 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
         processedAuthState.current = status;
 
         const initializeWishlist = async () => {
-            if (status === "authenticated") {
-                const localData = localStorage.getItem("wishlist_guest");
-                const localIds: string[] = localData ? JSON.parse(localData) : [];
+            const localData = localStorage.getItem("wishlist_guest");
+            let localIds: string[] = localData ? JSON.parse(localData) : [];
 
+            // FIX: Validate that IDs are valid 24-char Hex strings (MongoDB ObjectIDs)
+            localIds = localIds.filter(id => id && /^[a-fA-F0-9]{24}$/.test(id));
+
+            if (status === "authenticated") {
                 try {
                     if (localIds.length > 0) {
                         await fetch("/api/wishlist/merge", {
@@ -46,10 +48,9 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
                     }
                 } catch (e) {
                     console.error("Init failed", e);
+                    setWishlistIds(localIds);
                 }
             } else if (status === "unauthenticated") {
-                const localData = localStorage.getItem("wishlist_guest");
-                const localIds: string[] = localData ? JSON.parse(localData) : [];
                 setWishlistIds(localIds);
             }
         };
@@ -82,16 +83,24 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
             try {
                 await fetch(`/api/wishlist/toggle/${productId}`, { method: "POST" });
             } catch (e) {
-                console.error("Toggle failed, reverting", e);
-                // Revert on failure
+                console.error("Toggle failed", e);
                 setWishlistIds(wishlistIds);
                 updateLocal(wishlistIds);
             }
         }
     };
 
+    // NEW: Function to update list if invalid products are found
+    const refreshWishlist = (validIds: string[]) => {
+        // Only update if the list actually changed (e.g. ghost IDs removed)
+        if (JSON.stringify(validIds.sort()) !== JSON.stringify(wishlistIds.sort())) {
+            setWishlistIds(validIds);
+            updateLocal(validIds);
+        }
+    };
+
     return (
-        <WishlistContext.Provider value={{ wishlistIds, isInWishlist, toggleWishlist }}>
+        <WishlistContext.Provider value={{ wishlistIds, isInWishlist, toggleWishlist, refreshWishlist }}>
             {children}
         </WishlistContext.Provider>
     );

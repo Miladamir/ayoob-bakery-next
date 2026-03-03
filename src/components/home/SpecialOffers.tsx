@@ -27,7 +27,8 @@ export default function SpecialOffers({ offers }: SpecialOffersProps) {
                 <section
                     key={offer._id}
                     className="section-padding promo-special"
-                    style={{ backgroundImage: `linear-gradient(rgba(195, 117, 96, 0.9), rgba(195, 117, 96, 0.9)), url('${offer.image}')` }}
+                    // FIX: Pass image via CSS variable to the pseudo-element
+                    style={{ '--bg-image': `url('${offer.image}')` } as React.CSSProperties}
                 >
                     <div className="container text-center">
                         <span style={{ border: '1px solid rgba(255,255,255,0.4)', padding: '5px 15px', borderRadius: '50px', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
@@ -83,7 +84,11 @@ function CountdownTimer({ expiryDate, id }: { expiryDate: Date, id: string }) {
 
     const TimeBlock = ({ value, label }: { value: number, label: string }) => (
         <div className="text-center">
-            <div className="text-2xl md:text-4xl font-bold bg-white/20 backdrop-blur-sm p-3 md:p-4 rounded-lg shadow min-w-[70px] md:min-w-[90px]">
+            {/* FIX: Added font-variant-numeric: tabular-nums to stop width jumping */}
+            <div
+                className="text-2xl md:text-4xl font-bold bg-white/20 backdrop-blur-sm p-3 md:p-4 rounded-lg shadow min-w-[70px] md:min-w-[90px]"
+                style={{ fontVariantNumeric: 'tabular-nums' }}
+            >
                 {String(value).padStart(2, '0')}
             </div>
             <div className="text-xs md:text-sm uppercase mt-2 tracking-widest opacity-80">{label}</div>

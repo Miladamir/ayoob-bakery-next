@@ -9,16 +9,14 @@ interface Props {
 }
 
 export default async function EditBannerPage({ params }: Props) {
-    // FIX: Await params
     const { id } = await params;
-
     await dbConnect();
     const banner = await Banner.findById(id).lean();
     if (!banner) notFound();
 
     return (
         <div>
-            <h1 className="text-3xl font-bold font-serif text-gray-800 mb-6">Edit Banner</h1>
+            <h1 className="text-2xl md:text-3xl font-bold font-serif text-gray-800 mb-6">Edit Banner</h1>
             <BannerForm initialData={JSON.parse(JSON.stringify(banner))} isEdit />
         </div>
     );

@@ -3,7 +3,6 @@ import "./globals.css";
 import Providers from "./providers";
 import { lato, playfair } from "@/lib/fonts";
 
-// Define your production URL here
 const siteUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
 
 export const metadata: Metadata = {
@@ -49,11 +48,16 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  // FIX: Updated to point to the file you placed in the app folder
-  // Since it is in 'app/favicon.ico', the public URL is just '/favicon.ico'
+  // FIX: Added specific high-res icons for Android/iOS Speed Dials
   icons: {
-    icon: '/favicon.ico',
-    apple: '/favicon.ico',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' }, // Standard browser tab
+      { url: '/images/logo.png', sizes: '192x192', type: 'image/png' }, // Android Chrome
+      { url: '/images/logo.png', sizes: '512x512', type: 'image/png' }, // Android Chrome (High Res)
+    ],
+    apple: [
+      { url: '/images/logo.png', sizes: '180x180', type: 'image/png' }, // iOS Home Screen
+    ],
   },
 };
 

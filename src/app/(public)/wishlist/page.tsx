@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { IProduct } from "@/models/Product";
 
 export default function WishlistPage() {
-    const { wishlistIds } = useWishlist();
+    const { wishlistIds, refreshWishlist } = useWishlist(); // Get refreshWishlist
     const [products, setProducts] = useState<IProduct[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -21,11 +21,23 @@ export default function WishlistPage() {
 
             setLoading(true);
             try {
-                // Use the API we created earlier to get details for IDs
                 const res = await fetch(`/api/products/by-ids?ids=${wishlistIds.join(',')}`);
                 if (res.ok) {
                     const data = await res.json();
                     setProducts(data);
+
+                    // FIX: CLEANUP LOGIC
+                    // Compare fetched IDs with requested IDs
+                    const fetchedIds = data.map((p: any) => p._id.toString());
+
+                    // Find IDs that were in wishlist but NOT in DB (Ghost IDs)
+                    const ghostIds = wishlistIds.filter(id => !fetchedIds.includes(id));
+
+                    // If we found ghost IDs, refresh the context to remove them
+                    if (ghostIds.length > 0) {
+                        console.log("Cleaning invalid wishlist IDs:", ghostIds);
+                        refreshWishlist(fetchedIds);
+                    }
                 }
             } catch (error) {
                 console.error("Failed to fetch wishlist products", error);
@@ -34,14 +46,13 @@ export default function WishlistPage() {
             }
         };
 
-        // Only fetch if wishlistIds is populated (avoids flash of empty state on load)
-        // A simple check to ensure we don't fetch with empty array on first render
+        // Only fetch if wishlistIds is populated (avoids flash of empty state on first render)
         if (wishlistIds.length > 0 || !loading) {
             fetchProducts();
         } else {
             setLoading(false);
         }
-    }, [wishlistIds]);
+    }, [wishlistIds]); // Dependency is fine, logic handles the rest
 
     return (
         <>

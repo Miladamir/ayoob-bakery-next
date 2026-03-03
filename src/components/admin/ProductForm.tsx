@@ -18,7 +18,8 @@ export default function ProductForm({ initialData, categories, isEdit = false }:
     // Form State
     const [formData, setFormData] = useState({
         name: "", price: "", description: "", shortDescription: "", images: "",
-        category: "", badge: "", discount: "0", unit: "quantity", ingredients: "", nutrition: "", features: ""
+        category: "", badge: "", discount: "0", unit: "quantity",
+        ingredients: "", nutrition: "", features: "" // Added ingredients & nutrition
     });
 
     // Dynamic Options State
@@ -160,7 +161,6 @@ export default function ProductForm({ initialData, categories, isEdit = false }:
                 <input name="images" value={formData.images} onChange={handleChange} className="w-full border p-2 rounded-lg" />
             </div>
 
-            {/* ADDED: Short Description Field */}
             <div>
                 <label className="block text-sm font-semibold text-gray-600 mb-1">Short Description</label>
                 <input
@@ -175,6 +175,45 @@ export default function ProductForm({ initialData, categories, isEdit = false }:
             <div>
                 <label className="block text-sm font-semibold text-gray-600 mb-1">Description</label>
                 <textarea name="description" value={formData.description} onChange={handleChange} rows={3} className="w-full border p-2 rounded-lg"></textarea>
+            </div>
+
+            {/* NEW: Ingredients Field */}
+            <div>
+                <label className="block text-sm font-semibold text-gray-600 mb-1">Ingredients</label>
+                <textarea
+                    name="ingredients"
+                    value={formData.ingredients}
+                    onChange={handleChange}
+                    rows={3}
+                    className="w-full border p-2 rounded-lg"
+                    placeholder="e.g. Flour, Water, Salt, Yeast..."
+                ></textarea>
+                <p className="text-xs text-gray-400 mt-1">List the key ingredients used.</p>
+            </div>
+
+            {/* NEW: Nutrition Field */}
+            <div>
+                <label className="block text-sm font-semibold text-gray-600 mb-1">Nutrition Facts</label>
+                <textarea
+                    name="nutrition"
+                    value={formData.nutrition}
+                    onChange={handleChange}
+                    rows={3}
+                    className="w-full border p-2 rounded-lg"
+                    placeholder="e.g. Calories: 250kcal, Protein: 8g, Carbs: 40g..."
+                ></textarea>
+                <p className="text-xs text-gray-400 mt-1">You can format this with line breaks.</p>
+            </div>
+
+            <div>
+                <label className="block text-sm font-semibold text-gray-600 mb-1">Features (Comma separated)</label>
+                <input
+                    name="features"
+                    value={formData.features}
+                    onChange={handleChange}
+                    className="w-full border p-2 rounded-lg"
+                    placeholder="Freshly Baked, Organic, Vegan"
+                />
             </div>
 
             {/* Dynamic Options Builder */}

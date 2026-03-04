@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import Product from "@/models/Product";
+import Category from "@/models/Category"; // CRITICAL FIX: Import Category to register schema
 import mongoose from "mongoose";
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET(request: Request) {
     try {
@@ -14,7 +16,6 @@ export async function GET(request: Request) {
             return NextResponse.json([]);
         }
 
-        // Connect to DB
         await dbConnect();
 
         // Sanitize IDs
@@ -37,6 +38,7 @@ export async function GET(request: Request) {
         }
 
         // Fetch Products
+        // Since we imported Category above, .populate will work correctly
         const products = await Product.find({ _id: { $in: idArray } })
             .select('name price images unit category badge discount')
             .populate('category', 'name')
@@ -45,11 +47,14 @@ export async function GET(request: Request) {
         return NextResponse.json(JSON.parse(JSON.stringify(products)));
 
     } catch (error: any) {
-        // PROFESSIONAL DEBUG: Log to Vercel logs and return details to frontend
-        console.error("Wishlist API Error:", error);
+        console.error("--- WISHLIST API ERROR ---");
+        console.error(error);
 
+        // Return the ACTUAL error message to help debug
         return NextResponse.json({
-            error: error.message || "Unknown Server Error",
+            error: error.message,
+            name: error.name,
+            // Send stack only if needed (remove in final production if desired)
             stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
         }, { status: 500 });
     }

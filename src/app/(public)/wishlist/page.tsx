@@ -10,11 +10,12 @@ export default function WishlistPage() {
     const { wishlistIds, refreshWishlist } = useWishlist();
     const [products, setProducts] = useState<IProduct[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false); // Track fetch errors
+    const [error, setError] = useState(false);
 
     useEffect(() => {
         const fetchProducts = async () => {
-            if (wishlistIds.length === 0) {
+            // 1. Handle Empty State Immediately
+            if (!wishlistIds || wishlistIds.length === 0) {
                 setProducts([]);
                 setLoading(false);
                 return;
@@ -24,29 +25,29 @@ export default function WishlistPage() {
             setError(false);
 
             try {
-                const res = await fetch(`/api/products/by-ids?ids=${wishlistIds.join(',')}`);
+                // 2. CRITICAL FIX: Add Timestamp to bust Vercel/Edge Cache
+                // This forces a fresh request every time
+                const res = await fetch(`/api/products/by-ids?ids=${wishlistIds.join(',')}&t=${Date.now()}`);
 
                 if (res.ok) {
                     const data = await res.json();
                     setProducts(data);
 
-                    // CLEANUP LOGIC:
-                    // Only remove IDs if the fetch was successful (res.ok)
+                    // 3. Cleanup "Ghost" IDs (Deleted Products)
                     const fetchedIds = data.map((p: any) => p._id.toString());
                     const ghostIds = wishlistIds.filter(id => !fetchedIds.includes(id));
 
+                    // If we found IDs that don't exist in DB, remove them from context
                     if (ghostIds.length > 0) {
                         console.log("Cleaning invalid wishlist IDs:", ghostIds);
                         refreshWishlist(fetchedIds);
                     }
                 } else {
-                    // If fetch fails (e.g. 500 error), DO NOT clear the wishlist.
-                    // Just show error. This prevents deleting valid items due to server glitch.
                     console.error("Failed to fetch wishlist products");
                     setError(true);
                 }
-            } catch (error) {
-                console.error("Network error fetching wishlist", error);
+            } catch (err) {
+                console.error("Network error fetching wishlist", err);
                 setError(true);
             } finally {
                 setLoading(false);
@@ -54,7 +55,7 @@ export default function WishlistPage() {
         };
 
         fetchProducts();
-    }, [wishlistIds]); // Dependency is fine, logic handles the rest
+    }, [wishlistIds]); // Standard dependency
 
     return (
         <>
@@ -74,14 +75,27 @@ export default function WishlistPage() {
             {/* Main Content */}
             <section className="py-16">
                 <div className="container mx-auto px-6">
+
+                    {/* Loading State */}
                     {loading ? (
-                        <div className="text-center text-gray-500 py-20">Loading favorites...</div>
+                        <div className="text-center text-gray-500 py-20">
+                            <i className="fa-solid fa-spinner fa-spin text-3xl mb-4"></i>
+                            <p>Loading favorites...</p>
+                        </div>
                     ) : error ? (
+                        /* Error State */
                         <div className="text-center py-20">
+                            <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 text-red-300">
+                                <i className="fa-solid fa-wifi text-4xl"></i>
+                            </div>
                             <h2 className="font-serif text-2xl font-bold text-gray-800 mb-2">Connection Error</h2>
                             <p className="text-gray-500 mb-6">Could not load your favorites. Please check your connection.</p>
+                            <button onClick={() => window.location.reload()} className="bg-brand-600 text-white px-8 py-3 rounded-full font-bold uppercase text-sm tracking-wider hover:bg-brand-700 transition-colors">
+                                Retry
+                            </button>
                         </div>
                     ) : products.length === 0 ? (
+                        /* Empty State */
                         <div className="text-center py-20">
                             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
                                 <i className="fa-solid fa-heart-crack text-4xl"></i>
@@ -93,12 +107,14 @@ export default function WishlistPage() {
                             </Link>
                         </div>
                     ) : (
+                        /* Product Grid */
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                             {products.map((product) => (
                                 <ProductCard key={product._id.toString()} product={product} />
                             ))}
                         </div>
                     )}
+
                 </div>
             </section>
         </>

@@ -1,14 +1,20 @@
-import { NextResponse } from "next/server";
-import dbConnect from "@/lib/dbConnect";
+// 1. CRITICAL: Import models used in .populate() to register their schemas
+import Category from "@/models/Category";
 import Product from "@/models/Product";
-import Category from "@/models/Category"; // CRITICAL FIX: Import Category to register schema
+import dbConnect from "@/lib/dbConnect";
+import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 
 export async function GET(request: Request) {
     try {
+        // 2. Force reference the model to ensure schema is registered in this isolated serverless function
+        // This prevents "MissingSchemaError" on cold starts
+        if (!mongoose.models.Category) {
+            mongoose.model('Category', Category.schema);
+        }
+
         const { searchParams } = new URL(request.url);
         const ids = searchParams.get("ids");
 
@@ -18,7 +24,6 @@ export async function GET(request: Request) {
 
         await dbConnect();
 
-        // Sanitize IDs
         const rawIds = ids.split(",");
         const idArray: mongoose.Types.ObjectId[] = [];
 
@@ -28,7 +33,7 @@ export async function GET(request: Request) {
                 try {
                     idArray.push(new mongoose.Types.ObjectId(trimmed));
                 } catch (e) {
-                    // Skip invalid ObjectIds
+                    // Skip invalid
                 }
             }
         }
@@ -37,8 +42,7 @@ export async function GET(request: Request) {
             return NextResponse.json([]);
         }
 
-        // Fetch Products
-        // Since we imported Category above, .populate will work correctly
+        // 3. Perform the query
         const products = await Product.find({ _id: { $in: idArray } })
             .select('name price images unit category badge discount')
             .populate('category', 'name')
@@ -47,15 +51,9 @@ export async function GET(request: Request) {
         return NextResponse.json(JSON.parse(JSON.stringify(products)));
 
     } catch (error: any) {
-        console.error("--- WISHLIST API ERROR ---");
-        console.error(error);
-
-        // Return the ACTUAL error message to help debug
+        console.error("--- WISHLIST API ERROR ---", error);
         return NextResponse.json({
-            error: error.message,
-            name: error.name,
-            // Send stack only if needed (remove in final production if desired)
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+            error: error.message
         }, { status: 500 });
     }
 }

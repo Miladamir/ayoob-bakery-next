@@ -5,6 +5,7 @@ import Cursor from "@/components/effects/Cursor";
 import Grain from "@/components/effects/Grain";
 import SmoothScroll from "@/components/effects/SmoothScroll";
 import RevealObserver from "@/components/effects/RevealObserver";
+import AnimationGovernor from "@/components/effects/AnimationGovernor";
 
 /* Account pages hold no search value — keep them out of the index. */
 export const metadata: Metadata = {
@@ -25,6 +26,7 @@ export default function AuthLayout({
       <Grain />
       <SmoothScroll />
       <RevealObserver />
+      <AnimationGovernor />
 
       {children}
     </>

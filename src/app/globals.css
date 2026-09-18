@@ -101,9 +101,14 @@ body.menu-open,body.locked{overflow:hidden}
 ============================================================ */
 #nav{position:fixed;inset:0 0 auto 0;z-index:70;padding:1.15rem 0;
   transition:background .35s,box-shadow .35s,padding .35s}
+/* PHASE 10: translateZ(0) promotes the nav to its own GPU layer — the
+   backdrop blur then composites on the GPU instead of forcing main-
+   thread work every scroll frame on every page. (The nav contains no
+   fixed-position descendants, so the containing-block side effect of
+   transform is harmless here.) */
 #nav.scrolled{background:rgba(247,241,229,.88);
   -webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);
-  padding:.7rem 0;box-shadow:0 1px 0 var(--line)}
+  padding:.7rem 0;box-shadow:0 1px 0 var(--line);transform:translateZ(0)}
 body.menu-open #nav{background:transparent;box-shadow:none}
 .nav-in{display:flex;align-items:center;gap:2rem}
 

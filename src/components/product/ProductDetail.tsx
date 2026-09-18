@@ -163,7 +163,7 @@ function Gallery({
 
     const size = () => {
       const r = stage.getBoundingClientRect();
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const dpr = Math.min(1.25, window.devicePixelRatio || 1);
       cv.width = r.width * dpr;
       cv.height = r.height * dpr;
       cw = r.width; ch = r.height;

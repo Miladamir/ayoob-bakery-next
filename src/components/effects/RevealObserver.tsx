@@ -5,20 +5,21 @@ import { useEffect } from "react";
 /**
  * Global reveal-on-scroll for [data-reveal] elements — hydration-safe.
  *
- * On dynamic pages the server streams HTML into the DOM *before* React
- * hydrates it. Revealing a node in that window mutates server-rendered
- * attributes React hasn't compared yet → hydration mismatch.
+ * PHASE 10 rewrite: the old MutationObserver handler ran a
+ * document-wide querySelectorAll + Object.keys() on EVERY class
+ * change anywhere in the body (toasts, FAQ toggles, hearts, even
+ * the reveal animations themselves) — constant main-thread churn
+ * during exactly the moments Lenis needs the thread. Now:
+ *  - class mutations → one hasAttribute() check, O(1)
+ *  - React className rewrites that wipe `revealed` (FAQ toggles)
+ *    are re-applied directly, O(1)
+ *  - new nodes → scanned in their own subtree only
  *
- * The rule: only reveal nodes React OWNS. React attaches its internal
- * `__reactFiber$` marker to a node after that node's attributes have
- * been diffed and accepted, so:
- *   • marker present → hydrated → safe to add `revealed`
- *   • marker absent  → still streamed HTML → queue + poll
- *
- * Hardening:
- *   • watches class mutations — if React rewrites an element's
- *     className (FAQ toggles) and wipes `revealed`, it re-reveals
- *   • 4s failsafe — nothing can ever stay hidden
+ * Hydration safety (unchanged concept): only observe nodes React
+ * owns (has a __reactFiber$/__reactProps$ marker) so streamed HTML
+ * is never mutated before hydration diffs it; un-owned nodes queue
+ * and poll until hydration lands. 4s failsafe still guarantees
+ * nothing can stay hidden.
  */
 export default function RevealObserver() {
   useEffect(() => {
@@ -26,13 +27,16 @@ export default function RevealObserver() {
     docEl.classList.add("js");
     (window as unknown as { __ayoobReveal?: boolean }).__ayoobReveal = true;
 
-    const pending = new Set<Element>(); // streamed in, not yet hydrated
+    const pending = new Set<Element>();          // streamed in, not yet hydrated
+    const revealedEver = new WeakSet<Element>(); // revealed at least once
 
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((en) => {
           if (en.isIntersecting) {
             en.target.classList.add("revealed");
+            revealedEver.add(en.target);
+            pending.delete(en.target);
             io.unobserve(en.target);
           }
         });
@@ -40,8 +44,6 @@ export default function RevealObserver() {
       { threshold: 0.12, rootMargin: "0px 0px -7%" }
     );
 
-    /* React attaches __reactFiber$<hash> / __reactProps$<hash> to a
-       node only once it has created or hydrated it. */
     const isReactOwned = (el: Element): boolean => {
       try {
         return Object.keys(el).some(
@@ -53,22 +55,51 @@ export default function RevealObserver() {
     };
 
     const tryObserve = (el: Element) => {
-      if (el.classList.contains("revealed")) return;
-      if (isReactOwned(el)) io.observe(el); // observe() is idempotent
+      if (el.classList.contains("revealed")) {
+        revealedEver.add(el);
+        return;
+      }
+      if (isReactOwned(el)) io.observe(el);
       else pending.add(el);
     };
 
-    const scan = () => {
-      document
-        .querySelectorAll("[data-reveal]:not(.revealed)")
-        .forEach(tryObserve);
+    /* scan only within a given root (document, or one added subtree) */
+    const scanRoot = (root: ParentNode) => {
+      root.querySelectorAll("[data-reveal]:not(.revealed)").forEach((el) => {
+        if (pending.has(el) || revealedEver.has(el)) return;
+        tryObserve(el);
+      });
     };
 
-    scan();
+    scanRoot(document);
 
-    /* new nodes (client-side navigation) + className rewrites
-       (React toggling `open` on FAQ items) both need a re-scan */
-    const mo = new MutationObserver(scan);
+    const mo = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        if (m.type === "childList") {
+          m.addedNodes.forEach((n) => {
+            if (n.nodeType !== 1) return;
+            const el = n as Element;
+            if (el.matches?.("[data-reveal]:not(.revealed)")) tryObserve(el);
+            scanRoot(el);
+          });
+        } else if (m.type === "attributes") {
+          /* className rewrite on a data-reveal element (FAQ toggles):
+             if it had been revealed and React wiped the class,
+             re-apply it instantly — one check, no document scan */
+          const t = m.target as Element;
+          if (
+            t.hasAttribute?.("data-reveal") &&
+            !t.classList.contains("revealed")
+          ) {
+            if (revealedEver.has(t)) {
+              t.classList.add("revealed");
+            } else if (!pending.has(t)) {
+              tryObserve(t);
+            }
+          }
+        }
+      }
+    });
     mo.observe(document.body, {
       childList: true,
       subtree: true,
@@ -95,7 +126,7 @@ export default function RevealObserver() {
         pending.delete(el);
         io.observe(el);
       }
-      scan();
+      scanRoot(document);
     }, 4000);
 
     return () => {

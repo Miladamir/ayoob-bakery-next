@@ -36,7 +36,7 @@ export default function Hero() {
     /* ---------- flour canvas ---------- */
     const sizeFlour = () => {
       const r = hero.getBoundingClientRect();
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const dpr = Math.min(1.25, window.devicePixelRatio || 1);
       cv.width = r.width * dpr;
       cv.height = r.height * dpr;
       cw = r.width;
@@ -181,7 +181,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section id="hero-home" ref={heroRef}>
+    <section id="hero-home" ref={heroRef} data-autopause>
       <canvas id="flour" ref={canvasRef} aria-hidden="true" />
 
       <div className="hero-main wrap">

@@ -8,14 +8,18 @@ import { Wheat } from "lucide-react";
  * curtain via pure CSS and triggers the hero fade-ins).
  * - Reduced motion: skips instantly.
  * - Seen once per browser session: skips the counter, quick lift.
- *   (Delete the sessionStorage check to always play the full count.)
  * - A 3.5s safety net in the root layout boot script guarantees the
  *   page always reveals, even if this component never hydrates.
+ *
+ * PHASE 10: no more React state per frame. The fill bar animates via
+ * a compositor-only scaleX transform and the number updates a single
+ * text node — zero re-renders during the busiest second of page load.
  */
 export default function Preloader() {
-  const [pct, setPct] = useState(0);
   const [gone, setGone] = useState(false);
   const doneRef = useRef(false);
+  const fillRef = useRef<HTMLSpanElement>(null);
+  const numRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const RM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -37,7 +41,8 @@ export default function Preloader() {
     const safety = window.setTimeout(finish, 3500);
 
     if (RM || alreadySeen) {
-      setPct(100);
+      if (fillRef.current) fillRef.current.style.transform = "none";
+      if (numRef.current) numRef.current.textContent = "100";
       finish();
       return () => window.clearTimeout(safety);
     }
@@ -48,7 +53,8 @@ export default function Preloader() {
     const step = (t: number) => {
       const k = Math.min(1, (t - t0) / D);
       const e = 1 - Math.pow(1 - k, 3);
-      setPct(Math.round(e * 100));
+      if (fillRef.current) fillRef.current.style.transform = `scaleX(${e.toFixed(4)})`;
+      if (numRef.current) numRef.current.textContent = String(Math.round(e * 100));
       if (k < 1) raf = requestAnimationFrame(step);
       else window.setTimeout(finish, 160);
     };
@@ -71,9 +77,9 @@ export default function Preloader() {
         <span className="pl-word">Ayoob Bakery</span>
         <div className="pl-row">
           <span className="pl-bar">
-            <span className="pl-fill" style={{ width: `${pct}%` }} />
+            <span className="pl-fill" ref={fillRef} />
           </span>
-          <span className="pl-count">{pct}</span>
+          <span className="pl-count" ref={numRef}>0</span>
         </div>
       </div>
     </div>

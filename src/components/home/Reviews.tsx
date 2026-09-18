@@ -38,10 +38,11 @@ export default function Reviews() {
     if (!bar) return;
     if (rmRef.current) {
       bar.style.animation = "none";
-      bar.style.width = "100%";
+      bar.style.transform = "none"; /* full bar, settled (RM) */
       return;
     }
     bar.style.animation = "none";
+    bar.style.transform = ""; /* back to the CSS scaleX(0) start */
     void bar.offsetWidth;
     bar.style.animation = "qbar 6.5s linear forwards";
   }, []);

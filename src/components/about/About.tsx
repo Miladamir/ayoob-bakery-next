@@ -162,7 +162,8 @@ export default function About({ tandoorPick, isNaan, yearsOnLygon }: AboutProps)
   return (
     <>
       {/* ============ BEAT 1 · THE SHOPFRONT ============ */}
-      <section id="hero" className="shop-hero" ref={heroRef}>
+            {/* PHASE 10 data-autopause: stamp spin + window steam pause offscreen */}
+      <section id="hero" className="shop-hero" ref={heroRef} data-autopause>
         <div className="wrap">
           <nav className="crumbs" aria-label="Breadcrumb">
             <Link href="/">Home</Link>
@@ -299,7 +300,7 @@ export default function About({ tandoorPick, isNaan, yearsOnLygon }: AboutProps)
       </section>
 
       {/* ============ BEAT 2 · THE STORY IN ONE BREATH ============ */}
-      <section id="story" className="sec">
+      <section id="story" className="sec" data-autopause>
         <div className="wrap">
           <div className="story-grid">
             <div data-reveal>
@@ -367,7 +368,7 @@ export default function About({ tandoorPick, isNaan, yearsOnLygon }: AboutProps)
       </section>
 
       {/* ============ BEAT 3 · THE TANDOOR (DARK) ============ */}
-      <section id="tandoor" className="sec sec--dark">
+      <section id="tandoor" className="sec sec--dark" data-autopause>
         {EMBERS.map((em, i) => (
           <span
             key={i}

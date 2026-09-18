@@ -16,7 +16,8 @@ body.loaded #preloader{transform:translateY(-101%);pointer-events:none}
 .pl-word{font:600 .72rem var(--ff-b);letter-spacing:.42em;text-transform:uppercase;color:var(--cream);opacity:.75}
 .pl-row{display:flex;align-items:center;gap:.9rem;margin-top:1.4rem}
 .pl-bar{flex:1;height:2px;background:rgba(255,253,246,.16);border-radius:2px;overflow:hidden}
-.pl-fill{display:block;height:100%;width:0%;background:var(--honey)}
+/* PHASE 10: scaleX instead of width — compositor-only, no layout per frame */
+.pl-fill{display:block;height:100%;width:100%;background:var(--honey);transform-origin:left center;transform:scaleX(0)}
 .pl-count{font:italic 600 1.15rem var(--ff-d);color:var(--honey);min-width:3ch;text-align:right}
 
 /* ---------- HERO ---------- */
@@ -60,7 +61,8 @@ html.js body.loaded .swash path{stroke-dashoffset:0}
 .hero-art{position:relative;min-height:460px}
 .art-l{position:absolute;will-change:transform}
 .art-cr-wrap{left:-2%;top:9%;width:min(102%,480px)}
-.art-cr{animation:bob 5.5s ease-in-out infinite;filter:drop-shadow(0 30px 26px rgba(38,24,14,.2))}
+/* PHASE 10: promoted — the infinite bob no longer re-rasters each frame */
+.art-cr{animation:bob 5.5s ease-in-out infinite;filter:drop-shadow(0 30px 26px rgba(38,24,14,.2));will-change:transform}
 .art-cr svg{width:100%;height:auto;display:block}
 .art-stamp-wrap{right:0;top:1%;width:clamp(112px,13vw,170px)}
 .stamp-svg{width:100%;height:auto;display:block;animation:spin 16s linear infinite}
@@ -125,8 +127,10 @@ html.js body.loaded .swash path{stroke-dashoffset:0}
   color:var(--ink);display:grid;place-items:center;cursor:pointer;transition:.3s}
 .q-btn:hover{background:var(--ink);color:var(--cream);transform:translateY(-2px)}
 .q-progress{flex:1;max-width:280px;height:2px;background:var(--line);overflow:hidden;border-radius:2px}
-.q-progress span{display:block;height:100%;width:0;background:var(--ember)}
-@keyframes qbar{from{width:0}to{width:100%}}
+/* PHASE 10: scaleX instead of width — this bar animated layout 6.5s
+   per cycle, forever, on the homepage */
+.q-progress span{display:block;height:100%;width:100%;background:var(--ember);transform-origin:left center;transform:scaleX(0)}
+@keyframes qbar{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 
 /* ---------- 03 · FAQS (dark) ---------- */
 .faq-list{border-top:1.5px solid var(--line-l)}

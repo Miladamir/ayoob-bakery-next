@@ -5,6 +5,7 @@ import Cursor from "@/components/effects/Cursor";
 import Grain from "@/components/effects/Grain";
 import SmoothScroll from "@/components/effects/SmoothScroll";
 import RevealObserver from "@/components/effects/RevealObserver";
+import AnimationGovernor from "@/components/effects/AnimationGovernor";
 
 export default function PublicLayout({
   children,
@@ -22,6 +23,7 @@ export default function PublicLayout({
       <Grain />
       <SmoothScroll />
       <RevealObserver />
+      <AnimationGovernor />
 
       <Header />
       <main id="main">{children}</main>

@@ -25,5 +25,48 @@ html.has-cursor input,html.has-cursor textarea{cursor:text}
 
 /* ---------- film grain ---------- */
 .grain{position:fixed;inset:0;z-index:120;pointer-events:none;opacity:.05;
+  contain:layout paint;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size:280px 280px}
+
+/* ============================================================
+   PHASE 10 — SMOOTHNESS
+
+   The stutter diagnosis: Lenis virtual-scrolls every frame on the
+   main thread, and the site was making the main thread (and the
+   rasterizer) do constant, forever-running work — width animations
+   (layout per frame), un-promoted infinite animations (raster per
+   frame), one big SVG repainting per frame (the map), a React
+   state update per preloader frame, and a document-wide scan on
+   every class change anywhere. Everything below is compositor
+   work or contained/eliminated work — zero visual change.
+============================================================ */
+
+/* 1 · FOREVER-SPINNING STAMPS & SPARKS → their own GPU layers.
+   These rotate 360° every 16–22s on every page; without promotion
+   each frame was a raster on the main thread. (This is the main
+   reason /categories could never reach 60.) */
+.mh-stamp svg,.mh-spark svg,.sh-stamp svg,.sh-spark svg,
+.aside-stamp svg,.aside-spark svg,.pd-rostamp svg,.stamp-svg,
+.art-cr,.mh-bag svg.bag-ill,.tand-art{will-change:transform}
+
+/* 2 · THE ANIMATED MAP OVERLAY — .map-live is the small, mostly
+   transparent layer holding the route + pin (see MapCard.tsx).
+   Its unavoidable per-frame SVG paint now happens here, instead
+   of invalidating and repainting the entire base map every frame.
+   `.map-card` gains position:relative for the overlay. */
+.map-card{position:relative}
+.map-live{position:absolute;inset:0;width:100%;height:100%;
+  pointer-events:none;will-change:transform}
+
+/* 3 · OFFSCREEN DECORATIVE ANIMATION PAUSING.
+   AnimationGovernor toggles .is-offscreen on [data-autopause]
+   sections once they leave the viewport. Pausing is safe ONLY on
+   sections whose animations are all infinite/decorative — entrance
+   animations must NOT be paused (they'd play on scroll-in instead
+   of at load), so only tag sections that contain no entrance
+   `animation:` elements. Transitions (data-reveal) are unaffected
+   by animation-play-state either way. */
+.is-offscreen *,
+.is-offscreen *::before,
+.is-offscreen *::after{animation-play-state:paused!important}

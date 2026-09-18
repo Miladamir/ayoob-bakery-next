@@ -187,10 +187,7 @@ html.js body.loaded .swash path{stroke-dashoffset:0}
 .hours-row:last-child{border-bottom:none}
 .hours-row .h-day{font-weight:600}
 .hours-row .h-time{color:var(--ink2)}
-.hours-row.today{color:var(--ember)}
-.hours-row.today .h-time{color:var(--ember);font-weight:600}
-.hours-row.today .h-day::after{content:" · today";font:600 .64rem var(--ff-b);
-  letter-spacing:.16em;text-transform:uppercase}
+
 
 /* ---------- RESPONSIVE (from template) ---------- */
 @media (max-width:1080px){

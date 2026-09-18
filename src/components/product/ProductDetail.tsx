@@ -284,7 +284,6 @@ function Gallery({
     <div className="pd-gallery">
       <div className="pd-stage" ref={stageRef} onClick={onBoing}>
         <canvas ref={canvasRef} aria-hidden="true" />
-        <span className="pd-ring" aria-hidden="true" />
 
         <div className="pd-illwrap">
           {current ? (

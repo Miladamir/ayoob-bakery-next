@@ -1,27 +1,26 @@
 import type { Metadata } from "next";
 import Contact from "@/components/contact/Contact";
-import { SITE_URL as siteUrl } from "@/lib/site";
+import { SITE_URL } from "@/lib/site";
 import "./contact.css";
 
 export const metadata: Metadata = {
   title: "Contact — Talk to the Counter",
   description:
-    "Contact Ayoob Bakery — call the counter on (03) 9387 2196, email us, or follow the smell to 312 Lygon Street, Brunswick.",
+    "Contact Ayoob Bakery — call the counter on (03) 9387 2196, email us, or find us at 4 Stevenson Ave, Dandenong North.",
   alternates: { canonical: "/contact" },
   openGraph: {
     title: "Contact — Talk to the Counter | Ayoob Bakery Melbourne",
     description:
-      "Call the counter on (03) 9387 2196, email us, or follow the smell to 312 Lygon Street, Brunswick.",
+      "Call the counter on (03) 9387 2196, email us, or find us at 4 Stevenson Ave, Dandenong North.",
     type: "website",
   },
 };
-
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "ContactPage",
   name: "Contact — Ayoob Bakery Melbourne",
-  url: `${siteUrl}/contact`,
+  url: `${SITE_URL}/contact`,
   mainEntity: {
     "@type": "Bakery",
     name: "Ayoob Bakery",
@@ -29,10 +28,10 @@ const jsonLd = {
     email: "hello@ayoobbakery.com.au",
     address: {
       "@type": "PostalAddress",
-      streetAddress: "312 Lygon Street",
-      addressLocality: "Brunswick",
+      streetAddress: "4 Stevenson Ave",
+      addressLocality: "Dandenong North",
       addressRegion: "VIC",
-      postalCode: "3056",
+      postalCode: "3175",
       addressCountry: "AU",
     },
     contactPoint: [

@@ -103,8 +103,8 @@ export default function Footer() {
           <div>
             <p className="foot-k">Visit</p>
             <ul className="foot-list">
-              <li>312 Lygon Street</li>
-              <li>Brunswick VIC 3056</li>
+              <li>4 Stevenson Ave</li>
+              <li>Dandenong North VIC 3175</li>
               <li>
                 <a href="tel:+61393872196">(03) 9387 2196</a>
               </li>
@@ -118,9 +118,8 @@ export default function Footer() {
           <div>
             <p className="foot-k">Hours</p>
             <ul className="foot-list">
-              <li>Mon – Fri · 6:30 am – 4 pm</li>
-              <li>Saturday · 6:30 am – 3 pm</li>
-              <li>Sunday · 7 am – 2 pm</li>
+              <li>Mon – Sat · 8 am – 6 pm</li>
+              <li>Sunday · closed</li>
             </ul>
           </div>
 

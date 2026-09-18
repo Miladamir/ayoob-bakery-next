@@ -17,19 +17,19 @@
 /* ---------- THE GALLERY ---------- */
 .pd-gallery{position:relative}
 .pd-stage{position:relative;background:var(--cream);border:1.5px solid var(--ink);border-radius:26px;aspect-ratio:1/.92;overflow:hidden;
-  background-image:radial-gradient(rgba(38,24,14,.07) 1px,transparent 1.4px);background-size:14px 14px;
   animation:pdIn .6s var(--ease) backwards;transition:box-shadow .35s var(--ease);cursor:pointer}
 @keyframes pdIn{from{opacity:0;transform:translateY(18px) scale(.985)}to{opacity:1;transform:none}}
 .pd-stage:hover{box-shadow:6px 8px 0 rgba(38,24,14,.9)}
 .pd-stage canvas{position:absolute;inset:0;width:100%;height:100%}
-.pd-ring{position:absolute;left:50%;top:53%;width:min(76%,330px);aspect-ratio:1;transform:translate(-50%,-50%);border:1.5px dashed rgba(38,24,14,.22);border-radius:50%;transition:border-color .4s;pointer-events:none}
-.pd-stage:hover .pd-ring{border-color:rgba(196,85,30,.55);animation:spin 24s linear infinite}
-.pd-illwrap{position:absolute;left:50%;top:52%;width:66%;max-width:340px;aspect-ratio:1;transform:translate(-50%,-50%);z-index:2}
-.pd-illimg{object-fit:contain;filter:drop-shadow(0 18px 20px rgba(38,24,14,.2));animation:pdbob 6s ease-in-out infinite;transition:transform .45s var(--ease)}
-.pd-stage:hover .pd-illimg{transform:rotate(-4deg) scale(1.04)}
+/* image fills the stage edge-to-edge (was a contained floating
+   illustration over dotted paper + a dashed ring — both removed).
+   Only scale-based motion remains: scaling UP never reveals edges
+   under the stage's overflow:hidden. */
+.pd-illwrap{position:absolute;inset:0;z-index:2}
+.pd-illimg{object-fit:cover;transition:transform .45s var(--ease)}
+.pd-stage:hover .pd-illimg{transform:scale(1.03)}
 .pd-illimg.boing{animation:pdboing .55s var(--ease)}
-@keyframes pdbob{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-10px) rotate(1deg)}}
-@keyframes pdboing{0%{transform:scale(1)}35%{transform:scale(1.1,.9)}65%{transform:scale(.96,1.06)}100%{transform:scale(1)}}
+@keyframes pdboing{0%{transform:scale(1)}35%{transform:scale(1.06)}70%{transform:scale(1.02)}100%{transform:scale(1)}}
 .pd-noimg{position:absolute;inset:0;margin:auto;width:110px;height:110px;color:rgba(38,24,14,.2)}
 .pd-chips{position:absolute;top:1.05rem;left:1.05rem;z-index:3;display:flex;flex-direction:column;gap:.5rem;align-items:flex-start;pointer-events:none}
 .pd-chip{font:600 .62rem/1 var(--ff-b);letter-spacing:.16em;text-transform:uppercase;background:var(--ember);color:var(--cream);padding:.42rem .72rem;border-radius:99px;white-space:nowrap;animation:rowIn .5s var(--ease) backwards}
@@ -236,5 +236,5 @@ textarea.rv-in{line-height:1.6;resize:vertical;min-height:110px}
   .stickybar{padding-left:.55rem}
 }
 @media (prefers-reduced-motion:reduce){
-  .pd-rostamp svg,.pd-illimg,.pd-stage:hover .pd-ring,.pd-skel-stage::after,.pd-chip,.rev-card{animation:none}
+  .pd-rostamp svg,.pd-illimg,.pd-skel-stage::after,.pd-chip,.rev-card{animation:none}
 }

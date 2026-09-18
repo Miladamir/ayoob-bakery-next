@@ -1,7 +1,6 @@
 "use client";
-import MapCard from "@/components/ui/MapCard";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   ArrowUpRight,
@@ -14,13 +13,11 @@ import {
   X,
 } from "lucide-react";
 import HoursCard from "@/components/home/HoursCard";
+import MapCard from "@/components/ui/MapCard";
 import { useToast } from "@/context/ToastContext";
 import { copyText } from "@/lib/clipboard";
-import { getDetailedStatus, getStatus } from "@/lib/hours";
-import type { DetailedStatus } from "@/lib/hours";
+import { MAPS_URL, SHOP_ADDRESS } from "@/lib/site";
 import { FacebookIcon, InstagramIcon } from "@/components/icons/BrandIcons";
-
-const MAPS_URL = "https://maps.google.com/?q=312+Lygon+Street+Brunswick+Melbourne";
 
 function SparkSvg({ className }: { className?: string }) {
   return (
@@ -30,49 +27,6 @@ function SparkSvg({ className }: { className?: string }) {
         fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"
       />
     </svg>
-  );
-}
-
-/* masthead pill — live open/closed, computed after mount */
-function StatusPill() {
-  const [status, setStatus] = useState<{ open: boolean; text: string } | null>(null);
-  useEffect(() => {
-    const upd = () => setStatus(getStatus());
-    upd();
-    const t = window.setInterval(upd, 30000);
-    return () => window.clearInterval(t);
-  }, []);
-  if (!status) return null;
-  return (
-    <div className={`status-pill${status.open ? "" : " closed"}`}>
-      <span className="pulse" />
-      <span className="st-text">{status.text}</span>
-    </div>
-  );
-}
-
-/* the phone line — "Answering now · until 4:00 pm" / "Voicemail · we're back Mon 6:30 am" */
-function PhoneStatus() {
-  const [st, setSt] = useState<DetailedStatus | null>(null);
-  useEffect(() => {
-    const upd = () => setSt(getDetailedStatus());
-    upd();
-    const t = window.setInterval(upd, 30000);
-    return () => window.clearInterval(t);
-  }, []);
-  return (
-    <span className={`ps${st && !st.open ? " closed" : ""}`}>
-      <span className="ps-dot" />
-      <span>
-        {st
-          ? st.open
-            ? `Answering now · until ${st.closesAt}`
-            : st.backAt
-              ? `Voicemail · we\u2019re back ${st.backAt}`
-              : "Voicemail"
-          : "Checking the oven clock\u2026"}
-      </span>
-    </span>
   );
 }
 
@@ -126,7 +80,7 @@ export default function Contact() {
               <ChevronRight className="lucide" />
               <span aria-current="page">Contact</span>
             </nav>
-            <StatusPill />
+            {/* the open/closed status pill is removed on this page (item 9) */}
           </div>
 
           <div className="mh-titlerow">
@@ -143,7 +97,7 @@ export default function Contact() {
                   <path id="stampPathContact" d="M60 60 m-45 0 a45 45 0 1 1 90 0 a45 45 0 1 1 -90 0" />
                 </defs>
                 <text className="mh-stamp-text">
-                  <textPath href="#stampPathContact">AYOOB BAKERY · BRUNSWICK · MELBOURNE · EST 1996 ·</textPath>
+                  <textPath href="#stampPathContact">AYOOB BAKERY · DANDENONG NORTH · MELBOURNE · EST 1996 ·</textPath>
                 </text>
                 <g stroke="#26180E" strokeWidth="2.4" strokeLinecap="round" fill="none">
                   <path d="M60 46v30" />
@@ -177,7 +131,6 @@ export default function Contact() {
                     <small>Call the counter</small>
                     <a className="crow-link" href="tel:+61393872196">(03) 9387 2196</a>
                     <span className="crow-sub">Fastest — orders, holds, and bread emergencies.</span>
-                    <PhoneStatus />
                   </div>
                 </div>
 
@@ -204,9 +157,9 @@ export default function Contact() {
                   <div className="crow-main">
                     <small>The shopfront</small>
                     <a className="crow-link" href={MAPS_URL} target="_blank" rel="noopener noreferrer">
-                      312 Lygon Street, Brunswick VIC 3056
+                      {SHOP_ADDRESS}
                     </a>
-                    <span className="crow-sub">The fogged window on the left — the queue moves fast.</span>
+                    <span className="crow-sub">Look for the flour in the window — you can't miss us.</span>
                   </div>
                 </div>
 
@@ -224,22 +177,17 @@ export default function Contact() {
               </div>
 
               <div data-reveal style={d(".08s")}>
-                <HoursCard showStatus />
+                <HoursCard />
               </div>
             </div>
 
-            {/* right: the map */}
-                        {/* PHASE 10 data-autopause: pauses the route/pin while this
-                (sticky) column is off-screen */}
+            {/* right: the map — tappable, opens Google Maps */}
             <div className="map-col" data-reveal data-autopause style={d(".1s")}>
-
-                            {/* PHASE 10: split base + animated overlay (see MapCard) */}
               <MapCard />
 
               <p className="map-note">
                 <MapPin />
-                Tram 19 to stop 22 · a six-minute wander from Brunswick station · 1–2P parking on
-                Albert &amp; Hope · wish you were here.
+                Street parking out front — the smell finds you before the signage does.
               </p>
 
               <div className="door-ctas">

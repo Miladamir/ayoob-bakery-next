@@ -1,8 +1,7 @@
 import { ArrowUpRight, Clock, Mail, MapPin, Phone } from "lucide-react";
 import HoursCard from "./HoursCard";
 import MapCard from "@/components/ui/MapCard";
-
-const MAPS_URL = "https://maps.google.com/?q=312+Lygon+Street+Brunswick+Melbourne";
+import { MAPS_URL, SHOP_ADDRESS } from "@/lib/site";
 
 export default function ContactSection() {
   return (
@@ -16,7 +15,7 @@ export default function ContactSection() {
               <span>Contact</span>
             </p>
             <h2 data-reveal style={{ "--d": ".08s" } as React.CSSProperties}>
-              Follow the smell down <em>Lygon Street.</em>
+              Follow the smell <em>to the counter.</em>
             </h2>
           </div>
           <p className="sec-note" data-reveal style={{ "--d": ".16s" } as React.CSSProperties}>
@@ -26,21 +25,18 @@ export default function ContactSection() {
         </header>
 
         <div className="contact-grid">
-          {/* PHASE 10 data-autopause: the map's route + pin pause while
-              this block is off-screen (it contains no entrance animations,
-              only data-reveal transitions — which are unaffected). */}
           <div data-reveal data-autopause>
             <MapCard />
             <p className="map-note">
               <MapPin />
-              Tram 19 to stop 22, or a short wander from Brunswick station.
+              Street parking out front — the smell finds you before the signage does.
             </p>
 
             <div style={{ marginTop: "1.8rem" }}>
               <div className="contact-row">
                 <span className="cr-ico"><MapPin /></span>
                 <a href={MAPS_URL} target="_blank" rel="noopener noreferrer">
-                  312 Lygon Street, Brunswick VIC 3056
+                  {SHOP_ADDRESS}
                 </a>
               </div>
               <div className="contact-row">
@@ -67,7 +63,7 @@ export default function ContactSection() {
             <HoursCard />
             <p className="map-note" style={{ marginTop: "1.1rem" }}>
               <Clock />
-              The board usually thins out after 2 pm — the early bird gets the croissant.
+              The board usually thins out late afternoon — the early bird gets the croissant.
             </p>
           </div>
         </div>

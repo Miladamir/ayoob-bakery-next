@@ -34,21 +34,21 @@ const jsonLd = {
   priceRange: "$$",
   address: {
     "@type": "PostalAddress",
-    streetAddress: "312 Lygon Street",
-    addressLocality: "Brunswick",
+    streetAddress: "4 Stevenson Ave",
+    addressLocality: "Dandenong North",
     addressRegion: "VIC",
-    postalCode: "3056",
+    postalCode: "3175",
     addressCountry: "AU",
   },
-  geo: { "@type": "GeoCoordinates", latitude: -37.7713, longitude: 144.9614 },
+  /* approximate — verify before relying on geo search (same note the
+     old coordinates carried) */
+  geo: { "@type": "GeoCoordinates", latitude: -37.9644, longitude: 145.2103 },
   openingHoursSpecification: [
     {
       "@type": "OpeningHoursSpecification",
-      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-      opens: "06:30", closes: "16:00",
+      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+      opens: "08:00", closes: "18:00",
     },
-    { "@type": "OpeningHoursSpecification", dayOfWeek: "Saturday", opens: "06:30", closes: "15:00" },
-    { "@type": "OpeningHoursSpecification", dayOfWeek: "Sunday", opens: "07:00", closes: "14:00" },
   ],
 };
 

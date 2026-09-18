@@ -1,12 +1,12 @@
 /** Opening hours in minutes-since-midnight (Melbourne time). */
 export const OPENING_HOURS: Record<string, [number, number]> = {
-  Mon: [390, 960], // 6:30 – 16:00
-  Tue: [390, 960],
-  Wed: [390, 960],
-  Thu: [390, 960],
-  Fri: [390, 960],
-  Sat: [390, 900], // 6:30 – 15:00
-  Sun: [420, 840], // 7:00 – 14:00
+  Mon: [480, 1080], // 8:00 – 18:00
+  Tue: [480, 1080],
+  Wed: [480, 1080],
+  Thu: [480, 1080],
+  Fri: [480, 1080],
+  Sat: [480, 1080],
+  // Sunday — closed (no entry; getStatus reports "Closed · opens Mon 8:00 am")
 };
 
 const DAY_ORDER = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -36,13 +36,10 @@ function fmtT(m: number): string {
 
 export interface DetailedStatus {
   open: boolean;
-  /** formatted closing time, when open — "4:00 pm" */
   closesAt?: string;
-  /** formatted next-opening, when closed — "6:30 am" / "Mon 6:30 am" */
   backAt?: string;
 }
 
-/** The raw pieces, so pages can phrase their own status lines. */
 export function getDetailedStatus(): DetailedStatus {
   const n = melbourneNow();
   const range = OPENING_HOURS[n.day];
@@ -69,7 +66,6 @@ export function getDetailedStatus(): DetailedStatus {
   };
 }
 
-/** "Open now · closes 4:00 pm" / "Closed · opens 6:30 am" */
 export function getStatus(): { open: boolean; text: string } {
   const s = getDetailedStatus();
   if (s.open) return { open: true, text: `Open now · closes ${s.closesAt}` };

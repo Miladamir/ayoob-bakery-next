@@ -110,7 +110,6 @@ export default function ProductCard({
       {/* ---- art plate ---- */}
       <div className="pc-art">
         <Link href={`/product/${id}`} className="pc-art-link" aria-label={product.name}>
-          <span className="pc-ring" aria-hidden="true" />
           <span className="pc-ill">
             {product.images?.[0] ? (
               <Image
@@ -183,6 +182,10 @@ export default function ProductCard({
           </button>
         </div>
       </div>
+
+      {/* whole-card tap target (item 5) — sits above the art, below the
+          heart and add button (see .pc-link in globals.css) */}
+      <Link href={`/product/${id}`} className="pc-link" aria-label={`View ${product.name}`} />
     </article>
   );
 }

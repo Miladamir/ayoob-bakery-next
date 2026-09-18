@@ -3,33 +3,15 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
-  ArrowRight,
-  ArrowUpRight,
-  Check,
   ChevronRight,
   Flame,
   Package,
-  Plus,
   Store,
   Timer,
 } from "lucide-react";
-import { useCart } from "@/context/CartContext";
-import { useToast } from "@/context/ToastContext";
-import { money } from "@/lib/format";
-import { flyToCart } from "@/lib/flyToCart";
 import { getStatus } from "@/lib/hours";
 
-export interface TandoorPick {
-  _id: string;
-  name: string;
-  price: number;
-  image: string | null;
-  unit: string;
-}
-
 interface AboutProps {
-  tandoorPick: TandoorPick | null;
-  isNaan: boolean;
   yearsOnLygon: number;
 }
 
@@ -59,19 +41,8 @@ function StatusPill() {
   );
 }
 
-const EMBERS = [
-  { left: "6%", top: "18%", size: 7, fd: "6.5s", fdel: "0s" },
-  { left: "12%", top: "64%", size: 5, fd: "8s", fdel: "1.2s" },
-  { left: "22%", top: "82%", size: 8, fd: "7s", fdel: ".6s" },
-  { right: "8%", top: "24%", size: 6, fd: "9s", fdel: "2s" },
-  { right: "16%", top: "72%", size: 9, fd: "6s", fdel: ".9s" },
-  { right: "28%", top: "12%", size: 5, fd: "8.5s", fdel: "1.6s" },
-];
 
-export default function About({ tandoorPick, isNaan, yearsOnLygon }: AboutProps) {
-  const { addToCart } = useCart();
-  const toast = useToast();
-
+export default function About({ yearsOnLygon }: AboutProps) {
   const heroRef = useRef<HTMLElement>(null);
 
   /* hero art parallax (fine pointers, motion-safe) */
@@ -141,21 +112,6 @@ export default function About({ tandoorPick, isNaan, yearsOnLygon }: AboutProps)
   }, []);
 
   /* tandoor CTA — adds the REAL featured bake */
-  const addPick = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (!tandoorPick) return;
-    await addToCart(
-      {
-        _id: tandoorPick._id,
-        name: tandoorPick.name,
-        price: tandoorPick.price,
-        images: tandoorPick.image ? [tandoorPick.image] : [],
-        unit: tandoorPick.unit,
-      },
-      1
-    );
-    flyToCart(e.currentTarget, tandoorPick.image || undefined);
-    toast(Check, "Added to cart", `${tandoorPick.name} — ${money(tandoorPick.price)}`);
-  };
 
   const d = (s: string) => ({ "--d": s } as React.CSSProperties);
 
@@ -363,160 +319,6 @@ export default function About({ tandoorPick, isNaan, yearsOnLygon }: AboutProps)
             <span className="rchip"><Flame /> Never day-old</span>
             <span className="rchip"><Timer /> Time, spent freely</span>
             <span className="rchip"><Package /> Paper &amp; string, never plastic</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ============ BEAT 3 · THE TANDOOR (DARK) ============ */}
-      <section id="tandoor" className="sec sec--dark" data-autopause>
-        {EMBERS.map((em, i) => (
-          <span
-            key={i}
-            className="fember"
-            aria-hidden="true"
-            style={{
-              left: em.left, right: em.right, top: em.top,
-              width: em.size, height: em.size,
-              "--fd": em.fd, "--fdel": em.fdel,
-            } as React.CSSProperties}
-          />
-        ))}
-
-        <div className="wrap tand-grid">
-          <div className="tand-art" data-reveal aria-hidden="true">
-            <svg viewBox="0 0 300 250" role="img" aria-label="Illustration of the clay tandoor with naan on the wall">
-              <g className="steam" fill="none" stroke="#FFFDF6" strokeWidth="3" strokeLinecap="round" opacity=".4">
-                <path className="s1" d="M128 44c-5-8 4-12 0-20" />
-                <path className="s2" d="M152 40c-5-8 4-12 0-20" />
-                <path className="s3" d="M176 44c-5-8 4-12 0-20" />
-              </g>
-              <g className="tand-naan">
-                <g transform="translate(118 8) scale(.5)"><use href="#i-naan" /></g>
-              </g>
-              <path d="M104 76 C86 134 100 196 150 196 C200 196 214 134 196 76" fill="#B8662F" stroke="#FFFDF6" strokeWidth="4" />
-              <path d="M96 130 C120 142 180 142 204 130" fill="none" stroke="#FFFDF6" strokeWidth="3" opacity=".4" />
-              <ellipse cx="150" cy="76" rx="50" ry="13" fill="#8A4A1F" stroke="#FFFDF6" strokeWidth="4" />
-              <ellipse cx="150" cy="76" rx="36" ry="8" fill="#26180E" />
-              <ellipse className="t-glow" cx="150" cy="75" rx="24" ry="5.5" fill="#E7A23B" opacity=".4" />
-              <path className="fl fl1" d="M138 78c-3-10 5-15 3-24 8 6 10 15 7 24z" fill="#C4551E" />
-              <path className="fl fl2" d="M158 80c-2-8 4-12 2-19 7 5 8 12 5 19z" fill="#E7A23B" />
-              <path d="M100 96 c-10 4 -10 16 0 20 M200 96 c10 4 10 16 0 20" fill="none" stroke="#FFFDF6" strokeWidth="3.5" strokeLinecap="round" />
-              <rect x="96" y="192" width="108" height="13" rx="5" fill="#8A4A1F" stroke="#FFFDF6" strokeWidth="3" />
-              <path d="M40 218 H260" stroke="#FFFDF6" strokeWidth="3.5" strokeLinecap="round" opacity=".8" />
-              <g stroke="#FFFDF6" strokeWidth="2" opacity=".5" strokeDasharray="2 9" strokeLinecap="round">
-                <path d="M60 230 H120 M180 232 H240" />
-              </g>
-              <g fill="#E7A23B">
-                <circle className="emb e1" cx="120" cy="204" r="2.5" />
-                <circle className="emb e2" cx="180" cy="206" r="2" />
-                <circle className="emb e3" cx="150" cy="212" r="2.2" />
-              </g>
-            </svg>
-          </div>
-
-          <div className="tand-copy" data-reveal style={d(".1s")}>
-            <p className="kicker">
-              <span className="k-no">02</span>
-              <span className="k-rule" />
-              <span>The tandoor</span>
-            </p>
-            <h2>
-              Carried from <em>Kabul.</em>
-            </h2>
-            <p>
-              Our grandfather baked naan on the walls of a clay tandoor in Kabul for forty years.
-              In 2001 we rebuilt the motion in Brunswick.{" "}
-              <b>The tandoor runs at 480&deg;C, and the bread cooks on the wall in ninety
-              seconds</b> — blistered, faintly smoky, gone by noon. No dial for that kind of heat,
-              no shortcut for that kind of muscle memory. You slap, you count, you pull.
-            </p>
-            <p className="tand-line">&ldquo;The clay is new. The wrist is inherited.&rdquo;</p>
-
-            {tandoorPick ? (
-              <div className="tand-cta">
-                <button className="btn btn-primary" type="button" onClick={addPick}>
-                  Taste it — add {tandoorPick.name} <Plus />
-                </button>
-                <span className="tand-note">
-                  {money(tandoorPick.price)} · {isNaan ? "best while warm" : "fresh from the morning bake"}
-                </span>
-              </div>
-            ) : (
-              <div className="tand-cta">
-                <Link className="btn btn-primary" href="/products">
-                  See what&rsquo;s on the board <ArrowRight />
-                </Link>
-              </div>
-            )}
-
-            <Link className="tand-more" href="/products">
-              or browse the whole board <ArrowRight />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ============ BEAT 4 · THE YEARS & THE DOOR ============ */}
-      <section id="years" className="sec sec--tint">
-        <div className="wrap">
-          <header className="years-head" data-reveal>
-            <p className="kicker">
-              <span className="k-no">03</span>
-              <span className="k-rule" />
-              <span>The years</span>
-            </p>
-            <h2>
-              Same oven, <em>longer queue.</em>
-            </h2>
-          </header>
-
-          <ol className="years-strip" data-reveal>
-            <li className="yr">
-              <b>1996</b>
-              <small>The doors open</small>
-              <p>Forty loaves, one oven, a hand-painted sign. Sold out the first Saturday by nine.</p>
-            </li>
-            <li className="yr">
-              <b>2001</b>
-              <small>The tandoor arrives</small>
-              <p>Clay shipped over, wrist action inherited. The first naan made our father cry, briefly.</p>
-            </li>
-            <li className="yr">
-              <b>2015</b>
-              <small>Second generation</small>
-              <p>The kids start kneading before school. The recipe book gains a third handwriting style.</p>
-            </li>
-            <li className="yr">
-              <b>Today</b>
-              <small>Still by hand</small>
-              <p>9,400 loaves a month, one street number, and a queue that learned to bring a book.</p>
-            </li>
-          </ol>
-
-          <div className="thedoor" data-reveal>
-            <p className="kicker">
-              <span className="k-rule" />
-              <span>Come say hi</span>
-            </p>
-            <h3>
-              Come smell it <em>for yourself.</em>
-            </h3>
-            <p className="door-sub">
-              Reading about bread only goes so far. The window&rsquo;s fogged, the kettle&rsquo;s
-              on, and the counter remembers faces.
-            </p>
-            <div className="door-ctas">
-              <a
-                className="btn btn-primary"
-                href="https://maps.google.com/?q=312+Lygon+Street+Brunswick+Melbourne"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Get directions <ArrowUpRight />
-              </a>
-              <a className="btn btn-ghost" href="tel:+61393872196">Call the counter</a>
-              <StatusPill />
-            </div>
           </div>
         </div>
       </section>

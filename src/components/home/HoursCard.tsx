@@ -4,36 +4,19 @@ import { useEffect, useState } from "react";
 import { getStatus } from "@/lib/hours";
 
 const HOURS = [
-  { day: "Mon", label: "Monday", time: "6:30 am – 4:00 pm" },
-  { day: "Tue", label: "Tuesday", time: "6:30 am – 4:00 pm" },
-  { day: "Wed", label: "Wednesday", time: "6:30 am – 4:00 pm" },
-  { day: "Thu", label: "Thursday", time: "6:30 am – 4:00 pm" },
-  { day: "Fri", label: "Friday", time: "6:30 am – 4:00 pm" },
-  { day: "Sat", label: "Saturday", time: "6:30 am – 3:00 pm" },
-  { day: "Sun", label: "Sunday", time: "7:00 am – 2:00 pm" },
+  { day: "Mon", label: "Monday", time: "8:00 am – 6:00 pm" },
+  { day: "Tue", label: "Tuesday", time: "8:00 am – 6:00 pm" },
+  { day: "Wed", label: "Wednesday", time: "8:00 am – 6:00 pm" },
+  { day: "Thu", label: "Thursday", time: "8:00 am – 6:00 pm" },
+  { day: "Fri", label: "Friday", time: "8:00 am – 6:00 pm" },
+  { day: "Sat", label: "Saturday", time: "8:00 am – 6:00 pm" },
+  { day: "Sun", label: "Sunday", time: "Closed" },
 ];
 
 export default function HoursCard({ showStatus = false }: { showStatus?: boolean }) {
-  const [today, setToday] = useState("");
+  /* the "· today" row highlight is gone (removed on request) — the list
+     is now purely informational */
 
-  useEffect(() => {
-    const mark = () => {
-      try {
-        const day = new Intl.DateTimeFormat("en-AU", {
-          timeZone: "Australia/Melbourne",
-          weekday: "short",
-        }).format(new Date());
-        setToday(day);
-      } catch {
-        /* timezone API unavailable — no highlight */
-      }
-    };
-    mark();
-    const t = window.setInterval(mark, 60000);
-    return () => window.clearInterval(t);
-  }, []);
-
-  // optional live status pill — computed after mount (no hydration mismatch)
   const [status, setStatus] = useState<{ open: boolean; text: string } | null>(null);
   useEffect(() => {
     if (!showStatus) return;
@@ -55,7 +38,7 @@ export default function HoursCard({ showStatus = false }: { showStatus?: boolean
         )}
       </div>
       {HOURS.map((h) => (
-        <div key={h.day} className={`hours-row${today === h.day ? " today" : ""}`}>
+        <div key={h.day} className="hours-row">
           <span className="h-day">{h.label}</span>
           <span className="h-time">{h.time}</span>
         </div>

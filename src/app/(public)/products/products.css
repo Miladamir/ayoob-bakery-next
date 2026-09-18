@@ -126,9 +126,6 @@
 .hours-row:last-of-type{border-bottom:none}
 .hours-row .h-day{font-weight:600}
 .hours-row .h-time{color:var(--ink2)}
-.hours-row.today{color:var(--ember)}
-.hours-row.today .h-time{color:var(--ember);font-weight:600}
-.hours-row.today .h-day::after{content:" · today";font:600 .62rem var(--ff-b);letter-spacing:.16em;text-transform:uppercase}
 .map-note{margin-top:1rem;font:.82rem var(--ff-b);color:var(--ink2);display:flex;align-items:center;gap:.5rem}
 .map-note .lucide{width:14px;height:14px;color:var(--ember)}
 

@@ -111,11 +111,12 @@ function AisleCard({ aisle, index }: { aisle: Aisle; index: number }) {
             />
             <span className="ac-shade" aria-hidden="true" />
           </>
-        ) : (
+        ) : aisle.dark ? (
+          /* only the whole-board finale keeps its pattern — static now */
           <svg className="ac-paper" aria-hidden="true">
             <rect width="100%" height="100%" fill={`url(#${aisle.pattern})`} />
           </svg>
-        )}
+        ) : null}
 
         {aisle.tag && (
           <span className={`ac-tag${aisle.tone ? ` ac-tag--${aisle.tone}` : ""}`}>{aisle.tag}</span>

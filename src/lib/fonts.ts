@@ -1,16 +1,15 @@
-import { Lato, Playfair_Display } from 'next/font/google';
+import { Fraunces, Instrument_Sans } from "next/font/google";
 
-export const lato = Lato({
-    subsets: ['latin'],
-    weight: ['300', '400', '700'],
-    variable: '--font-body',
-    display: 'swap',
+export const fraunces = Fraunces({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  variable: "--font-fraunces",
+  display: "swap",
 });
 
-export const playfair = Playfair_Display({
-    subsets: ['latin'],
-    weight: ['400', '600', '700'],
-    style: ['normal', 'italic'],
-    variable: '--font-heading',
-    display: 'swap',
+export const instrumentSans = Instrument_Sans({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  variable: "--font-instrument",
+  display: "swap",
 });

@@ -1,23 +1,27 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { revalidatePath } from "next/cache";
 import dbConnect from "@/lib/dbConnect";
 import Banner from "@/models/Banner";
-import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/lib/admin";
+import { isValidId } from "@/lib/validate";
 
-export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
-    const session = await getServerSession(authOptions);
-    if ((session?.user as any)?.role !== 'admin') return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export async function POST(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { denied } = await requireAdmin();
+  if (denied) return denied;
 
-    const { id } = await params;
+  const { id } = await params;
+  if (!isValidId(id)) {
+    return NextResponse.json({ error: "Invalid banner id" }, { status: 400 });
+  }
 
-    try {
-        await dbConnect();
-        await Banner.findByIdAndDelete(id);
+  try {
+    await dbConnect();
+    await Banner.findByIdAndDelete(id);
 
-        revalidatePath('/');
-        return NextResponse.json({ success: true });
-    } catch (error) {
-        return NextResponse.json({ error: "Failed to delete banner" }, { status: 500 });
-    }
+    revalidatePath("/");
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Delete banner error:", error);
+    return NextResponse.json({ error: "Failed to delete banner" }, { status: 500 });
+  }
 }

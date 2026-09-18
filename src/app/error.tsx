@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import FontAwesome from "@/components/legacy/FontAwesome";
 
 export default function Error({
     error,
@@ -16,6 +17,8 @@ export default function Error({
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-brand-50 p-6">
+            {/* PHASE 5: this page still renders a fa-* icon — it loads FA itself */}
+            <FontAwesome />
             <div className="text-center bg-white p-12 rounded-2xl shadow-xl max-w-md border border-gray-100">
                 <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6 text-red-500">
                     <i className="fa-solid fa-triangle-exclamation text-3xl"></i>

@@ -17,6 +17,10 @@ export interface ICartItem {
     productId: mongoose.Types.ObjectId;
     quantity: number;
     note?: string;
+    /** TYPE FIX: the schema has always had this field (variant support was
+        added to the routes/schema but never to this interface — `next dev`
+        never type-checked it). null = the product's base line. */
+    variant?: string | null;
 }
 
 // 2. The Schema
@@ -29,13 +33,14 @@ const userSchema = new Schema<IUser>({
     cart: [{
         productId: { type: Schema.Types.ObjectId, ref: 'Product' },
         quantity: Number,
-        note: String
+        note: String,
+        variant: String
     }],
     wishlist: [{ type: Schema.Types.ObjectId, ref: 'Product' }]
 });
 
 // 3. Middleware (Hooks)
-// Fix: Use Promise-based middleware (remove 'next' argument) to avoid TypeScript confusion
+// Promise-based middleware (no 'next' argument) to avoid TypeScript confusion
 userSchema.pre('save', async function () {
     // Only hash the password if it has been modified (or is new)
     if (!this.isModified('password')) return;

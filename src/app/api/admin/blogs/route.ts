@@ -1,26 +1,39 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { revalidatePath } from "next/cache";
 import dbConnect from "@/lib/dbConnect";
 import Blog from "@/models/Blog";
-import { sanitizeHTML } from "@/lib/sanitize"; // Import sanitizer
-import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/lib/admin";
+import { sanitizeHTML } from "@/lib/sanitize";
+import { blogCreateSchema, safeJson, zodErrorMessage } from "@/lib/validate";
 
 export async function POST(request: Request) {
-    const session = await getServerSession(authOptions);
-    if ((session?.user as any)?.role !== 'admin') return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  /* Phase 2: unified on requireAdmin + whitelisted body */
+  const { denied } = await requireAdmin();
+  if (denied) return denied;
 
+  /* blog bodies can be long — read with a bigger cap */
+  const raw = await safeJson(request, 300_000);
+  const parsed = blogCreateSchema.safeParse(raw);
+  if (!parsed.success) {
+    return NextResponse.json({ error: zodErrorMessage(parsed.error) }, { status: 400 });
+  }
+
+  try {
     await dbConnect();
-    const body = await request.json();
 
-    // SECURITY: Sanitize HTML content to prevent XSS
-    if (body.content) {
-        body.content = sanitizeHTML(body.content);
-    }
+    /* SECURITY: sanitize the HTML content before storing it (XSS) */
+    const { content, ...rest } = parsed.data;
+    const newBlog = await Blog.create({
+      ...rest,
+      content: sanitizeHTML(content),
+    });
 
-    const newBlog = await Blog.create(body);
-
-    revalidatePath('/blogs');
+    revalidatePath("/blogs");
+    revalidatePath(`/blog/${newBlog._id}`);
 
     return NextResponse.json({ success: true, id: newBlog._id });
+  } catch (error) {
+    console.error("Create blog error:", error);
+    return NextResponse.json({ error: "Failed to create blog post" }, { status: 500 });
+  }
 }

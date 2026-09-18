@@ -1,0 +1,111 @@
+/* ============================================================
+   CONTACT PAGE — compact masthead + the counter (details card,
+   hours, socials, illustrated map). Fully static, no DB.
+   NOTE: social buttons are .csoc (not .soc) so they never
+   collide with the footer's dark .soc styles in globals.css.
+============================================================ */
+
+/* ---------- MASTHEAD ---------- */
+.masthead{position:relative;padding:7.5rem 0 clamp(1rem,2vw,1.5rem)}
+.mh-top{display:flex;justify-content:space-between;align-items:center;gap:.7rem 1.5rem;flex-wrap:wrap}
+.crumbs{display:flex;align-items:center;gap:.55rem;font:600 .72rem var(--ff-b);letter-spacing:.18em;text-transform:uppercase;color:var(--ink2)}
+.crumbs a{color:var(--ink2);text-decoration:none;border-bottom:1px dotted var(--line)}
+.crumbs a:hover{color:var(--ember);border-color:var(--ember)}
+.crumbs .lucide{width:13px;height:13px;opacity:.45}
+.crumbs [aria-current]{color:var(--ink)}
+.mh-titlerow{display:flex;align-items:center;gap:1.5rem;margin-top:clamp(.55rem,1.2vw,.85rem)}
+.mh-title{font:600 clamp(1.9rem,3.8vw,3.1rem)/1.04 var(--ff-d);letter-spacing:-.025em;max-width:20ch}
+.mh-title em{font-style:italic;font-weight:500;color:var(--ember);font-variation-settings:"SOFT" 80,"WONK" 1}
+.mh-spark{display:inline-block;width:clamp(15px,1.8vw,21px);margin-left:.4rem;color:var(--honey);vertical-align:.1em}
+.mh-spark svg{width:100%;height:auto;display:block;animation:spin 22s linear infinite reverse}
+.mh-stamp{margin-left:auto;flex:none;width:clamp(58px,6.5vw,88px)}
+.mh-stamp svg{width:100%;height:auto;display:block;animation:spin 16s linear infinite}
+.mh-stamp-text{font:700 8.4px var(--ff-b);letter-spacing:1.05px;fill:var(--ink)}
+.mh-sub{margin-top:.4rem;font:.95rem var(--ff-b);color:var(--ink2)}
+
+/* ---------- STATUS PILL ---------- */
+.status-pill{display:inline-flex;align-items:center;gap:.65rem;background:var(--cream);border:1.5px solid var(--line);padding:.6rem 1.15rem;border-radius:999px;font:600 .84rem var(--ff-b)}
+.status-pill .st-text{white-space:nowrap}
+.pulse{width:9px;height:9px;border-radius:50%;background:var(--ember);position:relative;flex:none}
+.pulse::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--ember);animation:ping 1.6s var(--ease) infinite;opacity:0}
+@keyframes ping{0%{transform:scale(.4);opacity:.9}80%,100%{transform:scale(1.5);opacity:0}}
+.status-pill.closed .pulse{background:var(--ink2)}
+.status-pill.closed .pulse::after{animation:none;opacity:0}
+
+/* ---------- THE COUNTER ---------- */
+.counter-sec{background:var(--flour2);padding:clamp(1.4rem,3vw,2.4rem) 0 clamp(3rem,6vw,4.8rem)}
+.contact-grid{display:grid;grid-template-columns:.95fr 1.05fr;gap:clamp(1.6rem,4vw,2.6rem);align-items:start}
+.left-col{display:grid;gap:1.3rem}
+.map-col{position:sticky;top:96px;display:grid;gap:1rem}
+
+/* the counter card */
+.counter-card{background:var(--cream);border:1.5px solid var(--ink);border-radius:20px;box-shadow:7px 7px 0 var(--ink);overflow:hidden}
+.cc-head{display:flex;align-items:baseline;gap:1rem;padding:1.2rem 1.4rem 1rem;border-bottom:1.5px solid var(--line);flex-wrap:wrap}
+.cc-head h2{font:600 1.5rem var(--ff-d);flex:1;min-width:0}
+.cc-no{font:600 .68rem var(--ff-b);letter-spacing:.2em;text-transform:uppercase;color:var(--ink2)}
+.crow{display:flex;align-items:flex-start;gap:1rem;padding:1.05rem 1.4rem;transition:background .25s}
+.crow + .crow{border-top:1.5px dashed var(--line)}
+.crow:hover{background:var(--flour)}
+.cr-ico{width:46px;height:46px;border-radius:13px;background:var(--flour2);display:grid;place-items:center;color:var(--ember);flex:none;border:1.5px solid var(--line)}
+.cr-ico .lucide{width:20px;height:20px}
+.crow-main{flex:1;min-width:0}
+.crow-main small{display:block;font:600 .6rem var(--ff-b);letter-spacing:.2em;text-transform:uppercase;color:var(--ink2);margin-bottom:.3rem}
+.crow-link{font:600 1.12rem var(--ff-d);color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--line)}
+.crow-link:hover{color:var(--ember);border-color:var(--ember)}
+.crow-sub{display:block;font:.8rem/1.5 var(--ff-b);color:var(--ink2);margin-top:.25rem}
+.ps{display:inline-flex;align-items:center;gap:.5rem;font:600 .72rem var(--ff-b);margin-top:.5rem;color:var(--ink2)}
+.ps-dot{width:7px;height:7px;border-radius:50%;background:var(--ember);flex:none;position:relative}
+.ps-dot::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:1.5px solid var(--ember);opacity:0;animation:ping 1.6s var(--ease) infinite}
+.ps.closed .ps-dot{background:var(--ink2)}
+.ps.closed .ps-dot::after{animation:none}
+.cc-foot{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;padding:1rem 1.4rem 1.15rem;border-top:1.5px dashed var(--line);background:var(--flour)}
+.cc-foot-k{font:600 .62rem var(--ff-b);letter-spacing:.2em;text-transform:uppercase;color:var(--ink2)}
+.csocs{display:flex;gap:.55rem;flex-wrap:wrap}
+.csoc{display:inline-flex;align-items:center;gap:.5rem;background:none;border:1.5px solid var(--line);color:var(--ink);padding:.5rem .95rem;border-radius:999px;cursor:pointer;font:600 .78rem var(--ff-b);transition:.25s}
+.csoc .lucide{width:14px;height:14px}
+.csoc:hover{border-color:var(--ember);color:var(--ember);transform:translateY(-2px)}
+
+/* hours card (page-scoped copy — matches the counter section) */
+.hours-card{position:relative;background:var(--cream);border:1.5px solid var(--ink);border-radius:18px;padding:1.5rem 1.7rem 1.1rem;box-shadow:7px 7px 0 var(--ink)}
+.hours-card::before,.hours-card::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:var(--flour2);top:96px}
+.hours-card::before{left:-9px}.hours-card::after{right:-9px}
+.hours-head{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding-bottom:1.05rem;border-bottom:2px dashed var(--line);flex-wrap:wrap}
+.hours-head h3{font:600 1.35rem var(--ff-d)}
+.hours-row{display:flex;justify-content:space-between;align-items:baseline;padding:.68rem 0;border-bottom:1px solid var(--line);font:.94rem var(--ff-b)}
+.hours-row:last-of-type{border-bottom:none}
+.hours-row .h-day{font-weight:600}
+.hours-row .h-time{color:var(--ink2)}
+.hours-row.today{color:var(--ember)}
+.hours-row.today .h-time{color:var(--ember);font-weight:600}
+.hours-row.today .h-day::after{content:" · today";font:600 .62rem var(--ff-b);letter-spacing:.16em;text-transform:uppercase}
+
+/* map */
+.map-card{border:1.5px solid var(--ink);border-radius:22px;overflow:hidden;background:var(--flour2);box-shadow:7px 7px 0 var(--ink);transition:transform .5s var(--ease)}
+.map-card:hover{transform:rotate(-.4deg) translateY(-3px)}
+.map-svg{width:100%;height:auto;display:block}
+.map-label{font:600 10px var(--ff-b);letter-spacing:.22em;fill:var(--ink);opacity:.5}
+.map-chip-t{font:700 13px var(--ff-b);letter-spacing:.14em;fill:var(--ink)}
+.map-sub{font:500 11px var(--ff-b);fill:var(--ink);opacity:.65}
+.pin-ring{transform-box:fill-box;transform-origin:center;animation:ping 2s var(--ease) infinite}
+.route{animation:dashmove 26s linear infinite}
+@keyframes dashmove{to{stroke-dashoffset:-320}}
+.map-note{font:.84rem/1.6 var(--ff-b);color:var(--ink2);display:flex;align-items:flex-start;gap:.5rem}
+.map-note .lucide{width:14px;height:14px;color:var(--ember);flex:none;margin-top:.2rem}
+.door-ctas{display:flex;gap:1rem;flex-wrap:wrap}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:1080px){
+  .masthead{padding-top:6.5rem}
+  .contact-grid{grid-template-columns:1fr}
+  .map-col{position:static}
+}
+@media (max-width:640px){
+  .mh-stamp{display:none}
+  .door-ctas .btn{width:100%}
+  .crow{padding:.95rem 1.1rem}
+  .cc-head{padding:1.1rem 1.1rem .95rem}
+  .cc-foot{padding:.95rem 1.1rem 1.05rem}
+}
+@media (prefers-reduced-motion:reduce){
+  .mh-spark svg,.mh-stamp svg,.pin-ring,.route,.pulse::after,.ps-dot::after{animation:none}
+}

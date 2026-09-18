@@ -1,24 +1,31 @@
+import "@/styles/site-effects.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import Sidebar from "@/components/layout/Sidebar";
-import { getNestedCategories } from "@/lib/data";
+import Cursor from "@/components/effects/Cursor";
+import Grain from "@/components/effects/Grain";
+import SmoothScroll from "@/components/effects/SmoothScroll";
+import RevealObserver from "@/components/effects/RevealObserver";
 
-export default async function PublicLayout({
-    children,
+export default function PublicLayout({
+  children,
 }: {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-    // This call is now cached for 1 hour, preventing DB hits on every page navigation
-    const nestedCategories = await getNestedCategories();
+  return (
+    <>
+      <a className="skip" href="#main">
+        Skip to content
+      </a>
 
-    return (
-        <>
-            <Sidebar />
-            <Header nestedCategories={JSON.parse(JSON.stringify(nestedCategories))} />
+      {/* site-wide effect layer */}
+      <Cursor />
+      <Grain />
+      <SmoothScroll />
+      <RevealObserver />
 
-            <main>{children}</main>
-
-            <Footer nestedCategories={JSON.parse(JSON.stringify(nestedCategories))} />
-        </>
-    );
+      <Header />
+      <main id="main">{children}</main>
+      <Footer />
+    </>
+  );
 }

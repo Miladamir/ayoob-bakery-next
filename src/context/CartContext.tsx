@@ -2,8 +2,9 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from "react";
 import { useSession } from "next-auth/react";
+import { readGuestCart, writeGuestCart, clearGuestCart } from "@/lib/localStore";
 
-interface CartItem {
+export interface CartItem {
     _id: string;
     name: string;
     price: number;
@@ -11,61 +12,71 @@ interface CartItem {
     unit: string;
     quantity: number;
     note?: string;
+    /** which option value this line is (e.g. "Half boule") —
+        a line's identity is (product, variant) */
+    variant?: string;
 }
+
+/** stable unique key for a cart line — product + variant */
+export const cartLineKey = (item: { _id: string; variant?: string }) =>
+    item.variant ? `${item._id}@${item.variant}` : item._id;
+
+const MAX_QTY = 99;
 
 interface CartContextType {
     cartItems: CartItem[];
     cartCount: number;
     cartTotal: number;
-    addToCart: (product: any, quantity: number) => Promise<void>;
-    updateQuantity: (productId: string, quantity: number) => Promise<void>;
-    removeItem: (productId: string) => Promise<void>;
+    addToCart: (product: any, quantity: number, variant?: string) => Promise<void>;
+    updateQuantity: (productId: string, quantity: number, variant?: string) => Promise<void>;
+    removeItem: (productId: string, variant?: string) => Promise<void>;
     clearCart: () => Promise<void>;
+    cartReady: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+/** does this line match (id, variant)? undefined and "" both mean "base line" */
+const sameLine = (item: CartItem, id: string, variant?: string) =>
+    item._id === id && (item.variant || undefined) === (variant || undefined);
+
 export const CartProvider = ({ children }: { children: ReactNode }) => {
     const { status } = useSession();
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
+    const [cartReady, setCartReady] = useState(false);
 
-    // Use ref to track if we have processed the initial auth state
     const processedAuthState = useRef<string | null>(null);
-    const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const updateTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    /* PHASE 8: latest cart for the logout-retention path below */
+    const cartItemsRef = useRef<CartItem[]>([]);
+    useEffect(() => {
+        cartItemsRef.current = cartItems;
+    }, [cartItems]);
 
     const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-    const cartTotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const cartTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-    // 1. Main Initialization Effect
+    /* ---------- crash-proof init (Phase 6) + logout retention (Phase 8) ---------- */
     useEffect(() => {
-        // Don't do anything while session is loading
         if (status === "loading") return;
-
-        // If we already processed this state, don't do it again
-        // (Prevents running logic on every re-render)
-        if (processedAuthState.current === status) return;
-
+        const previous = processedAuthState.current;
+        if (previous === status) return;
         processedAuthState.current = status;
 
         const initializeCart = async () => {
-            // CASE A: User is Logged In
-            if (status === "authenticated") {
-                // 1. Load Local (Guest) Data to check for merging
-                const localData = localStorage.getItem("cart_guest");
-                const localItems: CartItem[] = localData ? JSON.parse(localData) : [];
+            const localItems = readGuestCart();
 
+            if (status === "authenticated") {
                 try {
-                    // 2. If guest items exist, merge them into DB
                     if (localItems.length > 0) {
                         await fetch("/api/cart/merge", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({ items: localItems }),
                         });
-                        localStorage.removeItem("cart_guest"); // Clear guest data
+                        clearGuestCart();
                     }
-
-                    // 3. Fetch the MASTER state from DB
                     const res = await fetch("/api/cart");
                     if (res.ok) {
                         const data = await res.json();
@@ -73,53 +84,79 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
                     }
                 } catch (e) {
                     console.error("Cart init failed", e);
+                    setCartItems(localItems);
                 }
-            }
-            // CASE B: User is Guest
-            else if (status === "unauthenticated") {
-                const localData = localStorage.getItem("cart_guest");
-                const localItems: CartItem[] = localData ? JSON.parse(localData) : [];
+            } else if (status === "unauthenticated") {
+                /* PHASE 8 — LOGOUT RETENTION: signing out no longer wipes the
+                   cart mid-visit. The just-viewed server cart carries over
+                   into guest mode (localStorage); the server copy is
+                   untouched and re-merges on the next login (max semantics).
+                   DELETE THIS BLOCK to restore the old empty-on-logout
+                   behaviour. */
+                if (previous === "authenticated" && localItems.length === 0) {
+                    const current = cartItemsRef.current;
+                    if (current.length > 0) {
+                        /* store one image per line — the UI only uses images[0] */
+                        writeGuestCart(
+                            current.map((it) => ({ ...it, images: it.images?.slice(0, 1) ?? [] }))
+                        );
+                        setCartItems(current);
+                        setCartReady(true);
+                        return;
+                    }
+                }
                 setCartItems(localItems);
             }
+            setCartReady(true);
         };
 
         initializeCart();
-    }, [status]); // Dependency on status ensures this runs when login happens
+    }, [status]);
 
-    const updateLocal = (items: CartItem[]) => {
+    /* single persistence point (Phase 6) */
+    useEffect(() => {
+        if (!cartReady) return;
         if (status !== "authenticated") {
-            localStorage.setItem("cart_guest", JSON.stringify(items));
+            writeGuestCart(cartItems);
         }
-    };
+    }, [cartItems, cartReady, status]);
 
-    const addToCart = async (product: any, quantity: number) => {
-        const existingIndex = cartItems.findIndex(item => item._id === product._id);
-        let newItems: CartItem[];
+    /* ---------- mutations — functional, race-safe (Phase 6) ---------- */
 
-        if (existingIndex > -1) {
-            newItems = [...cartItems];
-            newItems[existingIndex].quantity += quantity;
-        } else {
-            const newItem: CartItem = {
-                _id: product._id,
-                name: product.name,
-                price: product.price,
-                images: product.images,
-                unit: product.unit,
-                quantity: quantity
-            };
-            newItems = [...cartItems, newItem];
-        }
+    const addToCart = async (product: any, quantity: number, variant?: string) => {
+        const v = variant || undefined;
+        const addQty = Math.max(1, Math.min(MAX_QTY, Math.round(Number(quantity)) || 1));
 
-        setCartItems(newItems);
-        updateLocal(newItems);
+        setCartItems((prev) => {
+            const existingIndex = prev.findIndex((item) => sameLine(item, product._id, v));
+            if (existingIndex > -1) {
+                const next = [...prev];
+                next[existingIndex] = {
+                    ...next[existingIndex],
+                    quantity: Math.min(MAX_QTY, next[existingIndex].quantity + addQty),
+                };
+                return next;
+            }
+            return [
+                ...prev,
+                {
+                    _id: product._id,
+                    name: product.name,
+                    price: product.price,
+                    images: Array.isArray(product.images) ? product.images : [],
+                    unit: product.unit ?? "quantity",
+                    quantity: addQty,
+                    variant: v,
+                },
+            ];
+        });
 
         if (status === "authenticated") {
             try {
                 await fetch(`/api/cart/add/${product._id}`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ quantity }),
+                    body: JSON.stringify({ quantity: addQty, variant: v }),
                 });
             } catch (e) {
                 console.error("Add to cart failed", e);
@@ -127,12 +164,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const updateQuantity = async (productId: string, quantity: number) => {
-        const newItems = cartItems.map(item =>
-            item._id === productId ? { ...item, quantity } : item
+    const updateQuantity = async (productId: string, quantity: number, variant?: string) => {
+        const v = variant || undefined;
+        const q = Math.max(1, Math.min(MAX_QTY, Math.round(Number(quantity)) || 1));
+
+        setCartItems((prev) =>
+            prev.map((item) => (sameLine(item, productId, v) ? { ...item, quantity: q } : item))
         );
-        setCartItems(newItems);
-        updateLocal(newItems);
 
         if (status === "authenticated") {
             if (updateTimeoutRef.current) clearTimeout(updateTimeoutRef.current);
@@ -141,32 +179,53 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
                     await fetch(`/api/cart/update/${productId}`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ quantity }),
+                        body: JSON.stringify({ quantity: q, variant: v }),
                     });
-                } catch (e) { console.error("Update failed", e); }
+                } catch (e) {
+                    console.error("Update failed", e);
+                }
             }, 500);
         }
     };
 
-    const removeItem = async (productId: string) => {
-        const newItems = cartItems.filter(item => item._id !== productId);
-        setCartItems(newItems);
-        updateLocal(newItems);
+    const removeItem = async (productId: string, variant?: string) => {
+        const v = variant || undefined;
+        setCartItems((prev) => prev.filter((item) => !sameLine(item, productId, v)));
 
         if (status === "authenticated") {
             try {
-                await fetch(`/api/cart/remove/${productId}`, { method: "POST" });
-            } catch (e) { console.error("Remove failed", e); }
+                await fetch(`/api/cart/remove/${productId}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ variant: v }),
+                });
+            } catch (e) {
+                console.error("Remove failed", e);
+            }
         }
     };
 
     const clearCart = async () => {
+        const snapshot = cartItems;
         setCartItems([]);
-        updateLocal([]);
+
+        if (status === "authenticated" && snapshot.length > 0) {
+            await Promise.allSettled(
+                snapshot.map((item) =>
+                    fetch(`/api/cart/remove/${item._id}`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ variant: item.variant || undefined }),
+                    }).catch(() => null)
+                )
+            );
+        }
     };
 
     return (
-        <CartContext.Provider value={{ cartItems, cartCount, cartTotal, addToCart, updateQuantity, removeItem, clearCart }}>
+        <CartContext.Provider
+            value={{ cartItems, cartCount, cartTotal, addToCart, updateQuantity, removeItem, clearCart, cartReady }}
+        >
             {children}
         </CartContext.Provider>
     );

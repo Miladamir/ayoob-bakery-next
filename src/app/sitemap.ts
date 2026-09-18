@@ -3,21 +3,17 @@ import dbConnect from '@/lib/dbConnect';
 import Product from '@/models/Product';
 import Category from '@/models/Category';
 import Blog from '@/models/Blog';
+import { SITE_URL } from '@/lib/site';
+
+/* PHASE 3: regenerate hourly (ISR) instead of only at build time,
+   and never let a DB outage break the build or the sitemap. */
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    await dbConnect();
+    // PHASE 8: SITE_URL — the single source of truth for public URLs
+    const baseUrl = SITE_URL;
 
-    // Define Base URL (Fallback to localhost if env not set)
-    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-
-    // 1. Parallel Fetching for Speed
-    const [products, categories, blogs] = await Promise.all([
-        Product.find({}).select('_id updatedAt').lean(),
-        Category.find({}).select('_id').lean(),
-        Blog.find({}).select('_id date').lean(),
-    ]);
-
-    // 2. Static Routes
+    // 1. Static Routes
     const staticRoutes: MetadataRoute.Sitemap = [
         {
             url: baseUrl,
@@ -56,6 +52,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             priority: 0.7,
         },
     ];
+
+    // 2. Dynamic routes — best effort. If the DB is unreachable
+    //    (e.g. during a build on a machine without credentials),
+    //    the sitemap serves the static routes instead of failing.
+    let products: any[] = [];
+    let categories: any[] = [];
+    let blogs: any[] = [];
+
+    try {
+        await dbConnect();
+        [products, categories, blogs] = await Promise.all([
+            Product.find({}).select('_id updatedAt').lean(),
+            Category.find({}).select('_id').lean(),
+            Blog.find({}).select('_id date').lean(),
+        ]);
+    } catch (error) {
+        console.error('Sitemap: DB fetch failed — serving static routes only.', error);
+    }
 
     // 3. Dynamic Product Routes
     const productRoutes: MetadataRoute.Sitemap = products.map((p: any) => ({

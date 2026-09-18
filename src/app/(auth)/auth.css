@@ -1,0 +1,143 @@
+/* ============================================================
+   AUTH PAGES — login & signup: the ink aside (brand, headline,
+   framed illustration, drifting embers, stamp) + the flour form
+   side (the card with the hard offset shadow).
+============================================================ */
+
+/* ---------- PAGE SHELL ---------- */
+.authpage{min-height:100vh;min-height:100svh;display:grid;grid-template-columns:1.08fr .92fr}
+
+/* ---------- THE INK ASIDE ---------- */
+.auth-aside{position:relative;background:var(--ink);color:var(--cream);
+  padding:clamp(1.5rem,3vw,2.4rem) clamp(1.5rem,3.4vw,3rem);
+  display:flex;flex-direction:column;gap:clamp(1.2rem,3vh,2.2rem);
+  overflow:hidden;--line:var(--line-l);--ink2:#C4B49B}
+
+.aside-top{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;position:relative;z-index:1}
+.auth-aside .brand{color:var(--cream)}
+.auth-aside .brand-mark{border-color:rgba(247,241,229,.35);background:transparent}
+.auth-aside .brand:hover .brand-mark{border-color:var(--honey)}
+.auth-aside .brand-text small{color:rgba(247,241,229,.55)}
+.aside-chip{display:inline-flex;align-items:center;gap:.5rem;font:600 .66rem var(--ff-b);
+  letter-spacing:.18em;text-transform:uppercase;color:rgba(247,241,229,.6);
+  border:1.5px dashed rgba(247,241,229,.3);border-radius:999px;padding:.5rem .95rem}
+.aside-chip .lucide{width:13px;height:13px;color:var(--honey)}
+
+.aside-mid{flex:1;display:flex;flex-direction:column;justify-content:center;gap:1.1rem;position:relative;z-index:1}
+.auth-aside .kicker{color:var(--honey)}
+.aside-h{font:600 clamp(2.4rem,4.6vw,4rem)/1.02 var(--ff-d);letter-spacing:-.025em;max-width:14ch}
+.aside-h em{font-style:italic;font-weight:500;color:var(--honey);font-variation-settings:"SOFT" 80,"WONK" 1}
+.aside-p{color:#C4B49B;font-size:1.03rem;line-height:1.7;max-width:44ch}
+
+/* the framed illustration */
+.aside-frame{background:var(--cream);border:1.5px solid var(--ink);border-radius:20px;
+  padding:1.1rem 1.1rem .8rem;box-shadow:7px 7px 0 rgba(0,0,0,.5);
+  transform:rotate(-1.4deg);max-width:300px;margin-top:.5rem;transition:transform .5s var(--ease)}
+.aside-frame:hover{transform:rotate(-.4deg) translateY(-4px)}
+.aside-frame svg{width:100%;height:auto;display:block}
+.frame-cap{margin-top:.6rem;font:.74rem/1.45 var(--ff-b);color:var(--ink2);text-align:center}
+.frame-cap b{color:var(--ember)}
+
+.aside-foot{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;
+  font:.8rem var(--ff-b);color:rgba(247,241,229,.5);position:relative;z-index:1}
+.aside-foot a{color:var(--cream);text-decoration:none;border-bottom:1px dotted rgba(247,241,229,.4);
+  display:inline-flex;align-items:center;gap:.35rem;transition:.25s}
+.aside-foot a .lucide{width:13px;height:13px}
+.aside-foot a:hover{color:var(--honey);border-color:var(--honey)}
+
+/* floating decorations */
+.aside-stamp{position:absolute;right:clamp(1rem,3vw,2.2rem);top:38%;width:clamp(84px,9vw,118px);
+  opacity:.9;z-index:0;pointer-events:none}
+.aside-stamp svg{width:100%;height:auto;display:block;animation:spin 16s linear infinite}
+.auth-stamp-text{font:700 7.6px var(--ff-b);letter-spacing:1.1px;fill:var(--ink)}
+.aside-spark{position:absolute;left:7%;bottom:14%;width:40px;color:var(--honey);opacity:.85;
+  z-index:0;pointer-events:none}
+.aside-spark svg{width:100%;height:auto;display:block;animation:spin 22s linear infinite reverse}
+
+/* drifting embers */
+.fember{position:absolute;border-radius:50%;background:var(--honey);opacity:.75;filter:blur(.4px);
+  pointer-events:none;z-index:0;animation:fember var(--fd,7s) ease-in-out infinite;animation-delay:var(--fdel,0s)}
+@keyframes fember{0%,100%{transform:translateY(0) translateX(0);opacity:.15}30%{opacity:.8}60%{transform:translateY(-46px) translateX(10px);opacity:.45}}
+
+/* illustration animations */
+.steam path{animation:authrise 2.8s ease-in-out infinite}
+.steam .s2{animation-delay:.8s}
+.steam .s3{animation-delay:1.5s}
+@keyframes authrise{0%{opacity:0;transform:translateY(8px)}30%{opacity:.45}100%{opacity:0;transform:translateY(-14px)}}
+.fl{transform-box:fill-box;transform-origin:50% 100%;animation:flick .7s ease-in-out infinite alternate}
+.fl2{animation-delay:.28s;animation-duration:.6s}
+@keyframes flick{from{transform:scaleY(.85)}to{transform:scaleY(1.15)}}
+.on-light{animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.bag-peek{animation:authpop .6s cubic-bezier(.34,1.56,.64,1) .45s both;transform-box:fill-box;transform-origin:center}
+@keyframes authpop{from{opacity:0;transform:scale(.15) rotate(-16deg)}to{opacity:1;transform:scale(1)}}
+
+/* ---------- THE FORM SIDE ---------- */
+.auth-main{display:grid;place-items:center;padding:clamp(1.5rem,4vw,3rem);position:relative}
+.formcard{width:min(460px,100%);background:var(--cream);border:1.5px solid var(--ink);
+  border-radius:22px;box-shadow:7px 7px 0 var(--ink);padding:clamp(1.6rem,3.5vw,2.2rem)}
+
+.fc-head{margin-bottom:1.35rem}
+.fc-k{display:flex;align-items:center;gap:.8rem;font:600 .72rem/1 var(--ff-b);
+  letter-spacing:.22em;text-transform:uppercase;color:var(--ember)}
+.fc-k .k-rule{width:36px;height:1.5px;background:currentColor;opacity:.45}
+.fc-head h2{font:600 clamp(1.7rem,3vw,2.2rem)/1.05 var(--ff-d);letter-spacing:-.02em;margin-top:.8rem}
+.fc-head h2 em{font-style:italic;font-weight:500;color:var(--ember);font-variation-settings:"SOFT" 80,"WONK" 1}
+.fc-sub{margin-top:.4rem;font:.92rem var(--ff-b);color:var(--ink2)}
+
+/* fields — the template .field language */
+.field{margin-bottom:1.05rem}
+.field label{display:block;font:600 .7rem var(--ff-b);letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink2);margin-bottom:.45rem}
+.field input{width:100%;background:var(--flour);border:1.5px solid var(--line);border-radius:14px;
+  padding:.95rem 1.15rem;font:500 .98rem var(--ff-b);color:var(--ink);outline:none;transition:.25s}
+.field input::placeholder{color:rgba(107,89,70,.5)}
+.field input:focus{border-color:var(--ember);background:var(--cream)}
+
+.pw-wrap{position:relative;display:block}
+.pw-wrap input{padding-right:3.3rem}
+.pw-toggle{position:absolute;right:.55rem;top:50%;transform:translateY(-50%);width:34px;height:34px;
+  border-radius:50%;border:1.5px solid var(--line);background:none;color:var(--ink2);
+  display:grid;place-items:center;cursor:pointer;transition:.2s}
+.pw-toggle .lucide{width:16px;height:16px}
+.pw-toggle:hover{border-color:var(--ember);color:var(--ember)}
+
+/* error notice */
+.auth-err{display:flex;gap:.7rem;align-items:flex-start;background:var(--cream);
+  border:1.5px dashed var(--ember);color:var(--ember-d);border-radius:12px;
+  padding:.85rem 1rem;font:.86rem/1.5 var(--ff-b);margin-bottom:1.1rem}
+.auth-err .lucide{width:16px;height:16px;flex:none;margin-top:.15rem}
+
+/* buttons */
+.auth-submit{margin-top:.3rem}
+.spin{animation:spin 1s linear infinite}
+.gg{width:18px;height:18px;flex:none}
+
+/* divider */
+.or{display:flex;align-items:center;gap:.9rem;margin:1.15rem 0}
+.or::before,.or::after{content:"";flex:1;height:1.5px;background:var(--line)}
+.or span{font:600 .66rem var(--ff-b);letter-spacing:.2em;text-transform:uppercase;color:var(--ink2)}
+
+/* switch link */
+.auth-switch{text-align:center;margin-top:1.15rem;font:.9rem var(--ff-b);color:var(--ink2)}
+.auth-switch a{color:var(--ember);font-weight:600;text-decoration:none;border-bottom:1px dotted var(--ember)}
+.auth-switch a:hover{color:var(--ember-d)}
+
+/* trust lines */
+.auth-trust{list-style:none;margin:1.3rem 0 0;padding-top:1.1rem;border-top:1.5px dashed var(--line)}
+.auth-trust li{display:flex;align-items:center;gap:.6rem;font:.78rem/1.6 var(--ff-b);
+  color:var(--ink2);padding:.22rem 0}
+.auth-trust .lucide{width:14px;height:14px;color:var(--ember);flex:none}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:980px){
+  .authpage{grid-template-columns:1fr}
+  .auth-aside{gap:1rem;padding-bottom:1.3rem}
+  .aside-mid{justify-content:flex-start;gap:.8rem}
+  .aside-h{font-size:clamp(2rem,7vw,2.7rem)}
+  .aside-p{font-size:.96rem;max-width:56ch}
+  .aside-frame,.aside-stamp,.aside-spark{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .aside-stamp svg,.aside-spark svg,.fember,.steam path,.fl,.on-light,.bag-peek{animation:none}
+}

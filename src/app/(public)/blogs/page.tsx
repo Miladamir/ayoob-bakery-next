@@ -1,8 +1,12 @@
 import dbConnect from "@/lib/dbConnect";
 import Blog from "@/models/Blog";
 import Link from "next/link";
+import FontAwesome from "@/components/legacy/FontAwesome";
+import { placeholderImg } from "@/lib/format";
 
-export const dynamic = 'force-dynamic';
+/* PHASE 4 — ISR: the list is prerendered and revalidated every 5 min;
+   admin mutations revalidate /blogs immediately. */
+export const revalidate = 300;
 
 export default async function BlogsPage() {
     await dbConnect();
@@ -10,6 +14,9 @@ export default async function BlogsPage() {
 
     return (
         <>
+            {/* PHASE 5: this legacy-styled page still uses fa-* icons */}
+            <FontAwesome />
+
             {/* Hero Section */}
             <section className="pt-32 pb-12 bg-brand-900 text-white relative overflow-hidden">
                 <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
@@ -27,8 +34,9 @@ export default async function BlogsPage() {
                             {blogs.map((blog: any) => (
                                 <Link href={`/blog/${blog._id}`} key={blog._id.toString()} className="group block bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
                                     <div className="h-56 overflow-hidden">
+                                        {/* PHASE 9 (B6): via.placeholder.com is dead — inline SVG fallback */}
                                         <img
-                                            src={blog.image || 'https://via.placeholder.com/600x400'}
+                                            src={blog.image || placeholderImg(600, 400, "Ayoob Bakery — journal")}
                                             alt={blog.title}
                                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                         />

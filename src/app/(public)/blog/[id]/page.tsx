@@ -1,27 +1,46 @@
+import { cache } from "react";
 import dbConnect from "@/lib/dbConnect";
 import Blog from "@/models/Blog";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Metadata } from "next"; // Added import
+import { Metadata } from "next";
+import { placeholderImg } from "@/lib/format";
+import FontAwesome from "@/components/legacy/FontAwesome";
+
 
 interface Props {
     params: Promise<{ id: string }>;
 }
 
-export const dynamic = 'force-dynamic';
+/* PHASE 4 — ISR: blog posts are prerendered at build; admin mutations
+   (which revalidate /blog/[id]) keep them instantly fresh. */
+export const revalidate = 3600;
+export const dynamicParams = true;
 
-// ADDED: Dynamic SEO Metadata Generator
+export async function generateStaticParams() {
+    try {
+        await dbConnect();
+        const blogs = await Blog.find({}).select("_id").lean();
+        return blogs.map((b: any) => ({ id: String(b._id) }));
+    } catch {
+        return [];
+    }
+}
+
+/* QUERY DEDUP (Phase 3): one query serves metadata + page */
+const getBlog = cache(async (id: string) => {
+    await dbConnect();
+    return Blog.findById(id).lean();
+});
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { id } = await params;
-    await dbConnect();
-
-    const blog = await Blog.findById(id).select('title content image').lean();
+    const blog: any = await getBlog(id);
 
     if (!blog) {
         return { title: 'Post Not Found' };
     }
 
-    // Strip HTML for description
     const plainTextContent = blog.content ? blog.content.replace(/<[^>]*>?/gm, '') : '';
 
     return {
@@ -32,7 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             description: plainTextContent.substring(0, 150),
             images: blog.image ? [blog.image] : [],
             type: 'article',
-            publishedTime: (blog as any).createdAt || blog.date,
+            publishedTime: blog.createdAt || blog.date,
         },
     };
 }
@@ -40,22 +59,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function BlogDetailPage({ params }: Props) {
     const { id } = await params;
 
-    await dbConnect();
-
-    const blog = await Blog.findById(id).lean();
+    const blog: any = await getBlog(id);
 
     if (!blog) {
         notFound();
     }
 
-    // Fetch recent blogs for sidebar (excluding current)
     const recentBlogs = await Blog.find({ _id: { $ne: blog._id } })
         .limit(3)
         .sort({ createdAt: -1 })
+        .select("title date createdAt")
         .lean();
 
     return (
         <>
+            {/* PHASE 5: this legacy-styled page still uses fa-* icons */}
+            <FontAwesome />
+
             {/* Hero Section */}
             <section className="pt-32 pb-12 bg-brand-900 text-white relative overflow-hidden">
                 <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
@@ -67,8 +87,8 @@ export default async function BlogDetailPage({ params }: Props) {
                         {blog.title}
                     </h1>
                     <div className="flex items-center justify-center gap-6 text-sm text-brand-200">
-                        <span><i className="fa-solid fa-calendar-days mr-2"></i> {new Date((blog as any).createdAt || blog.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                        <span><i className="fa-solid fa-user mr-2"></i> Ayoob Bakery</span>
+                        <span><i className="fa-solid fa-calendar-days mr-2"></i> {new Date(blog.createdAt || blog.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                        <span><i className="fa-solid fa-user mr-2"></i> {blog.author || 'Ayoob Bakery'}</span>
                     </div>
                 </div>
             </section>
@@ -83,8 +103,9 @@ export default async function BlogDetailPage({ params }: Props) {
                             <article className="bg-white rounded-3xl shadow-lg overflow-hidden">
                                 {/* Featured Image */}
                                 <div className="aspect-video overflow-hidden">
+                                    {/* PHASE 9 (B6): via.placeholder.com is dead — inline SVG fallback */}
                                     <img
-                                        src={blog.image || 'https://via.placeholder.com/1200x600'}
+                                        src={blog.image || placeholderImg(1200, 600, "Ayoob Bakery — journal")}
                                         alt={blog.title}
                                         className="w-full h-full object-cover"
                                     />
@@ -128,7 +149,7 @@ export default async function BlogDetailPage({ params }: Props) {
                                                         {post.title}
                                                     </h4>
                                                     <p className="text-xs text-gray-400 mt-1">
-                                                        {new Date((post as any).createdAt || post.date).toLocaleDateString()}
+                                                        {new Date(post.createdAt || post.date).toLocaleDateString()}
                                                     </p>
                                                 </Link>
                                             ))

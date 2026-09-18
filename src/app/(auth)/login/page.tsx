@@ -1,108 +1,148 @@
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
+import {
+  ArrowRight,
+  Check,
+  Eye,
+  EyeOff,
+  Loader2,
+  Phone,
+  ShieldCheck,
+  TriangleAlert,
+} from "lucide-react";
+import AuthShell from "@/components/auth/AuthShell";
+import GoogleIcon from "@/components/icons/GoogleIcon";
+import { useToast } from "@/context/ToastContext";
 
 export default function LoginPage() {
-    const router = useRouter();
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const toast = useToast();
+  const { status } = useSession();
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setLoading(true);
-        setError("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPw, setShowPw] = useState(false);
+  const submitted = useRef(false);
 
-        const formData = new FormData(e.currentTarget);
-        const email = formData.get("email") as string;
-        const password = formData.get("password") as string;
+  /* already signed in? straight home — never fires after our own submit */
+  useEffect(() => {
+    if (status === "authenticated" && !submitted.current) router.replace("/");
+  }, [status, router]);
 
-        try {
-            const result = await signIn("credentials", {
-                email,
-                password,
-                redirect: false, // Handle redirect manually
-            });
+  /* where to land after login (?callbackUrl= aware, same-origin paths only) */
+  const dest = (): string => {
+    try {
+      const cb = new URLSearchParams(window.location.search).get("callbackUrl");
+      if (cb && cb.startsWith("/") && !cb.startsWith("//")) return cb;
+    } catch {}
+    return "/";
+  };
 
-            if (result?.error) {
-                setError(result.error);
-            } else {
-                router.push("/"); // or router.back()
-                router.refresh();
-            }
-        } catch (err) {
-            setError("Something went wrong");
-        } finally {
-            setLoading(false);
-        }
-    };
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    submitted.current = true;
+    setError("");
 
-    return (
-        <div className="min-h-screen flex flex-col md:flex-row">
-            {/* Left Side: Branding (Hidden on mobile) */}
-            <div className="hidden md:flex md:w-1/2 bg-brand-900 relative overflow-hidden">
-                {/* ... Same content as views/login.ejs Left Side ... */}
-                <img src="https://images.unsplash.com/photo-1517433670267-08bbd4be890f?q=80&w=2070&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover z-0 opacity-50" alt="Background" />
-                <div className="relative z-20 flex flex-col justify-center p-12 text-white">
-                    <h1 className="font-serif text-5xl font-bold leading-tight mb-6">Welcome Back to<br /> the Family</h1>
-                    <p className="text-brand-200 text-lg max-w-md leading-relaxed">
-                        Sign in to track your orders, save your favorite artisan loaves, and enjoy exclusive member discounts.
-                    </p>
-                </div>
-            </div>
+    const formData = new FormData(e.currentTarget);
+    const email = ((formData.get("email") as string) || "").trim();
+    const password = (formData.get("password") as string) || "";
 
-            {/* Right Side: Form */}
-            <div className="w-full md:w-1/2 flex items-center justify-center p-8 bg-white">
-                <div className="w-full max-w-md">
-                    <div className="text-center mb-10">
-                        <h2 className="font-serif text-3xl md:text-4xl font-bold text-gray-800 mb-2">Sign In</h2>
-                        <p className="text-gray-400">Enter your credentials to continue</p>
-                    </div>
+    if (!email || !password) {
+      setError("Both fields, please — the counter can't find you without them.");
+      return;
+    }
 
-                    {error && (
-                        <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
-                            <p>{error}</p>
-                        </div>
-                    )}
+    setLoading(true);
+    try {
+      const result = await signIn("credentials", { email, password, redirect: false });
+      if (result?.error) {
+        setError(
+          result.error === "CredentialsSignin"
+            ? "That email and password don't match anything behind the counter — mind checking them?"
+            : "Something went wrong at the counter — please try again."
+        );
+        setLoading(false);
+        return;
+      }
+      toast(Check, "The kettle's on", "Welcome back — your favourites missed you.");
+      router.push(dest());
+      router.refresh();
+    } catch {
+      setError("Something went wrong — check your connection and try again.");
+      setLoading(false);
+    }
+  };
 
-                    {/* Social Login */}
-                    <button
-                        onClick={() => signIn('google', { callbackUrl: '/' })}
-                        className="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 rounded-xl py-3.5 px-4 font-semibold text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-colors shadow-sm mb-6"
-                    >
-                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google" />
-                        Continue with Google
-                    </button>
+  const google = () => {
+    submitted.current = true;
+    signIn("google", { callbackUrl: dest() });
+  };
 
-                    <div className="flex items-center gap-4 mb-6">
-                        <div className="flex-grow h-px bg-gray-200"></div>
-                        <span className="text-gray-300 text-xs uppercase tracking-widest">or</span>
-                        <div className="flex-grow h-px bg-gray-200"></div>
-                    </div>
-
-                    {/* Credentials Form */}
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div>
-                            <label className="block text-sm font-semibold text-gray-600 mb-2">Email Address</label>
-                            <input type="email" name="email" required className="input-field w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 px-4 focus:outline-none focus:bg-white transition-all" placeholder="you@example.com" />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-semibold text-gray-600 mb-2">Password</label>
-                            <input type="password" name="password" required className="input-field w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 px-4 focus:outline-none focus:bg-white transition-all" placeholder="••••••••" />
-                        </div>
-                        <button type="submit" disabled={loading} className="w-full bg-brand-600 text-white py-4 rounded-xl font-bold uppercase tracking-wider hover:bg-brand-700 transition-colors shadow-lg hover:shadow-xl disabled:opacity-50">
-                            {loading ? "Signing In..." : "Sign In"}
-                        </button>
-                    </form>
-
-                    <p className="text-center mt-8 text-sm text-gray-500">
-                        {/* Fix: Changed </a> to </Link> */}
-                        Don't have an account? <Link href="/signup" className="text-brand-600 font-bold hover:underline">Create Account</Link>
-                    </p>
-                </div>
-            </div>
+  return (
+    <AuthShell variant="login">
+      <div className="formcard" id="authform" data-reveal>
+        <div className="fc-head">
+          <p className="fc-k"><span className="k-rule" /><span>Sign in</span></p>
+          <h2>Back to the <em>board.</em></h2>
+          <p className="fc-sub">Your favourites, orders and crumbs card — all where you left them.</p>
         </div>
-    );
+
+        {error && (
+          <div className="auth-err" role="alert">
+            <TriangleAlert /> {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} noValidate>
+          <div className="field">
+            <label htmlFor="email">Email</label>
+            <input
+              id="email" name="email" type="email" autoComplete="email"
+              placeholder="you@example.com" required
+            />
+          </div>
+
+          <div className="field">
+            <label htmlFor="password">Password</label>
+            <span className="pw-wrap">
+              <input
+                id="password" name="password" type={showPw ? "text" : "password"}
+                autoComplete="current-password" placeholder="••••••••" required
+              />
+              <button
+                type="button" className="pw-toggle"
+                onClick={() => setShowPw((v) => !v)}
+                aria-label={showPw ? "Hide password" : "Show password"}
+              >
+                {showPw ? <EyeOff /> : <Eye />}
+              </button>
+            </span>
+          </div>
+
+          <button className="btn btn-primary btn-block auth-submit" type="submit" disabled={loading}>
+            {loading ? <Loader2 className="spin" /> : (<>Sign in <ArrowRight /></>)}
+          </button>
+        </form>
+
+        <div className="or"><span>or</span></div>
+
+        <button className="btn btn-ghost btn-block" type="button" onClick={google}>
+          <GoogleIcon /> Continue with Google
+        </button>
+
+        <p className="auth-switch">
+          New here? <Link href="/signup">Create an account</Link>
+        </p>
+
+        <ul className="auth-trust">
+          <li><ShieldCheck /> Your details stay between you and the counter</li>
+          <li><Phone /> Forgot your password? Ring the counter — (03) 9387 2196</li>
+        </ul>
+      </div>
+    </AuthShell>
+  );
 }

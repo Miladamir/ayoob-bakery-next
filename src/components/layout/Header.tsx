@@ -1,301 +1,237 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useSession, signOut } from "next-auth/react";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { Heart, Search, ShoppingCart, User } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { NestedCategory } from "@/lib/data";
+import CartModal from "@/components/cart/CartModal";
 
-interface HeaderProps {
-    nestedCategories: NestedCategory[];
+/**
+ * Primary navigation — ported from the approved home-page template.
+ * Sticky (never hides), glass-blur once scrolled, full-screen mobile
+ * menu with staggered links. The template's 6th link slot
+ * ("About Pages") is wired to the blog — swap it here if needed.
+ */
+const NAV_LINKS = [
+  { href: "/", label: "Home" },
+  { href: "/products", label: "Products" },
+  { href: "/categories", label: "Categories" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
+  { href: "/blogs", label: "Blog" },
+];
+
+function isActive(pathname: string, href: string): boolean {
+  if (href === "/") return pathname === "/";
+  if (href === "/blogs") return pathname.startsWith("/blogs") || pathname.startsWith("/blog/");
+  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export default function Header({ nestedCategories }: HeaderProps) {
-    const [isScrolled, setIsScrolled] = useState(false);
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [isSearchOpen, setIsSearchOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [suggestions, setSuggestions] = useState<string[]>([]);
+export default function Header() {
+  const pathname = usePathname();
+  const { data: session } = useSession();
+  const { cartCount } = useCart();
+  const { wishlistIds } = useWishlist();
 
-    const searchInputRef = useRef<HTMLInputElement>(null);
-    const { data: session } = useSession();
-    const { cartCount } = useCart();
-    const { wishlistIds } = useWishlist();
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
 
-    // Scroll Listener
-    useEffect(() => {
-        const handleScroll = () => {
-            setIsScrolled(window.scrollY > 50);
-        };
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
+  // close the mobile menu on route change
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
 
-    // Close search on ESC key
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "Escape") {
-                setIsSearchOpen(false);
-                setIsMobileMenuOpen(false);
-            }
-        };
-        window.addEventListener("keydown", handleKeyDown);
-        return () => window.removeEventListener("keydown", handleKeyDown);
-    }, []);
+  // scrolled state (glass background)
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
-    // Focus search input when modal opens
-    useEffect(() => {
-        if (isSearchOpen && searchInputRef.current) {
-            searchInputRef.current.focus();
-        }
-    }, [isSearchOpen]);
+  // body lock while the mobile menu is open
+  useEffect(() => {
+    document.body.classList.toggle("menu-open", menuOpen);
+    return () => document.body.classList.remove("menu-open");
+  }, [menuOpen]);
 
-    // Search Autocomplete Logic
-    useEffect(() => {
-        if (searchQuery.length < 2) {
-            setSuggestions([]);
-            return;
-        }
-
-        const debounceTimer = setTimeout(async () => {
-            try {
-                const res = await fetch(`/api/search/suggest?q=${encodeURIComponent(searchQuery)}`);
-                if (res.ok) {
-                    const data = await res.json();
-                    setSuggestions(data);
-                }
-            } catch (error) {
-                console.error("Search error:", error);
-            }
-        }, 300);
-
-        return () => clearTimeout(debounceTimer);
-    }, [searchQuery]);
-
-    const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
-    const openSearch = () => setIsSearchOpen(true);
-    const closeSearch = () => {
-        setIsSearchOpen(false);
-        setSearchQuery("");
-        setSuggestions([]);
+  // Escape closes the menu; resizing to desktop closes it too
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
     };
+    const onResize = () => {
+      if (window.innerWidth > 1000) setMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("resize", onResize);
+    };
+  }, [menuOpen]);
 
-    return (
-        <>
-            {/* NAVIGATION HEADER */}
-            <nav
-                id="navbar"
-                className={`fixed w-full z-50 transition-all duration-500 py-2 ${isScrolled
-                        ? "bg-white shadow-lg py-1 text-gray-800"
-                        : "text-white"
-                    }`}
+  const profileHref = session ? "/profile" : "/login";
+  const closeMenu = () => setMenuOpen(false);
+
+  return (
+    <>
+      {/* ============ NAV (sticky, never hides) ============ */}
+      <header id="nav" className={scrolled ? "scrolled" : undefined}>
+        <div className="nav-in wrap">
+          <Link href="/" className="brand" aria-label="Ayoob Bakery — back to top" onClick={closeMenu}>
+            <span className="brand-mark">
+              <Image
+                src="/images/logo.png"
+                alt="Ayoob Bakery"
+                width={46}
+                height={46}
+                priority
+                className="brand-logo"
+              />
+            </span>
+            <span className="brand-text">
+              <b>AYOOB</b>
+              <small>Bakery · Melbourne</small>
+            </span>
+          </Link>
+
+          {/* site pages */}
+          <nav className="nav-links" aria-label="Primary">
+            {NAV_LINKS.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                className={isActive(pathname, l.href) ? "active" : undefined}
+              >
+                {l.label}
+              </Link>
+            ))}
+          </nav>
+
+          
+          {/* icon actions — desktop only (text entries live in the mobile menu) */}
+          <div className="nav-icons">
+            <Link href="/search" className="nav-ic" aria-label="Search" title="Search">
+              <Search />
+            </Link>
+
+            <Link
+              href="/wishlist"
+              className="nav-ic"
+              id="icoFav"
+              aria-label={`Favourites (${wishlistIds.length})`}
             >
-                <div className="w-full px-6 flex justify-between items-center">
+              <Heart />
+              <NavBadge count={wishlistIds.length} />
+            </Link>
 
-                    {/* LEFT SIDE: LOGO & TITLE */}
-                    <Link href="/" className="flex items-center gap-4 group z-10" id="main-logo">
-                        <div className="w-14 h-14 md:w-16 md:h-16 relative flex-shrink-0 flex items-center justify-center">
-                            <img
-                                src="/images/logo.png"
-                                alt="Ayoob Bakery Australia Logo"
-                                className="w-full h-full object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300"
-                            />
-                        </div>
-                        <div className={`flex flex-col justify-center border-l pl-4 transition-colors ${isScrolled ? 'border-gray-200' : 'border-white/30'}`}>
-                            <span className={`font-serif text-3xl md:text-4xl font-bold tracking-tight leading-none ${isScrolled ? 'text-gray-800' : 'text-white'}`}>
-                                Ayoob Bakery
-                            </span>
-                            <span className={`font-sans text-xs md:text-sm uppercase tracking-[0.3em] font-semibold mt-1 ${isScrolled ? 'text-brand-600' : 'text-brand-300'}`}>
-                                Australia
-                            </span>
-                        </div>
-                    </Link>
-
-                    {/* RIGHT SIDE: LINKS & ICONS */}
-                    <div className="hidden lg:flex items-center space-x-8">
-                        {[
-                            { href: "/", label: "Home" },
-                            { href: "/products", label: "Shop" },
-                            { href: "/categories", label: "Categories" },
-                            { href: "/about", label: "About" },
-                            { href: "/blogs", label: "Blog" },
-                            { href: "/contact", label: "Contact" },
-                        ].map((link) => (
-                            <Link
-                                key={link.href}
-                                href={link.href}
-                                className="hover:text-brand-500 transition-colors uppercase text-sm tracking-widest font-semibold relative group nav-link-hover"
-                            >
-                                {link.label}
-                            </Link>
-                        ))}
-
-                        {/* Utility Icons */}
-                        <div className="flex items-center gap-4 pl-8 border-l border-white/20">
-                            <button onClick={openSearch} className="relative hover:text-brand-500 transition-colors focus:outline-none">
-                                <i className="fa-solid fa-magnifying-glass text-lg"></i>
-                            </button>
-
-                            <Link href="/wishlist" className="relative hover:text-brand-500 transition-colors">
-                                <i className="fa-solid fa-heart text-lg"></i>
-                                {wishlistIds.length > 0 && (
-                                    <span className="absolute -top-2 -right-2 w-5 h-5 bg-brand-500 text-white text-xs rounded-full flex items-center justify-center">
-                                        {wishlistIds.length}
-                                    </span>
-                                )}
-                            </Link>
-
-                            <Link href="/cart" className="relative hover:text-brand-500 transition-colors p-2 border border-transparent hover:border-brand-500 rounded-full">
-                                <i className="fa-solid fa-shopping-bag text-xl"></i>
-                                {cartCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-xs rounded-full flex items-center justify-center font-bold">
-                                        {cartCount}
-                                    </span>
-                                )}
-                            </Link>
-
-                            {session ? (
-                                <div className="flex items-center gap-4">
-                                    <Link href="/profile" className="hover:text-brand-500 transition-colors">
-                                        <i className="fa-solid fa-user text-lg"></i>
-                                    </Link>
-                                    <button onClick={() => signOut({ callbackUrl: '/' })} className="hover:text-brand-500 transition-colors">
-                                        <i className="fa-solid fa-sign-out-alt text-lg"></i>
-                                    </button>
-                                </div>
-                            ) : (
-                                <Link href="/login" className="hover:text-brand-500 transition-colors">
-                                    <i className="fa-solid fa-user text-lg"></i>
-                                </Link>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Mobile Menu Button */}
-                    <div className="lg:hidden flex items-center gap-4 z-10">
-                        <button onClick={openSearch} className="focus:outline-none">
-                            <i className="fa-solid fa-magnifying-glass text-xl"></i>
-                        </button>
-                        <button
-                            onClick={toggleMobileMenu}
-                            className="focus:outline-none p-2 rounded-lg hover:bg-white/10 transition-colors"
-                            aria-label="Open Menu"
-                        >
-                            <i className={`fa-solid ${isMobileMenuOpen ? 'fa-xmark' : 'fa-bars'} text-3xl`}></i>
-                        </button>
-                    </div>
-                </div>
-
-                {/* Mobile Menu Dropdown */}
-                <div
-                    id="mobile-menu"
-                    className={`lg:hidden absolute top-full left-0 w-full bg-white text-gray-800 shadow-2xl border-t border-gray-100 ${isMobileMenuOpen ? 'open' : ''}`}
-                >
-                    <div className="flex flex-col py-4 px-6">
-                        {[
-                            { href: "/", label: "Home", icon: "fa-home" },
-                            { href: "/products", label: "All Products", icon: "fa-store" },
-                            { href: "/categories", label: "Categories", icon: "fa-tags" },
-                            { href: "/about", label: "About Us", icon: "fa-info-circle" },
-                            { href: "/blogs", label: "Blog", icon: "fa-newspaper" },
-                            { href: "/contact", label: "Contact", icon: "fa-envelope" },
-                        ].map((link) => (
-                            <Link
-                                key={link.href}
-                                href={link.href}
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                className="px-4 py-3 hover:bg-brand-50 border-b border-gray-100 font-semibold text-gray-700 flex justify-between items-center"
-                            >
-                                {link.label} <i className={`fas ${link.icon} text-brand-500`}></i>
-                            </Link>
-                        ))}
-
-                        {/* Mobile Quick Actions */}
-                        <div className="mt-6 px-4 space-y-3">
-                            {/* Cart Button */}
-                            <Link href="/cart" onClick={() => setIsMobileMenuOpen(false)} className="w-full flex items-center justify-center gap-2 bg-brand-500 text-white py-3 rounded-full font-bold shadow-md">
-                                <i className="fa-solid fa-shopping-bag"></i> View Cart
-                            </Link>
-
-                            {/* Wishlist Button (Added for Mobile) */}
-                            <Link href="/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="w-full flex items-center justify-center gap-2 border border-brand-500 text-brand-500 py-3 rounded-full font-bold hover:bg-brand-50">
-                                <i className="fa-solid fa-heart"></i> Wishlist
-                            </Link>
-
-                            {session ? (
-                                <>
-                                    <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)} className="w-full flex items-center justify-center gap-2 border border-gray-200 text-gray-700 py-3 rounded-full font-bold hover:bg-gray-50">
-                                        <i className="fa-solid fa-user"></i> My Profile
-                                    </Link>
-                                    <button onClick={() => signOut()} className="w-full flex items-center justify-center gap-2 text-gray-500 py-2 text-sm">
-                                        <i className="fa-solid fa-sign-out-alt"></i> Logout
-                                    </button>
-                                </>
-                            ) : (
-                                <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="w-full flex items-center justify-center gap-2 text-gray-500 py-2 text-sm hover:text-brand-600">
-                                    <i className="fa-solid fa-sign-in-alt"></i> Login / Sign Up
-                                </Link>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </nav>
-
-            {/* SEARCH MODAL */}
-            <div
-                id="searchModal"
-                onClick={closeSearch}
-                className={`fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm flex items-start justify-center pt-20 px-4 ${isSearchOpen ? 'visible' : 'hidden'}`}
+            <button
+              type="button"
+              className="nav-ic"
+              id="icoCart"
+              onClick={() => setCartOpen(true)}
+              aria-label={`Your cart (${cartCount} items)`}
             >
-                <div className="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
-                    <div className="flex justify-between items-center p-4 border-b border-gray-100">
-                        <h3 className="font-bold text-gray-800">Search Products</h3>
-                        <button onClick={closeSearch} className="text-gray-400 hover:text-gray-600 text-xl">
-                            <i className="fa-solid fa-xmark"></i>
-                        </button>
-                    </div>
+              <ShoppingCart />
+              <NavBadge count={cartCount} />
+            </button>
 
-                    {/* FIX: Added Form Tag with Action and Name */}
-                    <form action="/search" method="GET" className="relative">
-                        <input
-                            type="text"
-                            name="q"
-                            ref={searchInputRef}
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full py-5 px-6 text-xl text-gray-800 focus:outline-none"
-                            placeholder="Search for breads, pastries..."
-                            autoComplete="off"
-                        />
-                        <button
-                            type="submit"
-                            className="absolute right-4 top-1/2 -translate-y-1/2 text-brand-500 hover:text-brand-600"
-                        >
-                            <i className="fa-solid fa-search text-xl"></i>
-                        </button>
-                    </form>
+            <Link
+              href={profileHref}
+              className="nav-ic"
+              aria-label={session ? "Profile" : "Log in"}
+            >
+              <User />
+            </Link>
+          </div>
 
-                    <div className="border-t border-gray-100 max-h-96 overflow-y-auto">
-                        {searchQuery.length < 2 ? (
-                            <div className="p-6 text-center text-gray-400 text-sm">Type at least 2 characters...</div>
-                        ) : suggestions.length > 0 ? (
-                            suggestions.map((name, idx) => (
-                                <Link
-                                    key={idx}
-                                    href={`/search?q=${encodeURIComponent(name)}`}
-                                    onClick={closeSearch}
-                                    className="block px-6 py-3 hover:bg-brand-50 text-gray-700 border-b border-gray-50 last:border-0 transition-colors"
-                                >
-                                    <i className="fa-solid fa-search text-gray-300 mr-3 text-sm"></i> {name}
-                                </Link>
-                            ))
-                        ) : (
-                            <div className="p-6 text-center text-gray-400 text-sm">No products found.</div>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </>
-    );
+          <button
+            type="button"
+            className="burger"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((v) => !v)}
+          >
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </header>
+
+      {/* ============ MOBILE MENU ============ */}
+      <nav className="mm" aria-label="Mobile">
+        <div>
+          {NAV_LINKS.map((l, i) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              className="mm-link"
+              style={{ "--i": i } as React.CSSProperties}
+              onClick={closeMenu}
+            >
+              <span className="no">{String(i + 1).padStart(2, "0")}</span>
+              {l.label}
+            </Link>
+          ))}
+        </div>
+
+        <div className="mm-bottom">
+          {/* the desktop icon actions, as text */}
+          <div className="mm-actions">
+            <Link href="/search" className="mm-action" onClick={closeMenu}>
+              <Search />
+              Search
+            </Link>
+            <Link href="/wishlist" className="mm-action" onClick={closeMenu}>
+              <Heart />
+              Favourites
+              {wishlistIds.length > 0 && (
+                <span className="mm-count">{wishlistIds.length}</span>
+              )}
+            </Link>
+            <button
+              type="button"
+              className="mm-action"
+              onClick={() => {
+                closeMenu();
+                window.setTimeout(() => setCartOpen(true), 150);
+              }}
+            >
+              <ShoppingCart />
+              Cart
+              {cartCount > 0 && <span className="mm-count">{cartCount}</span>}
+            </button>
+            <Link href={profileHref} className="mm-action" onClick={closeMenu}>
+              <User />
+              {session ? "Profile" : "Log in"}
+            </Link>
+          </div>
+          <div className="mm-foot">
+            <a href="tel:+61393872196">(03) 9387 2196</a>
+            <span>312 Lygon St · Brunswick</span>
+          </div>
+        </div>
+      </nav>
+
+      {/* ============ CART MODAL ============ */}
+      <CartModal open={cartOpen} onClose={() => setCartOpen(false)} />
+    </>
+  );
+}
+
+/** Cart / wishlist pill — replays the bump animation whenever the count changes */
+function NavBadge({ count }: { count: number }) {
+  if (count <= 0) return null;
+  return (
+    <span key={count} className="nav-badge bump">
+      {count}
+    </span>
+  );
 }

@@ -136,7 +136,7 @@ export default function ProductForm({ initialData, categories, isEdit = false }:
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div>
                     <label className="block text-sm font-semibold text-gray-600 mb-1">Price ($)</label>
                     <input name="price" type="number" step="0.01" value={formData.price} onChange={handleChange} required className="w-full border p-2 rounded-lg" />
@@ -152,6 +152,15 @@ export default function ProductForm({ initialData, categories, isEdit = false }:
                         <option value="Bestseller">Bestseller</option>
                         <option value="New">New</option>
                         <option value="Popular">Popular</option>
+                        <option value="Featured">Featured</option>
+                    </select>
+                </div>
+                <div>
+                    <label className="block text-sm font-semibold text-gray-600 mb-1">Unit</label>
+                    <select name="unit" value={formData.unit} onChange={handleChange} className="w-full border p-2 rounded-lg">
+                        <option value="quantity">Quantity (each)</option>
+                        <option value="kg">Weight (per kg)</option>
+                        <option value="lb">Weight (per lb)</option>
                     </select>
                 </div>
             </div>

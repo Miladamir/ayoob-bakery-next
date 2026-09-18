@@ -1,134 +1,188 @@
 "use client";
 
+import { useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image"; // Import Image
+import Image from "next/image";
+import { Check, Heart, HeartOff, Plus, Wheat } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { IProduct } from "@/models/Product";
+import { useToast } from "@/context/ToastContext";
+import { money, stripHtml } from "@/lib/format";
+import { flyToCart } from "@/lib/flyToCart";
+import type { IProduct } from "@/models/Product";
 
 interface ProductCardProps {
-    product: IProduct;
+  product: IProduct;
+  /** stagger index for the entrance animation */
+  index?: number;
+  /** When provided, unhearting is delegated to the parent (the wishlist page
+      uses this for its undo toast + exit animation). Default: internal toggle. */
+  onUnheart?: (productId: string) => void;
+  /** Renders the card in its exit-animation state (pairs with onUnheart). */
+  exiting?: boolean;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
-    const { addToCart, cartItems } = useCart();
-    const { isInWishlist, toggleWishlist } = useWishlist();
+/** badge → tag tone (ember / ink / sage), matching the template's tag variants */
+const TONES: Record<string, string> = {
+  Bestseller: "",
+  New: "sage",
+  Popular: "ink",
+  Featured: "ink",
+};
 
-    const productId = product._id.toString();
-    const isInCart = cartItems.some(item => item._id === productId);
-    const isWishlisted = isInWishlist(productId);
+const UNITS: Record<string, string> = {
+  quantity: "each",
+  kg: "per kg",
+  lb: "per lb",
+};
 
-    const displayPrice = product.discount > 0
-        ? (product.price * (1 - product.discount / 100)).toFixed(2)
-        : product.price.toFixed(2);
+export default function ProductCard({
+  product,
+  index = 0,
+  onUnheart,
+  exiting = false,
+}: ProductCardProps) {
+  const { addToCart, cartItems } = useCart();
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const toast = useToast();
 
-    const handleAddToCart = async (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        await addToCart(product, 1);
-    };
+  const id = product._id.toString();
+  const cardRef = useRef<HTMLElement>(null);
+  const addRef = useRef<HTMLButtonElement>(null);
+  const [flick, setFlick] = useState(false);
 
-    const handleWishlistToggle = async (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        await toggleWishlist(productId);
-    };
+  const discount = product.discount ?? 0;
+  const hasDiscount = discount > 0;
+  const price = hasDiscount ? product.price * (1 - discount / 100) : product.price;
 
-    return (
-        <div className="product-card bg-white rounded-2xl shadow-lg overflow-hidden group cursor-pointer relative border border-transparent hover:shadow-xl transition-all duration-300">
-            {/* Image Container */}
-            <div className="relative h-72 overflow-hidden">
-                <Link href={`/product/${productId}`} className="block w-full h-full">
-                    <Image
-                        src={product.images[0] || 'https://via.placeholder.com/400'}
-                        alt={product.name}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        priority={false} // Lazy load by default
-                    />
-                </Link>
+  const isFav = isInWishlist(id);
+  const inCart = cartItems.some((i) => i._id === id);
 
-                {/* Badge Logic */}
-                {product.badge && (
-                    <div className="absolute top-4 left-4 bg-brand-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md uppercase tracking-wide z-10">
-                        {product.badge}
-                    </div>
-                )}
+  const unit = UNITS[product.unit] ?? "each";
+  const desc = (product.shortDescription || stripHtml(product.description || "")).slice(0, 110);
 
-                {product.discount > 0 && (
-                    <div className={`absolute top-4 ${product.badge ? 'left-24' : 'left-4'} bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md uppercase tracking-wide z-10`}>
-                        -{product.discount}%
-                    </div>
-                )}
+  const handleAdd = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    await addToCart(product, 1);
 
-                {/* Wishlist Button */}
-                <button
-                    onClick={handleWishlistToggle}
-                    className="btn-favorite absolute top-4 right-4 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:bg-white transition-colors z-10"
-                >
-                    <i className={`fa${isWishlisted ? 's' : 'r'} fa-heart ${isWishlisted ? 'text-brand-500' : 'text-gray-400'}`}></i>
-                </button>
-            </div>
+    // fly the little thumbnail to the cart icon
+    flyToCart(addRef.current, product.images?.[0]);
 
-            {/* Content Container */}
-            <div className="p-5 border-t border-gray-50">
-                {/* Category Tag */}
-                <p className="text-xs text-brand-400 font-semibold uppercase tracking-widest mb-1">
-                    {(product.category as any)?.name || 'Uncategorized'}
-                </p>
+    // boing the illustration
+    const ill = cardRef.current?.querySelector(".pc-ill");
+    if (ill && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      ill.classList.remove("boing");
+      void (ill as HTMLElement).offsetWidth;
+      ill.classList.add("boing");
+    }
 
-                {/* Header: Title & Price */}
-                <div className="flex justify-between items-start gap-4 mb-2">
-                    <Link href={`/product/${productId}`}>
-                        <h3 className="font-serif text-xl font-bold text-gray-800 leading-tight group-hover:text-brand-600 transition-colors">
-                            {product.name}
-                        </h3>
-                    </Link>
-                    <div className="text-right flex-shrink-0">
-                        <span className="text-xl font-bold text-brand-600">${displayPrice}</span>
-                        <span className="block text-xs text-gray-400">{product.unit}</span>
-                    </div>
-                </div>
+    setFlick(true);
+    window.setTimeout(() => setFlick(false), 900);
+    toast(Check, "Added to cart", `${product.name} — ${money(price)}`);
+  };
 
-                {/* Description */}
-                <p className="text-gray-400 text-sm leading-relaxed mb-4 line-clamp-2">
-                    {product.description ? product.description.substring(0, 60) + '...' : 'Delicious freshly baked item.'}
-                </p>
-
-                {/* Footer Actions */}
-                <div className="flex items-center justify-between pt-4 border-t border-gray-100 border-dashed">
-                    {/* Rating */}
-                    <div className="flex items-center gap-1.5">
-                        <div className="flex text-yellow-400 text-sm">
-                            {[1, 2, 3, 4, 5].map((i) => (
-                                <i key={i} className={`fa${product.ratings >= i ? 's' : product.ratings >= i - 0.5 ? 's fa-star-half-stroke' : 'r'} fa-star`}></i>
-                            ))}
-                        </div>
-                        <span className="text-xs text-gray-400 font-medium">({product.reviews?.length || 0})</span>
-                    </div>
-
-                    {/* Add to Cart Logic */}
-                    {isInCart ? (
-                        <div className="flex items-center gap-2">
-                            <div className="flex items-center gap-2 text-green-600">
-                                <i className="fa-solid fa-check-circle"></i>
-                                <span className="text-sm font-bold">Added</span>
-                            </div>
-                            <Link href="/cart" onClick={(e) => e.stopPropagation()} className="text-brand-600 font-bold text-sm hover:underline">
-                                View Cart
-                            </Link>
-                        </div>
-                    ) : (
-                        <button
-                            onClick={handleAddToCart}
-                            className="btn-add-cart w-10 h-10 rounded-full border-2 border-gray-100 text-gray-400 flex items-center justify-center hover:border-brand-500 hover:text-white hover:bg-brand-500 transition-all"
-                        >
-                            <i className="fa-solid fa-plus text-sm"></i>
-                        </button>
-                    )}
-                </div>
-            </div>
-        </div>
+  const handleFav = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // the wishlist page takes over unhearting (undo + exit animation)
+    if (isFav && onUnheart) {
+      onUnheart(id);
+      return;
+    }
+    const willBeFav = !isFav;
+    await toggleWishlist(id);
+    toast(
+      willBeFav ? Heart : HeartOff,
+      willBeFav ? "Saved to favourites" : "Removed from favourites",
+      willBeFav
+        ? `${product.name} — we'll keep it warm for you.`
+        : `${product.name} is off the list.`
     );
+  };
+
+  return (
+    <article
+      className={`pc${exiting ? " out" : ""}`}
+      ref={cardRef}
+      style={{ "--d": `${index * 55}ms` } as React.CSSProperties}
+    >
+      {/* ---- art plate ---- */}
+      <div className="pc-art">
+        <Link href={`/product/${id}`} className="pc-art-link" aria-label={product.name}>
+          <span className="pc-ring" aria-hidden="true" />
+          <span className="pc-ill">
+            {product.images?.[0] ? (
+              <Image
+                src={product.images[0]}
+                alt={product.name}
+                fill
+                sizes="(max-width: 560px) 88vw, (max-width: 1024px) 45vw, 300px"
+                className="pc-img"
+              />
+            ) : (
+              <Wheat className="pc-noimg" aria-hidden="true" />
+            )}
+          </span>
+        </Link>
+
+        {(product.badge || hasDiscount) && (
+          <span className="pc-tags">
+            {product.badge && (
+              <span className={`pc-tag${TONES[product.badge] ? ` pc-tag--${TONES[product.badge]}` : ""}`}>
+                {product.badge}
+              </span>
+            )}
+            {hasDiscount && (
+              <span className="pc-tag pc-tag--ink">−{Math.round(discount)}%</span>
+            )}
+          </span>
+        )}
+
+        <button
+          type="button"
+          key={String(isFav)}
+          className={`pc-heart${isFav ? " on" : ""}`}
+          onClick={handleFav}
+          aria-pressed={isFav}
+          aria-label={
+            isFav
+              ? `Remove ${product.name} from favourites`
+              : `Save ${product.name} to favourites`
+          }
+        >
+          <Heart />
+        </button>
+      </div>
+
+      {/* ---- body ---- */}
+      <div className="pc-body">
+        <h3 className="pc-name">
+          <Link href={`/product/${id}`}>{product.name}</Link>
+        </h3>
+        {desc && <p className="pc-desc">{desc}</p>}
+
+        <div className="pc-foot">
+          <p className="pc-price">
+            <b>{money(price)}</b>
+            <span>
+              {unit}
+              {hasDiscount ? ` · was ${money(product.price)}` : ""}
+            </span>
+          </p>
+
+          <button
+            ref={addRef}
+            type="button"
+            className={`pc-add${flick || inCart ? " done" : ""}`}
+            onClick={handleAdd}
+            aria-label={`Add ${product.name} to the cart`}
+          >
+            <Plus />
+            <Check />
+          </button>
+        </div>
+      </div>
+    </article>
+  );
 }

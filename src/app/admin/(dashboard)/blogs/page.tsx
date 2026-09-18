@@ -1,12 +1,17 @@
 import dbConnect from "@/lib/dbConnect";
 import Blog from "@/models/Blog";
 import Link from "next/link";
+import { placeholderImg } from "@/lib/format";
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminBlogsPage() {
     await dbConnect();
-    const blogs = await Blog.find().sort({ createdAt: -1 }).lean();
+    // PHASE 3: the table shows image/title/date — fetch exactly that
+    const blogs = await Blog.find()
+        .select("title image createdAt")
+        .sort({ createdAt: -1 })
+        .lean();
 
     return (
         <div>
@@ -32,7 +37,8 @@ export default async function AdminBlogsPage() {
                             {blogs.map((blog: any) => (
                                 <tr key={blog._id.toString()} className="hover:bg-gray-50">
                                     <td className="p-3 md:p-4">
-                                        <img src={blog.image || "https://via.placeholder.com/100"} className="w-12 h-12 md:w-16 md:h-12 rounded-lg object-cover" alt={blog.title} />
+                                        {/* PHASE 9 (B6): via.placeholder.com is dead — inline SVG fallback */}
+                                        <img src={blog.image || placeholderImg(100, 100)} className="w-12 h-12 md:w-16 md:h-12 rounded-lg object-cover" alt={blog.title} />
                                     </td>
                                     <td className="p-3 md:p-4 font-semibold text-gray-800 text-sm md:text-base">{blog.title}</td>
                                     <td className="p-3 md:p-4 text-gray-500 text-sm hidden md:table-cell">

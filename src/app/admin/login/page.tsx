@@ -4,6 +4,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import FontAwesome from "@/components/legacy/FontAwesome";
 
 export default function AdminLoginPage() {
     const router = useRouter();
@@ -41,6 +42,10 @@ export default function AdminLoginPage() {
 
     return (
         <div className="font-sans text-gray-700 bg-brand-900 min-h-screen flex items-center justify-center">
+
+            {/* PHASE 5: this page sits outside the admin dashboard layout
+                (different route group) — it loads FA itself */}
+            <FontAwesome />
 
             <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-2xl relative overflow-hidden">
                 {/* Background Pattern */}

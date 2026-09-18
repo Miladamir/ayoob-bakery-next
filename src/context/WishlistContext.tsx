@@ -2,12 +2,15 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from "react";
 import { useSession } from "next-auth/react";
+import { readGuestWishlist, writeGuestWishlist, clearGuestWishlist, isId } from "@/lib/localStore";
 
 interface WishlistContextType {
     wishlistIds: string[];
     isInWishlist: (productId: string) => boolean;
     toggleWishlist: (productId: string) => Promise<void>;
-    refreshWishlist: (validIds: string[]) => void; // NEW: Allow page to sync valid IDs
+    refreshWishlist: (validIds: string[]) => void;
+    /** true once the initial guest/server wishlist load has finished */
+    wishlistReady: boolean;
 }
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
@@ -15,20 +18,27 @@ const WishlistContext = createContext<WishlistContextType | undefined>(undefined
 export const WishlistProvider = ({ children }: { children: ReactNode }) => {
     const { status } = useSession();
     const [wishlistIds, setWishlistIds] = useState<string[]>([]);
-    const processedAuthState = useRef<string | null>(null);
+    const [wishlistReady, setWishlistReady] = useState(false);
 
+    const processedAuthState = useRef<string | null>(null);
+    const inflight = useRef<Map<string, number>>(new Map());
+
+    /* PHASE 8: latest wishlist for the logout-retention path below */
+    const wishlistIdsRef = useRef<string[]>([]);
+    useEffect(() => {
+        wishlistIdsRef.current = wishlistIds;
+    }, [wishlistIds]);
+
+    /* crash-proof init (Phase 6) + logout retention (Phase 8) */
     useEffect(() => {
         if (status === "loading") return;
-        if (processedAuthState.current === status) return;
+        const previous = processedAuthState.current;
+        if (previous === status) return;
 
         processedAuthState.current = status;
 
         const initializeWishlist = async () => {
-            const localData = localStorage.getItem("wishlist_guest");
-            let localIds: string[] = localData ? JSON.parse(localData) : [];
-
-            // FIX: Validate that IDs are valid 24-char Hex strings (MongoDB ObjectIDs)
-            localIds = localIds.filter(id => id && /^[a-fA-F0-9]{24}$/.test(id));
+            const localIds = readGuestWishlist();
 
             if (status === "authenticated") {
                 try {
@@ -38,7 +48,7 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({ ids: localIds }),
                         });
-                        localStorage.removeItem("wishlist_guest");
+                        clearGuestWishlist();
                     }
 
                     const res = await fetch("/api/wishlist");
@@ -51,56 +61,75 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
                     setWishlistIds(localIds);
                 }
             } else if (status === "unauthenticated") {
+                /* PHASE 8 — LOGOUT RETENTION: same policy as the cart.
+                   DELETE THIS BLOCK to restore empty-on-logout. */
+                if (previous === "authenticated" && localIds.length === 0) {
+                    const current = wishlistIdsRef.current;
+                    if (current.length > 0) {
+                        writeGuestWishlist(current);
+                        setWishlistIds(current);
+                        setWishlistReady(true);
+                        return;
+                    }
+                }
                 setWishlistIds(localIds);
             }
+
+            setWishlistReady(true);
         };
 
         initializeWishlist();
     }, [status]);
 
-    const updateLocal = (ids: string[]) => {
+    /* single persistence point (Phase 6) */
+    useEffect(() => {
+        if (!wishlistReady) return;
         if (status !== "authenticated") {
-            localStorage.setItem("wishlist_guest", JSON.stringify(ids));
+            writeGuestWishlist(wishlistIds);
         }
-    };
+    }, [wishlistIds, wishlistReady, status]);
 
     const isInWishlist = (productId: string) => wishlistIds.includes(productId);
 
     const toggleWishlist = async (productId: string) => {
-        let newIds: string[];
-        const wasInWishlist = wishlistIds.includes(productId);
+        if (!isId(productId)) return;
 
-        if (wasInWishlist) {
-            newIds = wishlistIds.filter(id => id !== productId);
-        } else {
-            newIds = [...wishlistIds, productId];
-        }
+        const flip = (prev: string[]) =>
+            prev.includes(productId)
+                ? prev.filter((id) => id !== productId)
+                : [...prev, productId];
 
-        setWishlistIds(newIds);
-        updateLocal(newIds);
+        const seq = (inflight.current.get(productId) ?? 0) + 1;
+        inflight.current.set(productId, seq);
+        setWishlistIds(flip);
 
         if (status === "authenticated") {
             try {
                 await fetch(`/api/wishlist/toggle/${productId}`, { method: "POST" });
+                if (inflight.current.get(productId) === seq) {
+                    inflight.current.delete(productId);
+                }
             } catch (e) {
                 console.error("Toggle failed", e);
-                setWishlistIds(wishlistIds);
-                updateLocal(wishlistIds);
+                if (inflight.current.get(productId) === seq) {
+                    inflight.current.delete(productId);
+                    setWishlistIds(flip);
+                }
             }
         }
     };
 
-    // NEW: Function to update list if invalid products are found
     const refreshWishlist = (validIds: string[]) => {
-        // Only update if the list actually changed (e.g. ghost IDs removed)
-        if (JSON.stringify(validIds.sort()) !== JSON.stringify(wishlistIds.sort())) {
-            setWishlistIds(validIds);
-            updateLocal(validIds);
-        }
+        setWishlistIds((prev) => {
+            const next = Array.from(new Set(validIds.filter(isId)));
+            const same =
+                prev.length === next.length && next.every((id) => prev.includes(id));
+            return same ? prev : next;
+        });
     };
 
     return (
-        <WishlistContext.Provider value={{ wishlistIds, isInWishlist, toggleWishlist, refreshWishlist }}>
+        <WishlistContext.Provider value={{ wishlistIds, isInWishlist, toggleWishlist, refreshWishlist, wishlistReady }}>
             {children}
         </WishlistContext.Provider>
     );

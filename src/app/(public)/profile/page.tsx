@@ -2,25 +2,36 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import FontAwesome from "@/components/legacy/FontAwesome";
 
 export default function ProfilePage() {
     const { data: session, status } = useSession();
     const router = useRouter();
     const [activeTab, setActiveTab] = useState("profile");
 
-    // We keep this loading state for UX, but Middleware handles the auth check.
-    if (status === "loading") {
+    // middleware is gone — guard the page here instead
+    useEffect(() => {
+        if (status === "unauthenticated") {
+            router.replace("/login?callbackUrl=/profile");
+        }
+    }, [status, router]);
+
+    // treat "not signed in yet" like "loading" so nothing flashes
+    if (status === "loading" || status === "unauthenticated") {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-brand-50">
-                <p className="text-gray-500">Loading...</p>
+            <div className="min-h-screen flex items-center justify-center bg-flour">
+                <p className="text-ink2">Loading...</p>
             </div>
         );
     }
 
     return (
         <>
+            {/* PHASE 5: this legacy-styled page still uses fa-* icons */}
+            <FontAwesome />
+
             {/* Hero Section */}
             <section className="pt-32 pb-12 bg-brand-900 text-white relative overflow-hidden">
                 <div className="container mx-auto px-6 relative z-10 text-center">

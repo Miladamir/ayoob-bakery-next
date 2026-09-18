@@ -1,128 +1,173 @@
+import { cache } from "react";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import dbConnect from "@/lib/dbConnect";
 import Product from "@/models/Product";
-import ProductGallery from "@/components/product/ProductGallery";
-import ProductActions from "@/components/product/ProductActions";
-import ProductTabs from "@/components/product/ProductTabs";
-import ProductCard from "@/components/ui/ProductCard";
-import { Metadata } from "next"; // Added import
+import ProductDetail from "@/components/product/ProductDetail";
+import { stripHtml } from "@/lib/format";
+import { SITE_URL as siteUrl } from "@/lib/site";
+import "./product.css";
 
-export const dynamic = 'force-dynamic';
+/* PHASE 4 — ISR: every product page is prerendered at build time and
+   served from the cache. Freshness is on-demand, not eventual:
+   - admin create/update/delete call revalidatePath(`/product/${id}`)
+   - reviews (post/edit/delete) call revalidatePath(`/product/${id}`)
+   The hourly revalidate is only a safety net (e.g. direct DB edits).
+   dynamicParams=true (default) means brand-new products still render
+   on first request, then cache. */
+export const revalidate = 3600;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  try {
+    await dbConnect();
+    const products = await Product.find({}).select("_id").lean();
+    return products.map((p: any) => ({ id: String(p._id) }));
+  } catch {
+    /* building on a machine without DB access: render on demand instead */
+    return [];
+  }
+}
+
+/* the full field set the DETAIL page itself renders */
+const FIELDS =
+  "name price images unit discount badge shortDescription description ingredients nutrition options ratings salesCount reviews category";
+
+/* PAYLOAD DIET (Phase 3): related products render as ProductCards —
+   one image + a ~110-char blurb. */
+const CARD_FIELDS = "name price images unit discount badge shortDescription description ratings";
+
+const trimForCard = (p: any) => ({
+  _id: String(p._id),
+  name: p.name,
+  price: p.price,
+  images: p.images?.slice(0, 1) ?? [],
+  unit: p.unit,
+  discount: p.discount ?? 0,
+  badge: p.badge ?? "",
+  ratings: p.ratings ?? 0,
+  shortDescription:
+    p.shortDescription || stripHtml(p.description || "").slice(0, 110),
+});
+
+/* QUERY DEDUP (Phase 3): generateMetadata and the page share one query */
+const getProduct = cache(async (id: string) => {
+  await dbConnect();
+  return Product.findById(id).select(FIELDS).populate("category", "name").lean();
+});
 
 interface Props {
-    params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>;
 }
 
-// ADDED: Dynamic SEO Metadata Generator
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const { id } = await params;
-    await dbConnect();
+  const { id } = await params;
+  const product: any = await getProduct(id);
 
-    const product = await Product.findById(id).select('name shortDescription description images').lean();
+  if (!product) return { title: "Product Not Found" };
 
-    if (!product) {
-        return { title: 'Product Not Found' };
-    }
+  const description =
+    product.shortDescription ||
+    (product.description ? stripHtml(product.description).slice(0, 150) : "") ||
+    "Delicious freshly baked item from Ayoob Bakery, Brunswick.";
 
-    const description = product.shortDescription || (product.description ? product.description.replace(/<[^>]*>?/gm, '').substring(0, 150) : 'Delicious freshly baked item.');
-
-    return {
-        title: product.name,
-        description: description,
-        openGraph: {
-            title: product.name,
-            description: description,
-            images: product.images?.length > 0 ? [product.images[0]] : [],
-            type: 'article',
-        },
-    };
+  return {
+    title: product.name,
+    description,
+    alternates: { canonical: `/product/${id}` },
+    openGraph: {
+      title: `${product.name} | Ayoob Bakery Melbourne`,
+      description,
+      images: product.images?.length ? [product.images[0]] : [],
+      type: "website",
+    },
+  };
 }
 
-export default async function ProductDetailPage({ params }: Props) {
-    const { id } = await params;
+export default async function ProductPage({ params }: Props) {
+  const { id } = await params;
 
-    await dbConnect();
+  const product: any = await getProduct(id);
 
-    const product = await Product.findById(id).populate('category').lean();
+  if (!product) notFound();
 
-    if (!product) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <h1 className="text-2xl font-bold text-gray-700">Product not found</h1>
-            </div>
-        );
-    }
+  /* related: same aisle first, topped up with the best sellers */
+  const catId = product.category?._id;
+  let related: any[] = await Product.find({
+    category: catId,
+    _id: { $ne: id },
+  })
+    .select(CARD_FIELDS)
+    .limit(8)
+    .lean();
 
-    const category = product.category as any;
+  if (related.length < 8) {
+    const exclude = [id, ...related.map((r: any) => r._id)];
+    const more = await Product.find({ _id: { $nin: exclude } })
+      .select(CARD_FIELDS)
+      .sort({ salesCount: -1, ratings: -1 })
+      .limit(8 - related.length)
+      .lean();
+    related = [...related, ...more];
+  }
 
-    // Fetch related products
-    const relatedProducts = await Product.find({
-        category: category._id || category,
-        _id: { $ne: product._id }
-    }).limit(4).lean();
+  const serializedProduct = JSON.parse(JSON.stringify(product));
+  const serializedRelated = related.map(trimForCard);
 
-    // Serialize data
-    const serializedProduct = JSON.parse(JSON.stringify(product));
-    const serializedRelated = JSON.parse(JSON.stringify(relatedProducts));
+  /* ---------- SEO: Product + Breadcrumb rich results ---------- */
+  const eff =
+    serializedProduct.discount > 0
+      ? serializedProduct.price * (1 - serializedProduct.discount / 100)
+      : serializedProduct.price;
+  const reviewCount = serializedProduct.reviews?.length || 0;
 
-    // Breadcrumb logic
-    const breadcrumb = [
-        { name: 'Home', href: '/' },
-        { name: 'Menu', href: '/products' },
-        { name: category?.name || 'Category', href: `/products?category=${category._id || category}` },
-        { name: product.name, href: '#' }
-    ];
+  const productLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: serializedProduct.name,
+    description: serializedProduct.shortDescription || stripHtml(serializedProduct.description || ""),
+    image: serializedProduct.images || [],
+    category: serializedProduct.category?.name,
+    url: `${siteUrl}/product/${id}`,
+    offers: {
+      "@type": "Offer",
+      price: eff.toFixed(2),
+      priceCurrency: "AUD",
+      availability: "https://schema.org/InStock",
+      url: `${siteUrl}/product/${id}`,
+    },
+    ...(reviewCount > 0
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: serializedProduct.ratings?.toFixed?.(1) ?? String(serializedProduct.ratings ?? 0),
+            reviewCount,
+          },
+        }
+      : {}),
+  };
 
-    return (
-        <>
-            {/* Hero Header */}
-            <section className="pt-32 pb-12 bg-brand-900 text-white relative overflow-hidden">
-                <div className="container mx-auto px-6 relative z-10">
-                    <nav className="flex mb-6 text-sm text-brand-300">
-                        {breadcrumb.map((item, i) => (
-                            <span key={i} className="flex items-center">
-                                <a href={item.href} className="hover:text-white transition-colors">{item.name}</a>
-                                {i < breadcrumb.length - 1 && <i className="fa-solid fa-chevron-right text-xs text-brand-500 mx-2"></i>}
-                            </span>
-                        ))}
-                    </nav>
-                    <h1 className="font-serif text-3xl md:text-4xl font-bold">{product.name}</h1>
-                </div>
-            </section>
+  const crumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+      { "@type": "ListItem", position: 2, name: "The Board", item: `${siteUrl}/products` },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: serializedProduct.category?.name || "Products",
+        item: `${siteUrl}/products?category=${serializedProduct.category?._id}`,
+      },
+      { "@type": "ListItem", position: 4, name: serializedProduct.name, item: `${siteUrl}/product/${id}` },
+    ],
+  };
 
-            {/* Main Product Section */}
-            <section className="py-12 bg-white border-b border-gray-100">
-                <div className="container mx-auto px-6">
-                    <div className="grid lg:grid-cols-2 gap-12 lg:gap-20">
-                        <ProductGallery images={serializedProduct.images} />
-                        <div className="flex flex-col justify-center">
-                            <ProductActions product={serializedProduct} />
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <ProductTabs product={serializedProduct} />
-
-            {/* Related Products */}
-            <section className="py-20 bg-white">
-                <div className="container mx-auto px-6">
-                    <div className="flex justify-between items-end mb-12">
-                        <div>
-                            <span className="text-brand-500 font-bold tracking-widest uppercase text-xs">You Might Also Like</span>
-                            <h2 className="font-serif text-3xl md:text-4xl text-gray-800 font-bold mt-1">Related Products</h2>
-                        </div>
-                        <a href={`/products?category=${category._id || category}`} className="hidden md:flex items-center gap-2 text-brand-600 font-semibold hover:text-brand-700 group">
-                            View All <i className="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
-                        </a>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {serializedRelated.map((p: any) => (
-                            <ProductCard key={p._id} product={p} />
-                        ))}
-                    </div>
-                </div>
-            </section>
-        </>
-    );
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbLd) }} />
+      <ProductDetail product={serializedProduct} related={serializedRelated} />
+    </>
+  );
 }

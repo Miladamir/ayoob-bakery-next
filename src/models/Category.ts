@@ -12,7 +12,11 @@ const categorySchema = new Schema<ICategory>({
     parent: { type: Schema.Types.ObjectId, ref: 'Category', default: null },
     image: { type: String },
     description: { type: String }
-});
+}, { timestamps: true });
+
+/* INDEX (Phase 3): the category tree (getNestedCategories) filters on
+   parent twice per call — { parent: null } and { parent: { $ne: null } } */
+categorySchema.index({ parent: 1 });
 
 const Category: Model<ICategory> = mongoose.models.Category || mongoose.model<ICategory>('Category', categorySchema);
 

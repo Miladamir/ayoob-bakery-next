@@ -1,14 +1,25 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
-    // 1. Tell Tailwind where your files are
+const config = {
     content: [
         "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
         "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     ],
     theme: {
         extend: {
-            // 2. Map your CSS variables to Tailwind colors
             colors: {
+                /* ---- new design palette ---- */
+                flour: 'var(--flour)',
+                flour2: 'var(--flour2)',
+                cream: 'var(--cream)',
+                ink: 'var(--ink)',
+                ink2: 'var(--ink2)',
+                ember: 'var(--ember)',
+                emberd: 'var(--ember-d)',
+                honey: 'var(--honey)',
+                kraft: 'var(--kraft)',
+                sage: 'var(--sage)',
+
+                /* ---- legacy palette (old pages) ---- */
                 brand: {
                     DEFAULT: 'var(--primary)',
                     50: 'var(--muted)',
@@ -16,8 +27,8 @@ module.exports = {
                     200: '#eaddd7',
                     300: '#e0c1b3',
                     400: '#d29a8a',
-                    500: 'var(--primary)',     // Main Brand Color
-                    600: 'var(--primary-dark)', // Hover
+                    500: 'var(--primary)',
+                    600: 'var(--primary-dark)',
                     700: 'var(--primary-darker)',
                     800: '#73372f',
                     900: '#5f302b',
@@ -28,11 +39,14 @@ module.exports = {
                 },
             },
             fontFamily: {
-                sans: ['var(--font-body)'],
-                serif: ['var(--font-heading)'],
+                sans: ['var(--ff-b)'],
+                serif: ['var(--ff-d)'],
             },
         },
     },
-    // 3. Add the Tailwind plugins if you have them installed, otherwise leave empty
     plugins: [],
-}
+};
+
+/* PHASE 9: module.exports in a .ts config — export default, same as
+   next.config.ts was fixed in Phase 1. Behaviour identical. */
+export default config;

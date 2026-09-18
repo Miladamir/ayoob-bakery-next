@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
+import "./Category";
 
 // Interfaces for nested schemas
 interface IProductOptionValue {
@@ -12,7 +13,7 @@ interface IProductOption {
 }
 
 interface IProductReview {
-    userId?: mongoose.Types.ObjectId;
+    userId?: mongoose.Types.ObjectId | null;
     user: string;
     comment: string;
     rating: number;
@@ -39,6 +40,9 @@ export interface IProduct extends Document {
 }
 
 // Schema Definitions
+/* timestamps: true (Phase 3) — the codebase already sorts and reads
+   createdAt everywhere; now every new document is guaranteed to have
+   it. Existing docs are untouched (see the optional backfill below). */
 const productSchema = new Schema<IProduct>({
     name: { type: String, required: true },
     price: { type: Number, required: true },
@@ -73,7 +77,18 @@ const productSchema = new Schema<IProduct>({
         rating: Number,
         date: { type: Date, default: Date.now }
     }]
-});
+}, { timestamps: true });
+
+/* INDEXES (Phase 3) — every hot list query gets an index-backed path:
+   - badge:      the four homepage tab queries (find badge: "Bestseller"…)
+   - category:   related-products + per-category board queries
+   - createdAt:  the "newest first" sort used on nearly every list
+   Mongoose creates these automatically on first model use per process
+   (autoIndex default). Verify in Atlas → Collections → Indexes after
+   the first request post-deploy. */
+productSchema.index({ badge: 1 });
+productSchema.index({ category: 1 });
+productSchema.index({ createdAt: -1 });
 
 const Product: Model<IProduct> = mongoose.models.Product || mongoose.model<IProduct>('Product', productSchema);
 

@@ -1,13 +1,17 @@
 import dbConnect from "@/lib/dbConnect";
 import Product from "@/models/Product";
-import Category from "@/models/Category";
 import Link from "next/link";
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminProductsPage() {
     await dbConnect();
-    const products = await Product.find().populate('category').sort({ createdAt: -1 }).lean();
+    // PHASE 3: the table shows image/name/price/category/badge — fetch exactly that
+    const products = await Product.find()
+        .select("name price images category badge")
+        .populate('category')
+        .sort({ createdAt: -1 })
+        .lean();
 
     return (
         <div>

@@ -1,4 +1,3 @@
-// 1. CRITICAL: Import models used in .populate() to register their schemas
 import Category from "@/models/Category";
 import Product from "@/models/Product";
 import dbConnect from "@/lib/dbConnect";
@@ -7,14 +6,11 @@ import mongoose from "mongoose";
 
 export const dynamic = 'force-dynamic';
 
+/* Phase 3: hard cap — matches the WishlistContext's local cap */
+const MAX_IDS = 500;
+
 export async function GET(request: Request) {
     try {
-        // 2. Force reference the model to ensure schema is registered in this isolated serverless function
-        // This prevents "MissingSchemaError" on cold starts
-        if (!mongoose.models.Category) {
-            mongoose.model('Category', Category.schema);
-        }
-
         const { searchParams } = new URL(request.url);
         const ids = searchParams.get("ids");
 
@@ -24,7 +20,7 @@ export async function GET(request: Request) {
 
         await dbConnect();
 
-        const rawIds = ids.split(",");
+        const rawIds = ids.split(",").slice(0, MAX_IDS);
         const idArray: mongoose.Types.ObjectId[] = [];
 
         for (const id of rawIds) {
@@ -42,13 +38,20 @@ export async function GET(request: Request) {
             return NextResponse.json([]);
         }
 
-        // 3. Perform the query
+        // Importing Category above registers its schema — that alone
+        // prevents "MissingSchemaError" on cold starts.
         const products = await Product.find({ _id: { $in: idArray } })
             .select('name price images unit category badge discount')
             .populate('category', 'name')
             .lean();
 
-        return NextResponse.json(JSON.parse(JSON.stringify(products)));
+        // PAYLOAD DIET (Phase 3): cards render one image
+        const trimmed = products.map((p: any) => ({
+            ...p,
+            images: p.images?.slice(0, 1) ?? [],
+        }));
+
+        return NextResponse.json(JSON.parse(JSON.stringify(trimmed)));
 
     } catch (error: any) {
         console.error("--- WISHLIST API ERROR ---", error);

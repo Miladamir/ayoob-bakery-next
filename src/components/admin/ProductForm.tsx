@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import ImageUpload from "@/components/admin/ImageUpload";
 
 interface OptionValue { value: string; price: number; }
 interface OptionGroup { name: string; values: OptionValue[]; }
@@ -166,8 +167,28 @@ export default function ProductForm({ initialData, categories, isEdit = false }:
             </div>
 
             <div>
-                <label className="block text-sm font-semibold text-gray-600 mb-1">Images (Comma separated URLs)</label>
-                <input name="images" value={formData.images} onChange={handleChange} className="w-full border p-2 rounded-lg" />
+                <label className="block text-sm font-semibold text-gray-600 mb-1">Images</label>
+                <div className="flex gap-2 items-start">
+                    <input
+                        name="images"
+                        value={formData.images}
+                        onChange={handleChange}
+                        className="w-full border p-2 rounded-lg"
+                        placeholder="Uploaded URLs land here — or paste your own, comma separated"
+                    />
+                    <ImageUpload
+                        folder="products"
+                        multiple
+                        label="Upload"
+                        onUploaded={(url) =>
+                            setFormData((prev) => {
+                                const list = prev.images.split(",").map((s) => s.trim()).filter(Boolean);
+                                return { ...prev, images: [...list, url].join(", ") };
+                            })
+                        }
+                    />
+                </div>
+                <p className="text-xs text-gray-400 mt-1">Upload from your device (the Cloudinary URL is added automatically), or paste URLs.</p>
             </div>
 
             <div>

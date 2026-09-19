@@ -9,8 +9,7 @@ import Reviews from "@/components/home/Reviews";
 import Faqs from "@/components/home/Faqs";
 import ContactSection from "@/components/home/ContactSection";
 import { stripHtml } from "@/lib/format";
-import { SITE_URL as siteUrl } from "@/lib/site";
-import "./home.css";
+import { SITE_URL as siteUrl, BUSINESS_NAME, PHONE_TEL, SOCIAL_PROFILES } from "@/lib/site";import "./home.css";
 
 /* ISR: the homepage is prerendered and re-validated every 5 minutes.
    Admin actions already call revalidatePath('/'), so edits appear instantly. */
@@ -24,12 +23,14 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Bakery",
-  name: "Ayoob Bakery",
+  name: BUSINESS_NAME,
   description:
-    "Stone-baked sourdough, Afghan naan, butter croissants and more, fresh from Brunswick every morning.",
+    "Stone-baked sourdough, Afghan naan, butter croissants and more, fresh from Dandenong North every morning.",
   url: siteUrl,
   image: `${siteUrl}/images/og-image.jpg`,
-  telephone: "+61393872196",
+  telephone: PHONE_TEL,
+  foundingDate: "1952",
+  sameAs: SOCIAL_PROFILES,
   email: "hello@ayoobbakery.com.au",
   priceRange: "$$",
   address: {

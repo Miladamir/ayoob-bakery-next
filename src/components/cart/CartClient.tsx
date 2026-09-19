@@ -301,7 +301,7 @@ export default function CartClient({ pool }: { pool: CartPoolProduct[] }) {
     lines.push(`Total: ${money(cartTotal)}`);
     if (note.trim()) lines.push(`Note: ${note.trim()}`);
     lines.push("Pick-up: 312 Lygon Street, Brunswick VIC · ready in ~20 minutes");
-    lines.push("Call to confirm: (03) 9387 2196");
+    lines.push("Call to confirm: 0473 621 594");
     const ok = await copyText(lines.join("\n"));
     if (ok) toast(Check, okTitle, okMsg);
     else toast(X, "Copy failed", "Give it one more try.");
@@ -313,7 +313,7 @@ export default function CartClient({ pool }: { pool: CartPoolProduct[] }) {
       toast(ShoppingBag, "Nothing to order yet", "Pick a few bakes first — the slip is right here.");
       return;
     }
-    if (status?.open) window.location.href = "tel:+61393872196";
+    if (status?.open) window.location.href = "tel:+61473621594";
     else copyOrder("Order copied", "Paste it anywhere — ring us when we open and it's yours.");
   };
 
@@ -542,7 +542,7 @@ export default function CartClient({ pool }: { pool: CartPoolProduct[] }) {
                 <div className="sum-ctas">
                   <button className="btn btn-primary btn-block" type="button" onClick={callAction} aria-live="polite">
                     {status?.open ? (
-                      <><Phone /> Call to order — (03) 9387 2196</>
+                      <><Phone /> Call to order — 0473 621 594</>
                     ) : (
                       <><Clock /> Closed — copy your order for tomorrow</>
                     )}

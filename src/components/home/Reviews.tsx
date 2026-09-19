@@ -5,24 +5,24 @@ import { ArrowLeft, ArrowRight, Star } from "lucide-react";
 
 const REVIEWS = [
   {
-    q: "The sourdough here has ruined every other loaf in Melbourne for me. I do the Coburg-to-Brunswick run every Saturday and regret nothing.",
-    n: "Priya M. — Coburg",
+    q: "The sourdough here has ruined every other loaf in Melbourne for me. I drive past three bakeries to get here every Saturday and regret nothing.",
+    n: "Priya M. — Keysborough",
   },
   {
-    q: "The naan comes out warm, the bolani has a queue of regulars by 7 am, and the counter remembers your order by week two. That’s an institution.",
-    n: "Hamed R. — Brunswick",
+    q: "The naan comes out warm, the bolani has a queue of regulars by 9 am, and the counter remembers your order by week two. That's an institution.",
+    n: "Hamed R. — Dandenong North",
   },
   {
     q: "I sent a mixed dozen to the office. It did not survive the 9 am stand-up.",
-    n: "Jess T. — Collingwood",
+    n: "Jess T. — Noble Park",
   },
   {
-    q: "Cardamom scrolls on Friday are worth setting an alarm for. I’ve started calling them my weekly bonus.",
-    n: "Marta K. — Fitzroy",
+    q: "Cardamom scrolls on Friday are worth setting an alarm for. I've started calling them my weekly bonus.",
+    n: "Marta K. — Springvale",
   },
   {
-    q: "Proper baklava, proper espresso, and the kind of counter chat you can’t get in a chain. Ten years a local.",
-    n: "Sam W. — Carlton",
+    q: "Proper baklava, proper espresso, and the kind of counter chat you can't get in a chain. Grew up on this baklava.",
+    n: "Sam W. — Endeavour Hills",
   },
 ];
 

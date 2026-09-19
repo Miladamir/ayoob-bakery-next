@@ -422,3 +422,28 @@ footer{background:var(--ink);color:var(--flour2);padding:clamp(4rem,8vw,6.5rem) 
 .container{width:min(1240px,100%);margin-inline:auto}
 .section-padding{padding:80px 0}
 .input-field:focus{border-color:var(--ember);box-shadow:0 0 0 3px rgba(196,85,30,.15)}
+
+/* ============================================================
+   ROUTE PROGRESS BAR — client-side navigation feedback.
+   Compositor-only (scaleX transform, Phase 10 discipline):
+   the trickle is a keyframe curve, the finish is a transform
+   transition — zero layout/paint per frame.
+============================================================ */
+.rpb{position:fixed;top:0;left:0;right:0;height:3px;z-index:130;pointer-events:none;
+  opacity:0;transition:opacity .25s ease-out}
+.rpb.on{opacity:1}
+.rpb.done{opacity:0;transition:opacity .25s ease-out .12s}
+.rpb-bar{display:block;height:100%;width:100%;transform-origin:0 50%;transform:scaleX(0);
+  background:linear-gradient(90deg,var(--ember),var(--honey));
+  box-shadow:0 0 8px rgba(196,85,30,.55)}
+.rpb.on .rpb-bar{animation:rpb-advance 7s cubic-bezier(.2,.6,.35,1) forwards}
+.rpb.done .rpb-bar{animation:none;transform:scaleX(1);transition:transform .2s ease-out}
+@keyframes rpb-advance{
+  0%{transform:scaleX(0)}
+  6%{transform:scaleX(.22)}
+  22%{transform:scaleX(.44)}
+  48%{transform:scaleX(.62)}
+  78%{transform:scaleX(.75)}
+  100%{transform:scaleX(.84)}
+}
+@media (prefers-reduced-motion:reduce){.rpb{display:none}}

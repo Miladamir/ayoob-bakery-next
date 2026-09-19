@@ -22,7 +22,7 @@ const securityHeaders = [
 
 const nextConfig = {
   // Keep this for Mongoose compatibility on Serverless
-  serverExternalPackages: ["mongoose", "bcryptjs"],
+  serverExternalPackages: ["mongoose", "bcryptjs", "cloudinary"],
 
   // Don't advertise the framework (removes the X-Powered-By header)
   poweredByHeader: false,
@@ -46,6 +46,7 @@ const nextConfig = {
       { protocol: 'https', hostname: 'via.placeholder.com' },
       { protocol: 'https', hostname: 'cdn-icons-png.flaticon.com' },
       { protocol: 'https', hostname: 'www.transparenttextures.com' },
+      { protocol: 'https', hostname: 'res.cloudinary.com' },
     ],
   },
 

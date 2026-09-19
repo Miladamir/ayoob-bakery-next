@@ -5,7 +5,7 @@ import dbConnect from "@/lib/dbConnect";
 import Product from "@/models/Product";
 import ProductDetail from "@/components/product/ProductDetail";
 import { stripHtml } from "@/lib/format";
-import { SITE_URL as siteUrl } from "@/lib/site";
+import { SITE_URL as siteUrl, BUSINESS_NAME } from "@/lib/site";
 import "./product.css";
 
 /* PHASE 4 — ISR: every product page is prerendered at build time and
@@ -121,18 +121,34 @@ export default async function ProductPage({ params }: Props) {
       : serializedProduct.price;
   const reviewCount = serializedProduct.reviews?.length || 0;
 
+  /* SEO-4 guards: Google requires 1+ image and a non-empty description
+     for a valid Product — imageless/description-less products were
+     emitting image: [] and description: "" (validator failures). */
+  const productImages = serializedProduct.images?.length
+    ? serializedProduct.images
+    : [`${siteUrl}/images/og-image.jpg`];
+
+  const productDescription =
+    serializedProduct.shortDescription ||
+    stripHtml(serializedProduct.description || "") ||
+    "Freshly baked at Ayoob Bakery Melbourne, Dandenong North.";
+
   const productLd = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: serializedProduct.name,
-    description: serializedProduct.shortDescription || stripHtml(serializedProduct.description || ""),
-    image: serializedProduct.images || [],
+    description: productDescription,
+    image: productImages,
     category: serializedProduct.category?.name,
+    brand: { "@type": "Brand", name: BUSINESS_NAME },
     url: `${siteUrl}/product/${id}`,
     offers: {
       "@type": "Offer",
       price: eff.toFixed(2),
       priceCurrency: "AUD",
+      /* deliberate: no stock-tracking exists; everything is baked
+         daily and sold-out lines reset at opening — InStock is the
+         honest default for this business */
       availability: "https://schema.org/InStock",
       url: `${siteUrl}/product/${id}`,
     },
@@ -157,7 +173,7 @@ export default async function ProductPage({ params }: Props) {
         "@type": "ListItem",
         position: 3,
         name: serializedProduct.category?.name || "Products",
-        item: `${siteUrl}/products?category=${serializedProduct.category?._id}`,
+        item: `${siteUrl}/categories`,
       },
       { "@type": "ListItem", position: 4, name: serializedProduct.name, item: `${siteUrl}/product/${id}` },
     ],

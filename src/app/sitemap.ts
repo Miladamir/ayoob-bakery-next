@@ -1,99 +1,88 @@
 import { MetadataRoute } from 'next';
 import dbConnect from '@/lib/dbConnect';
 import Product from '@/models/Product';
-import Category from '@/models/Category';
 import Blog from '@/models/Blog';
+import Category from '@/models/Category';
 import { SITE_URL } from '@/lib/site';
 
-/* PHASE 3: regenerate hourly (ISR) instead of only at build time,
-   and never let a DB outage break the build or the sitemap. */
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    // PHASE 8: SITE_URL — the single source of truth for public URLs
     const baseUrl = SITE_URL;
 
-    // 1. Static Routes
-    const staticRoutes: MetadataRoute.Sitemap = [
-        {
-            url: baseUrl,
-            lastModified: new Date(),
-            changeFrequency: 'daily',
-            priority: 1,
-        },
-        {
-            url: `${baseUrl}/products`,
-            lastModified: new Date(),
-            changeFrequency: 'daily',
-            priority: 0.9,
-        },
-        {
-            url: `${baseUrl}/categories`,
-            lastModified: new Date(),
-            changeFrequency: 'weekly',
-            priority: 0.7,
-        },
-        {
-            url: `${baseUrl}/about`,
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.6,
-        },
-        {
-            url: `${baseUrl}/contact`,
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.6,
-        },
-        {
-            url: `${baseUrl}/blogs`,
-            lastModified: new Date(),
-            changeFrequency: 'daily',
-            priority: 0.7,
-        },
-    ];
-
-    // 2. Dynamic routes — best effort. If the DB is unreachable
-    //    (e.g. during a build on a machine without credentials),
-    //    the sitemap serves the static routes instead of failing.
     let products: any[] = [];
-    let categories: any[] = [];
     let blogs: any[] = [];
+    let categories: any[] = [];
 
     try {
         await dbConnect();
-        [products, categories, blogs] = await Promise.all([
+        [products, blogs, categories] = await Promise.all([
             Product.find({}).select('_id updatedAt').lean(),
-            Category.find({}).select('_id').lean(),
-            Blog.find({}).select('_id date').lean(),
+            Blog.find({}).select('_id date updatedAt').lean(),
+            /* categories aren't listed as URLs (SEO-1) but drive the
+               /categories page's lastmod */
+            Category.find({}).select('_id updatedAt').lean(),
         ]);
     } catch (error) {
         console.error('Sitemap: DB fetch failed — serving static routes only.', error);
     }
 
-    // 3. Dynamic Product Routes
+    /* ---------- honest lastmod ----------
+       Real update time when we have one → else the legacy `date`
+       field → else the ObjectId's embedded creation time. Never
+       "now": a standing fake date trains crawlers to ignore every
+       date in this file. */
+    const toLastMod = (doc: any, fallbackField?: string): Date => {
+        if (doc?.updatedAt) return new Date(doc.updatedAt);
+        if (fallbackField && doc?.[fallbackField]) return new Date(doc[fallbackField]);
+        try {
+            return (doc._id as any).getTimestamp();
+        } catch {
+            return new Date();
+        }
+    };
+
+    const latestOf = (docs: any[], fallbackField?: string): Date | undefined =>
+        docs.length
+            ? docs.map((d) => toLastMod(d, fallbackField)).reduce((a, b) => (b > a ? b : a))
+            : undefined;
+
+    const latestProduct = latestOf(products);
+    const latestCategory = latestOf(categories);
+    const latestBlog = latestOf(blogs, 'date');
+    const catalogMax = [latestProduct, latestCategory]
+        .filter((d): d is Date => !!d)
+        .sort((a, b) => b.getTime() - a.getTime())[0];
+
+    const staticRoutes: MetadataRoute.Sitemap = [
+        /* catalog-driven pages: their content genuinely changes when
+           the catalog does, so their lastmod is the newest item */
+        { url: baseUrl, lastModified: catalogMax, changeFrequency: 'daily', priority: 1 },
+        { url: `${baseUrl}/products`, lastModified: catalogMax, changeFrequency: 'daily', priority: 0.9 },
+        /* SEO-5: the menu — highest-intent local page ("bakery menu
+           Dandenong North"), so it gets priority to match */
+        { url: `${baseUrl}/menu`, lastModified: catalogMax, changeFrequency: 'weekly', priority: 0.9 },
+        { url: `${baseUrl}/categories`, lastModified: catalogMax, changeFrequency: 'weekly', priority: 0.7 },
+        { url: `${baseUrl}/blogs`, lastModified: latestBlog, changeFrequency: 'daily', priority: 0.7 },
+        /* /about and /contact: no lastModified — we don't track copy
+           changes, and a fake "now" would devalue the real dates */
+        { url: `${baseUrl}/about`, changeFrequency: 'monthly', priority: 0.6 },
+        { url: `${baseUrl}/contact`, changeFrequency: 'monthly', priority: 0.6 },
+    ];
+
     const productRoutes: MetadataRoute.Sitemap = products.map((p: any) => ({
         url: `${baseUrl}/product/${p._id}`,
-        lastModified: p.updatedAt ? new Date(p.updatedAt) : new Date(),
+        lastModified: toLastMod(p),
         changeFrequency: 'weekly',
         priority: 0.8,
     }));
 
-    // 4. Dynamic Category Routes
-    const categoryRoutes: MetadataRoute.Sitemap = categories.map((c: any) => ({
-        url: `${baseUrl}/products?category=${c._id}`,
-        lastModified: new Date(),
-        changeFrequency: 'weekly',
-        priority: 0.7,
-    }));
-
-    // 5. Dynamic Blog Routes
     const blogRoutes: MetadataRoute.Sitemap = blogs.map((b: any) => ({
         url: `${baseUrl}/blog/${b._id}`,
-        lastModified: b.date ? new Date(b.date) : new Date(),
+        lastModified: toLastMod(b, 'date'),
         changeFrequency: 'monthly',
         priority: 0.6,
     }));
 
-    return [...staticRoutes, ...productRoutes, ...categoryRoutes, ...blogRoutes];
+    return [...staticRoutes, ...productRoutes, ...blogRoutes];
 }

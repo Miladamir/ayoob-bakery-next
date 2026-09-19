@@ -1,17 +1,15 @@
 import type { Metadata } from "next";
 import Contact from "@/components/contact/Contact";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, BUSINESS_NAME, PHONE_TEL, PHONE_DISPLAY, SOCIAL_PROFILES } from "@/lib/site";
 import "./contact.css";
 
 export const metadata: Metadata = {
   title: "Contact — Talk to the Counter",
-  description:
-    "Contact Ayoob Bakery — call the counter on (03) 9387 2196, email us, or find us at 4 Stevenson Ave, Dandenong North.",
+  description: `Contact Ayoob Bakery Melbourne — call the counter on ${PHONE_DISPLAY}, email us, or find us at 4 Stevenson Ave, Dandenong North.`,
   alternates: { canonical: "/contact" },
   openGraph: {
     title: "Contact — Talk to the Counter | Ayoob Bakery Melbourne",
-    description:
-      "Call the counter on (03) 9387 2196, email us, or find us at 4 Stevenson Ave, Dandenong North.",
+    description: `Call the counter on ${PHONE_DISPLAY}, email us, or find us at 4 Stevenson Ave, Dandenong North.`,
     type: "website",
   },
 };
@@ -23,9 +21,10 @@ const jsonLd = {
   url: `${SITE_URL}/contact`,
   mainEntity: {
     "@type": "Bakery",
-    name: "Ayoob Bakery",
-    telephone: "+61393872196",
+    name: BUSINESS_NAME,
+    telephone: PHONE_TEL,
     email: "hello@ayoobbakery.com.au",
+    sameAs: SOCIAL_PROFILES,
     address: {
       "@type": "PostalAddress",
       streetAddress: "4 Stevenson Ave",
@@ -37,7 +36,7 @@ const jsonLd = {
     contactPoint: [
       {
         "@type": "ContactPoint",
-        telephone: "+61393872196",
+        telephone: PHONE_TEL,
         contactType: "customer service",
         areaServed: "AU",
         availableLanguage: ["English"],

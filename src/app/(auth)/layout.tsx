@@ -6,6 +6,8 @@ import Grain from "@/components/effects/Grain";
 import SmoothScroll from "@/components/effects/SmoothScroll";
 import RevealObserver from "@/components/effects/RevealObserver";
 import AnimationGovernor from "@/components/effects/AnimationGovernor";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 /* Account pages hold no search value — keep them out of the index. */
 export const metadata: Metadata = {
@@ -27,6 +29,10 @@ export default function AuthLayout({
       <SmoothScroll />
       <RevealObserver />
       <AnimationGovernor />
+
+      {/* SEO-2 — login/signup are real visitor pages; track them too */}
+      <Analytics />
+      <SpeedInsights />
 
       {children}
     </>

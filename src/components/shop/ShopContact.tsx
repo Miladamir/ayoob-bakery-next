@@ -1,7 +1,6 @@
 import { ArrowUpRight, Clock, Mail, MapPin, Phone } from "lucide-react";
 import HoursCard from "@/components/home/HoursCard";
-
-const MAPS_URL = "https://maps.google.com/?q=312+Lygon+Street+Brunswick+Melbourne";
+import { MAPS_URL, SHOP_ADDRESS, PHONE_HREF, PHONE_DISPLAY } from "@/lib/site";
 
 export default function ShopContact() {
   return (
@@ -28,12 +27,12 @@ export default function ShopContact() {
             <div className="contact-row">
               <span className="cr-ico"><MapPin /></span>
               <a href={MAPS_URL} target="_blank" rel="noopener noreferrer">
-                312 Lygon Street, Brunswick VIC 3056
+                {SHOP_ADDRESS}
               </a>
             </div>
             <div className="contact-row">
               <span className="cr-ico"><Phone /></span>
-              <a href="tel:+61393872196">(03) 9387 2196</a>
+              <a href={PHONE_HREF}>{PHONE_DISPLAY}</a>
             </div>
             <div className="contact-row">
               <span className="cr-ico"><Mail /></span>
@@ -44,7 +43,7 @@ export default function ShopContact() {
               <a className="btn btn-primary" href={MAPS_URL} target="_blank" rel="noopener noreferrer">
                 Get directions <ArrowUpRight />
               </a>
-              <a className="btn btn-ghost" href="tel:+61393872196">Call the counter</a>
+              <a className="btn btn-ghost" href={PHONE_HREF}>Call the counter</a>
             </div>
           </div>
 
@@ -52,7 +51,7 @@ export default function ShopContact() {
             <HoursCard />
             <p className="map-note">
               <Clock />
-              The board usually thins out after 2 pm — the early bird gets the croissant.
+              The board usually thins out after 4 pm — the early bird gets the croissant.
             </p>
           </div>
         </div>

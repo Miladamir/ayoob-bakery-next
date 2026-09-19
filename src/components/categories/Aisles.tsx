@@ -301,7 +301,7 @@ export default function Aisles({ aisles, totals }: AislesProps) {
                   <path id="stampPathCats" d="M60 60 m-45 0 a45 45 0 1 1 90 0 a45 45 0 1 1 -90 0" />
                 </defs>
                 <text className="mh-stamp-text">
-                  <textPath href="#stampPathCats">AYOOB BAKERY · SHOP BY CRAVING · BRUNSWICK · EST 1996 ·</textPath>
+                  <textPath href="#stampPathCats">AYOOB BAKERY · SHOP BY CRAVING · DANDENONG NORTH · EST 1952 ·</textPath>
                 </text>
                 <g stroke="#26180E" strokeWidth="2.4" strokeLinecap="round" fill="none">
                   <path d="M60 46v30" />
@@ -360,7 +360,7 @@ export default function Aisles({ aisles, totals }: AislesProps) {
               <span className="g-ico"><Truck /></span>
               <div>
                 <b>Local delivery</b>
-                <span>$6 flat within 8 km of Brunswick, free over $50, same morning.</span>
+                <span>$6 flat within 8 km of Dandenong North, free over $50, same morning.</span>
               </div>
             </div>
           </div>

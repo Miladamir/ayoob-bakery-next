@@ -97,7 +97,7 @@ export default function Contact() {
                   <path id="stampPathContact" d="M60 60 m-45 0 a45 45 0 1 1 90 0 a45 45 0 1 1 -90 0" />
                 </defs>
                 <text className="mh-stamp-text">
-                  <textPath href="#stampPathContact">AYOOB BAKERY · DANDENONG NORTH · MELBOURNE · EST 1996 ·</textPath>
+                  <textPath href="#stampPathContact">AYOOB BAKERY · DANDENONG NORTH · MELBOURNE · EST 1952 ·</textPath>
                 </text>
                 <g stroke="#26180E" strokeWidth="2.4" strokeLinecap="round" fill="none">
                   <path d="M60 46v30" />
@@ -129,7 +129,7 @@ export default function Contact() {
                   <span className="cr-ico"><Phone /></span>
                   <div className="crow-main">
                     <small>Call the counter</small>
-                    <a className="crow-link" href="tel:+61393872196">(03) 9387 2196</a>
+                    <a className="crow-link" href="tel:+61473621594">0473 621 594</a>
                     <span className="crow-sub">Fastest — orders, holds, and bread emergencies.</span>
                   </div>
                 </div>
@@ -194,7 +194,7 @@ export default function Contact() {
                 <a className="btn btn-primary" href={MAPS_URL} target="_blank" rel="noopener noreferrer">
                   Get directions <ArrowUpRight />
                 </a>
-                <a className="btn btn-ghost" href="tel:+61393872196">Call the counter</a>
+                <a className="btn btn-ghost" href="tel:+61473621594">Call the counter</a>
               </div>
             </div>
           </div>

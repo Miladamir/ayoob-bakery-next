@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import ImageUpload from "@/components/admin/ImageUpload";
 
 interface BlogFormProps {
     initialData?: any;
@@ -77,8 +78,21 @@ export default function BlogForm({ initialData, isEdit = false }: BlogFormProps)
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label className="block text-sm font-semibold text-gray-600 mb-1">Image URL</label>
-                    <input name="image" value={formData.image} onChange={handleChange} className="w-full border p-2 rounded-lg" />
+                    <label className="block text-sm font-semibold text-gray-600 mb-1">Image</label>
+                    <div className="flex gap-2">
+                        <input
+                            name="image"
+                            value={formData.image}
+                            onChange={handleChange}
+                            className="w-full border p-2 rounded-lg"
+                            placeholder="Paste a URL, or upload →"
+                        />
+                        <ImageUpload
+                            folder="blogs"
+                            label="Upload"
+                            onUploaded={(url) => setFormData((prev) => ({ ...prev, image: url }))}
+                        />
+                    </div>
                 </div>
                 <div>
                     <label className="block text-sm font-semibold text-gray-600 mb-1">Author</label>

@@ -13,7 +13,7 @@ export const revalidate = 300;
 export const metadata: Metadata = {
   title: "Search the Board",
   description:
-    "Search every bake on the Ayoob Bakery board — sourdough, naan, croissants, baklava and more, fresh from the Brunswick oven every morning.",
+    "Search every bake on the Ayoob Bakery board — sourdough, naan, croissants, baklava and more, fresh from the Dandenong North oven every morning.",
   robots: { index: false, follow: true },
 };
 

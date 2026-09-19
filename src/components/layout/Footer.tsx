@@ -7,6 +7,7 @@ import { useToast } from "@/context/ToastContext";
 import { copyText } from "@/lib/clipboard";
 import { scrollToTop } from "@/lib/scroll";
 import { FacebookIcon, InstagramIcon } from "@/components/icons/BrandIcons";
+import Link from "next/link";
 
 type SocialIcon = ComponentType<SVGProps<SVGSVGElement>>;
 
@@ -106,7 +107,7 @@ export default function Footer() {
               <li>4 Stevenson Ave</li>
               <li>Dandenong North VIC 3175</li>
               <li>
-                <a href="tel:+61393872196">(03) 9387 2196</a>
+                <a href="tel:+61473621594">0473 621 594</a>
               </li>
               <li>
                 <a href="mailto:hello@ayoobbakery.com.au">hello@ayoobbakery.com.au</a>
@@ -114,12 +115,28 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* hours */}
+                    {/* hours */}
           <div>
             <p className="foot-k">Hours</p>
             <ul className="foot-list">
               <li>Mon – Sat · 8 am – 6 pm</li>
               <li>Sunday · closed</li>
+            </ul>
+          </div>
+
+          {/* SEO-3 — site navigation: the footer now links into the site,
+              giving every page (including every product + post) a
+              crawlable path to the main sections */}
+          <div>
+            <p className="foot-k">Explore</p>
+            <ul className="foot-list">
+              <li><Link href="/menu">Menu &amp; prices</Link></li>
+              <li><Link href="/products">All products</Link></li>
+              <li><Link href="/categories">Categories</Link></li>
+              <li><Link href="/search">Search</Link></li>
+              <li><Link href="/blogs">Journal</Link></li>
+              <li><Link href="/about">Our story</Link></li>
+              <li><Link href="/contact">Contact</Link></li>
             </ul>
           </div>
 

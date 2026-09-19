@@ -6,6 +6,9 @@ import Grain from "@/components/effects/Grain";
 import SmoothScroll from "@/components/effects/SmoothScroll";
 import RevealObserver from "@/components/effects/RevealObserver";
 import AnimationGovernor from "@/components/effects/AnimationGovernor";
+import ConversionTracker from "@/components/effects/ConversionTracker";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 export default function PublicLayout({
   children,
@@ -24,6 +27,12 @@ export default function PublicLayout({
       <SmoothScroll />
       <RevealObserver />
       <AnimationGovernor />
+
+      {/* SEO-2 — measurement: pageviews + real-user CWV + conversion
+          events. Admin pages deliberately render none of these. */}
+      <Analytics />
+      <SpeedInsights />
+      <ConversionTracker />
 
       <Header />
       <main id="main">{children}</main>

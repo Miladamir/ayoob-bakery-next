@@ -29,6 +29,7 @@ export async function POST(request: Request) {
     revalidatePath("/products");
     revalidatePath("/categories");
     revalidatePath("/search");
+    revalidatePath("/menu");
     revalidatePath(`/product/${newProduct._id}`);
 
     return NextResponse.json({ success: true, id: newProduct._id });

@@ -15,7 +15,7 @@ export const revalidate = 300;
 export const metadata: Metadata = {
   title: "Categories — Shop by Craving",
   description:
-    "Browse every aisle of Ayoob Bakery — breads, sweets, savoury and more, all stone-baked fresh every morning in Brunswick, Melbourne. Shop by craving.",
+    "Browse every aisle of Ayoob Bakery — breads, sweets, savoury and more, all baked fresh every morning in Dandenong North, Melbourne. Shop by craving.",
   alternates: { canonical: "/categories" },
 };
 

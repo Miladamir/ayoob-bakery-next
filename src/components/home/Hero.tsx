@@ -188,7 +188,7 @@ export default function Hero() {
         <div className="hero-copy">
           <p className="hero-eyebrow hero-fade" style={{ "--d": ".4s" } as React.CSSProperties}>
             <Wheat />
-            <span>Artisan bakery — Brunswick, Melbourne</span>
+            <span>Artisan bakery — Dandenong North, Melbourne</span>
           </p>
 
           <h1 className="hero-title" aria-label="Ayoob Bakery">
@@ -269,7 +269,7 @@ export default function Hero() {
               </defs>
               <text className="stamp-text">
                 <textPath href="#stampPath">
-                  AYOOB BAKERY · BRUNSWICK · MELBOURNE · EST 1996 ·
+                  AYOOB BAKERY · DANDENONG NORTH · MELBOURNE · EST 1952 ·
                 </textPath>
               </text>
               <g stroke="#26180E" strokeWidth="2.4" strokeLinecap="round" fill="none">
@@ -282,7 +282,7 @@ export default function Hero() {
           <div className="art-l art-chip" data-depth="38">
             <span className="chip-in">
               <Flame />
-              out of the oven at 6:30 am
+              out of the oven at 8:00 am
             </span>
           </div>
 

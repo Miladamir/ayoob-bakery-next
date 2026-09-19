@@ -162,7 +162,7 @@ export default function CartModal({ open, onClose }: CartModalProps) {
               empty the cart
             </button>
             <p className="bm-note">
-              Pick-up only · 312 Lygon St, Brunswick · ready in about 20 minutes — we&rsquo;ll
+              Pick-up only · 4 Stevenson Ave, Dandenong North · ready in about 20 minutes — we&rsquo;ll
               confirm on the phone.
             </p>
           </>

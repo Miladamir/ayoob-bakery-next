@@ -19,6 +19,7 @@ import CartModal from "@/components/cart/CartModal";
 const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/products", label: "Products" },
+  { href: "/menu", label: "Menu" },
   { href: "/categories", label: "Categories" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
@@ -214,7 +215,7 @@ export default function Header() {
             </Link>
           </div>
           <div className="mm-foot">
-            <a href="tel:+61393872196">(03) 9387 2196</a>
+            <a href="tel:+61473621594">0473 621 594</a>
             <span>4 Stevenson Ave · Dandenong Nth</span>
           </div>
         </div>

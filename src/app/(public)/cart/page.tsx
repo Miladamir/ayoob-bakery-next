@@ -11,7 +11,7 @@ export const revalidate = 300;
 export const metadata: Metadata = {
   title: "Your Order — Cart",
   description:
-    "Review your order at Ayoob Bakery — pick-up only from 312 Lygon Street, Brunswick. Wrapped in paper, ready in about 20 minutes.",
+    "Review your order at Ayoob Bakery — pick-up only from 4 Stevenson Ave, Dandenong North. Wrapped in paper, ready in about 20 minutes.",
   robots: { index: false, follow: true }, // personal content — never indexed
 };
 

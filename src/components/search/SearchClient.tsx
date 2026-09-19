@@ -275,7 +275,7 @@ export default function SearchClient({ pool }: SearchClientProps) {
                   <path id="stampPathSearch" d="M60 60 m-45 0 a45 45 0 1 1 90 0 a45 45 0 1 1 -90 0" />
                 </defs>
                 <text className="mh-stamp-text">
-                  <textPath href="#stampPathSearch">AYOOB BAKERY · THE WHOLE BOARD · ONE STONE OVEN · EST 1996 ·</textPath>
+                  <textPath href="#stampPathSearch">AYOOB BAKERY · THE WHOLE BOARD · ONE STONE OVEN · EST 1952 ·</textPath>
                 </text>
                 <g stroke="#26180E" strokeWidth="2.4" strokeLinecap="round" fill="none">
                   <path d="M60 46v30" />
@@ -416,7 +416,7 @@ export default function SearchClient({ pool }: SearchClientProps) {
                   </div>
                 )}
                 <div className="empty-btns">
-                  <a className="btn btn-primary btn-sm" href="tel:+61393872196">
+                  <a className="btn btn-primary btn-sm" href="tel:+61473621594">
                     <Phone /> Ring the counter
                   </a>
                   <button
@@ -447,7 +447,7 @@ export default function SearchClient({ pool }: SearchClientProps) {
                   </h2>
                 </div>
                 <p className="sec-note" data-reveal style={d(".16s")}>
-                  The ones Brunswick keeps coming back for — or start typing and the board
+                  The ones Dandenong North keeps coming back for — or start typing and the board
                   bends to your craving.
                 </p>
               </header>

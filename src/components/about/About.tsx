@@ -12,7 +12,7 @@ import {
 import { getStatus } from "@/lib/hours";
 
 interface AboutProps {
-  yearsOnLygon: number;
+  yearsBaking: number;
 }
 
 function SparkSvg({ className }: { className?: string }) {
@@ -42,7 +42,7 @@ function StatusPill() {
 }
 
 
-export default function About({ yearsOnLygon }: AboutProps) {
+export default function About({ yearsBaking }: AboutProps) {
   const heroRef = useRef<HTMLElement>(null);
 
   /* hero art parallax (fine pointers, motion-safe) */
@@ -131,20 +131,20 @@ export default function About({ yearsOnLygon }: AboutProps) {
             <div>
               <p className="kicker" data-reveal>
                 <span className="k-rule" />
-                <span>Our story · est. 1996</span>
+                <span>Our story · est. 1952</span>
               </p>
               <h1 className="sh-title" data-reveal style={d(".08s")}>
-                Thirty years of <em>flour</em> on our hands.
+                Seventy years of <em>flour</em> on our hands.
               </h1>
               <p className="sh-sub" data-reveal style={d(".16s")}>
-                A tiny shop at 312 Lygon Street, one secondhand stone oven, and a recipe book
-                carried from Kabul. Thirty years on, the oven hasn&rsquo;t stopped — and every loaf
-                still goes out the door the morning it was baked.
+                A tiny shop at 4 Stevenson Avenue, one secondhand stone oven, and a recipe
+                book carried from Kabul. Seventy years on, the oven hasn&rsquo;t stopped — and
+                every loaf still goes out the door the morning it was baked.
               </p>
               <div className="sh-meta" data-reveal style={d(".24s")}>
                 <div className="sh-stat">
-                  <b className="num" data-count={yearsOnLygon}>0</b>
-                  <span>years on Lygon St</span>
+                  <b className="num" data-count={yearsBaking}>0</b>
+                  <span>years of baking</span>
                 </div>
                 <div className="sh-stat">
                   <b className="num" data-count="1">0</b>
@@ -222,7 +222,7 @@ export default function About({ yearsOnLygon }: AboutProps) {
                   </g>
                 </svg>
                 <p className="frame-cap">
-                  312 Lygon Street — <b>the window&rsquo;s been fogged since 1996.</b>
+                  4 Stevenson Avenue — <b>the window&rsquo;s been fogged since 1952.</b>
                 </p>
               </div>
 
@@ -234,7 +234,7 @@ export default function About({ yearsOnLygon }: AboutProps) {
                     <path id="stampPathAbout" d="M60 60 m-45 0 a45 45 0 1 1 90 0 a45 45 0 1 1 -90 0" />
                   </defs>
                   <text className="stamp-text">
-                    <textPath href="#stampPathAbout">AYOOB BAKERY · BRUNSWICK · MELBOURNE · EST 1996 ·</textPath>
+                    <textPath href="#stampPathAbout">AYOOB BAKERY · DANDENONG NORTH · MELBOURNE · EST 1952 ·</textPath>
                   </text>
                   <g stroke="#26180E" strokeWidth="2.4" strokeLinecap="round" fill="none">
                     <path d="M60 46v30" />
@@ -284,7 +284,7 @@ export default function About({ yearsOnLygon }: AboutProps) {
                   <path d="M48 190v16M212 190v16" stroke="#26180E" strokeWidth="6" strokeLinecap="round" />
                 </svg>
                 <p className="oven-cap">
-                  The deck oven — bought secondhand from a closing pizzeria in <b>1996</b>, still
+                  The deck oven — bought secondhand from a closing pizzeria in <b>1952</b>, still
                   perfect at 280&deg;.
                 </p>
               </div>
@@ -300,12 +300,12 @@ export default function About({ yearsOnLygon }: AboutProps) {
                 A shop, an oven, <em>and a stubborn idea.</em>
               </h2>
               <p>
-                We opened the doors in 1996 with one stone deck oven and a recipe book carried
-                from Kabul. Melbourne already had bread, we were told — politely, repeatedly. It
-                didn&rsquo;t have naan blistered on a tandoor wall or sourdough that slept for
-                thirty-six hours. So we made those. Three decades on, the oven hasn&rsquo;t
-                stopped, the recipe book has a rubber band around it, and the second generation
-                kneads before school.
+                We first opened the doors in 1952 with one stone deck oven and a recipe book
+                carried from Kabul. Melbourne already had bread, we were told — politely,
+                repeatedly. It didn&rsquo;t have naan blistered on a tandoor wall or sourdough
+                that slept for thirty-six hours. So we made those. Now newly reopened at
+                4 Stevenson Avenue, the oven hasn&rsquo;t stopped, the recipe book has a rubber
+                band around it, and the third generation kneads before school.
               </p>
             </div>
           </div>

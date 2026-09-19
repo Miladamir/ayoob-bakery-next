@@ -41,7 +41,7 @@ export default function ContactSection() {
               </div>
               <div className="contact-row">
                 <span className="cr-ico"><Phone /></span>
-                <a href="tel:+61393872196">(03) 9387 2196</a>
+                <a href="tel:+61473621594">0473 621 594</a>
               </div>
               <div className="contact-row">
                 <span className="cr-ico"><Mail /></span>

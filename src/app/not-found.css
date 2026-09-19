@@ -1,0 +1,29 @@
+/* ============================================================
+   404 — the ink-curtain variant of the design system.
+   Self-contained: renders under the ROOT layout (no site chrome),
+   so buttons are re-scoped for the dark background here.
+============================================================ */
+.nf{min-height:100vh;min-height:100svh;display:grid;place-items:center;
+  background:var(--ink);padding:2rem}
+.nf-in{text-align:center;max-width:560px;--line:var(--line-l)}
+
+.nf-kicker{display:inline-flex;align-items:center;gap:.6rem;
+  font:600 .72rem var(--ff-b);letter-spacing:.24em;text-transform:uppercase;color:var(--honey)}
+.nf-kicker .lucide{width:15px;height:15px}
+
+.nf-code{font:600 clamp(6rem,22vw,11rem)/.9 var(--ff-d);letter-spacing:-.03em;
+  color:var(--cream);margin:1.2rem 0 .4rem}
+.nf-code em{font-style:italic;font-weight:500;color:var(--ember);
+  font-variation-settings:"SOFT" 80,"WONK" 1}
+
+.nf-title{font:italic 500 clamp(1.5rem,4vw,2.2rem)/1.2 var(--ff-d);color:var(--cream)}
+.nf-sub{margin:1rem auto 2rem;font:.98rem/1.65 var(--ff-b);color:#C4B49B;max-width:42ch}
+
+.nf-ctas{display:flex;gap:.9rem;justify-content:center;flex-wrap:wrap}
+/* .btn-primary is ink-on-cream by default — invisible on this ink page */
+.nf .btn-primary{background:var(--cream);color:var(--ink)}
+.nf .btn-primary:hover{background:var(--ember);color:var(--cream)}
+.nf-ghost{border-color:rgba(247,241,229,.4);color:var(--flour2)}
+.nf-ghost:hover{background:var(--cream);color:var(--ink)}
+
+.nf-foot{margin-top:3rem;font:.8rem var(--ff-b);color:rgba(247,241,229,.45)}

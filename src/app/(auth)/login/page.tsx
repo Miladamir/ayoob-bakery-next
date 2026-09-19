@@ -140,7 +140,7 @@ export default function LoginPage() {
 
         <ul className="auth-trust">
           <li><ShieldCheck /> Your details stay between you and the counter</li>
-          <li><Phone /> Forgot your password? Ring the counter — (03) 9387 2196</li>
+          <li><Phone /> Forgot your password? Ring the counter — 0473 621 594</li>
         </ul>
       </div>
     </AuthShell>

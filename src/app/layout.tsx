@@ -3,23 +3,38 @@ import "./globals.css";
 import Providers from "./providers";
 import { fraunces, instrumentSans } from "@/lib/fonts";
 import { SITE_URL as siteUrl } from "@/lib/site";
+import RouteProgressBar from "@/components/effects/RouteProgressBar";
+
+/* SEO-2 — search-engine ownership verification (meta-tag method).
+   The env vars hold the CONTENT of each verification tag (the long
+   token inside content="..."), not the full element. Absent vars →
+   the tags simply don't render — nothing breaks locally.
+   NEXT_PUBLIC_ vars are inlined at BUILD time: set them on Vercel,
+   then redeploy, then click Verify in each console. */
+const verification: Metadata["verification"] = {};
+if (process.env.NEXT_PUBLIC_GSC_VERIFICATION) {
+  verification.google = process.env.NEXT_PUBLIC_GSC_VERIFICATION;
+}
+if (process.env.NEXT_PUBLIC_BING_VERIFICATION) {
+  verification.other = { "msvalidate.01": process.env.NEXT_PUBLIC_BING_VERIFICATION };
+}
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Ayoob Bakery — Artisan Bakes · Brunswick, Melbourne",
+    default: "Ayoob Bakery — Artisan Bakery in Dandenong North, Melbourne",
     template: "%s | Ayoob Bakery Melbourne",
   },
   description:
-    "Ayoob Bakery Melbourne — stone-baked sourdough, Afghan naan, butter croissants and more, fresh from Brunswick every morning.",
+    "Ayoob Bakery Melbourne — stone-baked sourdough, Afghan naan, butter croissants and more, fresh from Dandenong North every morning.",
   keywords: [
     "bakery Melbourne",
-    "artisan bakery Brunswick",
+    "artisan bakery Dandenong North",
     "sourdough Melbourne",
     "Afghan naan",
-    "croissants Brunswick",
+    "croissants Dandenong North",
     "Ayoob Bakery",
-    "bread Lygon Street",
+    "bakery Dandenong",
     "patisserie Melbourne",
   ],
   authors: [{ name: "Ayoob Bakery" }],
@@ -29,9 +44,9 @@ export const metadata: Metadata = {
     locale: "en_AU",
     url: siteUrl,
     siteName: "Ayoob Bakery Melbourne",
-    title: "Ayoob Bakery — Artisan Bakes · Brunswick, Melbourne",
+    title: "Ayoob Bakery — Artisan Bakery in Dandenong North, Melbourne",
     description:
-      "Stone-baked sourdough, Afghan naan, butter croissants — fresh from Brunswick every morning.",
+      "Stone-baked sourdough, Afghan naan, butter croissants — fresh from Dandenong North every morning.",
     images: [
       {
         url: "/images/og-image.jpg",
@@ -45,7 +60,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Ayoob Bakery Melbourne",
     description:
-      "Stone-baked sourdough, Afghan naan, butter croissants — fresh from Brunswick every morning.",
+      "Stone-baked sourdough, Afghan naan, butter croissants — fresh from Dandenong North every morning.",
     images: ["/images/og-image.jpg"],
   },
   robots: {
@@ -59,6 +74,7 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  verification,
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -99,6 +115,8 @@ export default function RootLayout({
             paints without that render-blocking stylesheet. */}
       </head>
       <body suppressHydrationWarning>
+      {/* navigation feedback — appears only when a page transition is slow */}
+      <RouteProgressBar />
       <Providers>{children}</Providers>
     </body>
     </html>

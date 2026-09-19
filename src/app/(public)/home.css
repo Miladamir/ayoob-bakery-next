@@ -208,3 +208,16 @@ html.js body.loaded .swash path{stroke-dashoffset:0}
   .hero-est{display:none}
   .quote-box::before{display:none}
 }
+
+/* ---------- SEO-3 — blog grid + tag bar (shared with /blogs) ---------- */
+.blog-grid{display:grid;grid-template-columns:repeat(1,1fr);gap:2rem}
+@media (min-width:640px){.blog-grid{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:1024px){.blog-grid{grid-template-columns:repeat(3,1fr)}}
+.tagbar{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:2.5rem;justify-content:center}
+/* the .tchip styles live in products.css — minimal local fallback
+   for pages that load this stylesheet without it */
+.tagbar .tchip{display:inline-flex;align-items:center;gap:.45rem;padding:.62rem 1.05rem;
+  border-radius:999px;border:1.5px dashed var(--line);background:none;color:var(--ink2);
+  font:600 .8rem var(--ff-b);cursor:pointer;transition:.25s}
+.tagbar .tchip:hover{border-color:var(--ink);color:var(--ink)}
+.tagbar .tchip.on{border-style:solid;background:var(--ink);color:var(--cream)}

@@ -37,6 +37,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     revalidatePath("/categories");
     revalidatePath("/products");
     revalidatePath("/search");
+    revalidatePath("/menu");
 
     return NextResponse.json(category);
   } catch (error) {

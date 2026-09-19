@@ -139,7 +139,7 @@ export default function AuthShell({
               <small>Bakery · Melbourne</small>
             </span>
           </Link>
-          <span className="aside-chip"><Wheat /> est. 1996 · Brunswick</span>
+          <span className="aside-chip"><Wheat /> est. 1952 · Dandenong North</span>
         </div>
 
         <div className="aside-mid">
@@ -164,7 +164,7 @@ export default function AuthShell({
             {isLogin ? <OvenArt /> : <BagArt />}
             <p className="frame-cap">
               {isLogin ? (
-                <>The deck oven — <b>bought secondhand in 1996, still perfect.</b></>
+                <>The deck oven — <b>bought secondhand in 1952, still perfect.</b></>
               ) : (
                 <>Your first bag — <b>there&rsquo;s room in here for a usual.</b></>
               )}
@@ -181,8 +181,8 @@ export default function AuthShell({
           <StampSvg
             text={
               isLogin
-                ? "AYOOB BAKERY · WELCOME BACK · BRUNSWICK · EST 1996 ·"
-                : "AYOOB BAKERY · PULL UP A CHAIR · BRUNSWICK · EST 1996 ·"
+                ? "AYOOB BAKERY · WELCOME BACK · DANDENONG NORTH · EST 1952 ·"
+                : "AYOOB BAKERY · PULL UP A CHAIR · DANDENONG NORTH · EST 1952 ·"
             }
           />
         </span>

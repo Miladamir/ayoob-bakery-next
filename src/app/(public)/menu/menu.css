@@ -1,0 +1,108 @@
+/* ============================================================
+   MENU PAGE — masthead (page-local pattern, same as the other
+   list pages) + the paper menu sheet: dotted leaders, honest
+   prices, no images (that's /products' job).
+============================================================ */
+
+/* ---------- MASTHEAD ---------- */
+.masthead{position:relative;padding:7.5rem 0 clamp(1rem,2vw,1.5rem)}
+.mh-top{display:flex;justify-content:space-between;align-items:center;gap:.7rem 1.5rem;flex-wrap:wrap}
+.crumbs{display:flex;align-items:center;gap:.55rem;font:600 .72rem var(--ff-b);letter-spacing:.18em;text-transform:uppercase;color:var(--ink2)}
+.crumbs a{color:var(--ink2);text-decoration:none;border-bottom:1px dotted var(--line)}
+.crumbs a:hover{color:var(--ember);border-color:var(--ember)}
+.crumbs .lucide{width:13px;height:13px;opacity:.45}
+.crumbs [aria-current]{color:var(--ink)}
+.mh-live{font:600 .72rem/1.5 var(--ff-b);letter-spacing:.16em;text-transform:uppercase;color:var(--ink2);text-align:right}
+.mh-live b{color:var(--ember);font-size:.88rem}
+.mh-titlerow{display:flex;align-items:center;gap:1.5rem;margin-top:clamp(.55rem,1.2vw,.85rem)}
+.mh-title{font:600 clamp(1.9rem,3.8vw,3.1rem)/1.04 var(--ff-d);letter-spacing:-.025em;max-width:20ch}
+.mh-title em{font-style:italic;font-weight:500;color:var(--ember);font-variation-settings:"SOFT" 80,"WONK" 1}
+.mh-spark{display:inline-block;width:clamp(15px,1.8vw,21px);margin-left:.4rem;color:var(--honey);vertical-align:.1em}
+.mh-spark svg{width:100%;height:auto;display:block;animation:spin 22s linear infinite reverse}
+.mh-stamp{margin-left:auto;flex:none;width:clamp(58px,6.5vw,88px)}
+.mh-stamp svg{width:100%;height:auto;display:block;animation:spin 16s linear infinite}
+.mh-stamp-text{font:700 8.4px var(--ff-b);letter-spacing:1.05px;fill:var(--ink)}
+.mh-sub{margin-top:.4rem;font:.95rem var(--ff-b);color:var(--ink2)}
+.mh-sub b{color:var(--ink);font-weight:600}
+
+/* ---------- THE SHEET ---------- */
+.menu-sec{padding:clamp(1.2rem,2.6vw,2.2rem) 0 clamp(3rem,6vw,4.8rem)}
+.menu-layout{display:grid;grid-template-columns:1.9fr 1fr;gap:clamp(1.6rem,4vw,2.8rem);align-items:start}
+
+.menu-sheet{background:var(--cream);border:1.5px solid var(--ink);border-radius:22px;
+  box-shadow:7px 7px 0 var(--ink);overflow:hidden}
+
+/* Phase 10.5 discipline: offscreen sections skip rendering */
+.menu-sec-block{padding:2rem 2.3rem 1.8rem;content-visibility:auto;contain-intrinsic-size:auto 380px}
+.menu-sec-block + .menu-sec-block{border-top:1.5px dashed var(--line)}
+
+.menu-sec-k{display:flex;align-items:baseline;gap:1rem;margin-bottom:1.4rem;flex-wrap:wrap}
+.menu-sec-k .k-no{font:600 .74rem var(--ff-b);letter-spacing:.18em;color:var(--ember)}
+.menu-sec-k h2{font:600 clamp(1.5rem,2.6vw,2.1rem)/1.1 var(--ff-d);letter-spacing:-.015em;flex:1;min-width:0}
+.menu-sec-meta{font:600 .62rem var(--ff-b);letter-spacing:.16em;text-transform:uppercase;color:var(--ink2);white-space:nowrap}
+.menu-sec-meta b{color:var(--ember);font:italic 600 .95rem var(--ff-d);letter-spacing:0}
+
+.menu-list{display:grid;gap:.95rem}
+
+/* one line: name …… price */
+.menu-item{display:block;text-decoration:none;color:inherit}
+.menu-line{display:flex;align-items:baseline;gap:.7rem}
+.menu-item-name{font:600 1.06rem/1.25 var(--ff-d);letter-spacing:-.01em;transition:color .2s}
+.menu-item:hover .menu-item-name{color:var(--ember)}
+.menu-leader{flex:1;min-width:1.5rem;border-bottom:1.5px dotted var(--line);transform:translateY(-.28em)}
+.menu-was{font:600 .78rem var(--ff-b);color:var(--ink2);text-decoration:line-through;white-space:nowrap}
+.menu-price{font:italic 600 1.08rem var(--ff-d);color:var(--ember);white-space:nowrap}
+.menu-price i{font:600 .6rem var(--ff-b);font-style:normal;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);margin-left:.3rem}
+.menu-desc{display:block;font:.85rem/1.5 var(--ff-b);color:var(--ink2);max-width:62ch;margin-top:.18rem}
+
+/* ---------- ORDER COLUMN ---------- */
+.menu-aside{position:sticky;top:96px;display:grid;gap:1.2rem;align-content:start}
+.menu-call{background:var(--cream);border:1.5px solid var(--ink);border-radius:18px;
+  box-shadow:5px 5px 0 var(--ink);padding:1.3rem 1.4rem;display:grid;gap:.9rem;justify-items:start}
+.menu-call>p{font:.9rem/1.55 var(--ff-b);color:var(--ink2)}
+.menu-call>p b{color:var(--ink)}
+.menu-addr{display:flex;gap:.45rem;align-items:center;font:.82rem var(--ff-b);color:var(--ink2)}
+.menu-addr .lucide{width:14px;height:14px;color:var(--ember);flex:none}
+
+/* ---------- EMPTY ---------- */
+.menu-empty{border:2px dashed var(--line);border-radius:22px;padding:clamp(2.2rem,5vw,3.4rem) 2rem;text-align:center}
+.menu-empty .ring{width:58px;height:58px;margin:0 auto 1rem;border:1.5px dashed var(--line);border-radius:50%;
+  display:grid;place-items:center;color:var(--ember)}
+.menu-empty .ring .lucide{width:24px;height:24px}
+.menu-empty>b{font:600 1.25rem var(--ff-d);display:block;margin-bottom:.35rem}
+.menu-empty p{font:.9rem/1.6 var(--ff-b);color:var(--ink2);max-width:44ch;margin:0 auto 1.4rem}
+
+.board-note{margin-top:2.6rem;font:italic 500 1.02rem var(--ff-d);color:var(--ink2);text-align:center}
+
+/* ---------- HOURS CARD (page-local copy — shared component) ---------- */
+.hours-card{position:relative;background:var(--cream);border:1.5px solid var(--ink);border-radius:18px;
+  padding:1.5rem 1.7rem 1.1rem;box-shadow:7px 7px 0 var(--ink)}
+.hours-card::before,.hours-card::after{content:"";position:absolute;width:16px;height:16px;
+  border-radius:50%;background:var(--flour2);top:96px}
+.hours-card::before{left:-9px}.hours-card::after{right:-9px}
+.hours-head{display:flex;justify-content:space-between;align-items:center;gap:1rem;
+  padding-bottom:1.05rem;border-bottom:2px dashed var(--line);flex-wrap:wrap}
+.hours-head h3{font:600 1.35rem var(--ff-d)}
+.hours-row{display:flex;justify-content:space-between;align-items:baseline;padding:.68rem 0;
+  border-bottom:1px solid var(--line);font:.94rem var(--ff-b)}
+.hours-row:last-of-type{border-bottom:none}
+.hours-row .h-day{font-weight:600}
+.hours-row .h-time{color:var(--ink2)}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:1080px){
+  .masthead{padding-top:6.5rem}
+  .menu-layout{grid-template-columns:1fr}
+  .menu-aside{position:static}
+}
+@media (max-width:640px){
+  .mh-stamp{display:none}
+  .mh-live{text-align:left}
+  .menu-sec-block{padding:1.5rem 1.2rem 1.4rem}
+  .menu-line{flex-wrap:wrap}
+  .menu-leader{display:none}
+  .menu-price{margin-left:auto}
+}
+@media (prefers-reduced-motion:reduce){
+  .mh-spark svg,.mh-stamp svg{animation:none}
+}

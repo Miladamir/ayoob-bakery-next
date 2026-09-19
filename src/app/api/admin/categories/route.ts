@@ -40,6 +40,7 @@ export async function POST(request: Request) {
     revalidatePath("/categories");
     revalidatePath("/products");
     revalidatePath("/search");
+    revalidatePath("/menu");
 
     return NextResponse.json({ success: true, id: newCat._id });
   } catch (error) {

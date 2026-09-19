@@ -111,7 +111,7 @@ function StampSvg() {
         <path id="pdStampPath" d="M60 60 m-45 0 a45 45 0 1 1 90 0 a45 45 0 1 1 -90 0" />
       </defs>
       <text className="pd-stamp-text">
-        <textPath href="#pdStampPath">AYOOB BAKERY · BAKED THIS MORNING · BRUNSWICK ·</textPath>
+        <textPath href="#pdStampPath">AYOOB BAKERY · BAKED THIS MORNING · DANDENONG NORTH ·</textPath>
       </text>
       <g stroke="#26180E" strokeWidth="2.4" strokeLinecap="round" fill="none">
         <path d="M60 46v30" />
@@ -486,7 +486,7 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
             <ChevronRight className="lucide" />
             <Link href="/products">The board</Link>
             <ChevronRight className="lucide" />
-            <Link href={`/products?category=${product.category?._id}`}>{product.category?.name}</Link>
+            <Link href="/categories">{product.category?.name}</Link>
             <ChevronRight className="lucide" />
             <span aria-current="page">{product.name}</span>
           </nav>
@@ -506,7 +506,7 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
             <div className="pd-info" id="buy">
               <p className="kicker">
                 <span className="k-rule" />
-                <Link href={`/products?category=${product.category?._id}`} className="kicker-link">
+                <Link href="/categories" className="kicker-link">
                   The board · {product.category?.name}
                 </Link>
               </p>
@@ -585,7 +585,7 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
 
               <div className="pd-sub">
                 <span className="pd-subnote">
-                  <Wheat /> baked this morning · pick-up only from 312 Lygon St
+                  <Wheat /> baked this morning · pick-up only from 4 Stevenson Ave
                 </span>
                 {inCartQty > 0 && (
                   <Link href="/cart" className="pd-vieworder">
@@ -665,10 +665,10 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
                 <span className="fc-ico"><Bike /></span>
                 <h3>Pick-up &amp; delivery</h3>
               </div>
-              <div className="fact-row"><MapPin /><span><b>Pick-up only</b> — 312 Lygon Street, Brunswick (tram 19, stop 22).</span></div>
+              <div className="fact-row"><MapPin /><span><b>Pick-up only</b> — 4 Stevenson Ave, Dandenong North.</span></div>
               <div className="fact-row"><Timer /><span>Wrapped and waiting in <b>about 20 minutes</b> from your call.</span></div>
               <div className="fact-row"><CreditCard /><span>Pay at the counter — <b>card, cash, EFTPOS</b>.</span></div>
-              <div className="fact-row"><Clock /><span>Orders after 2 pm roll to the <b>next morning&rsquo;s bake</b>.</span></div>
+              <div className="fact-row"><Clock /><span>Orders after 4 pm roll to the <b>next morning&rsquo;s bake</b>.</span></div>
               {status && (
                 <div className={`status-pill${status.open ? "" : " closed"}`}>
                   <span className="pulse" />
@@ -676,7 +676,7 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
                 </div>
               )}
               <div className="fact-cta">
-                <a className="btn btn-primary btn-sm" href="tel:+61393872196">
+                <a className="btn btn-primary btn-sm" href="tel:+61473621594">
                   <Phone /> Call to order
                 </a>
               </div>
@@ -724,7 +724,7 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
           </div>
 
           <p className="board-note" data-reveal>
-            Prices in AUD · everything wrapped in paper, never plastic · sold-out lines reset at 6:30 am.
+            Prices in AUD · everything wrapped in paper, never plastic · sold-out lines reset at 8:00 am.
           </p>
         </div>
       </section>

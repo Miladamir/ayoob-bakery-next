@@ -268,7 +268,7 @@ export default function WishlistClient({ suggestions }: { suggestions: Suggestio
                   <path id="stampPathFav" d="M60 60 m-45 0 a45 45 0 1 1 90 0 a45 45 0 1 1 -90 0" />
                 </defs>
                 <text className="mh-stamp-text">
-                  <textPath href="#stampPathFav">AYOOB BAKERY · THE SHELF OF LOVES · HEARTS NEVER EXPIRE · EST 1996 ·</textPath>
+                  <textPath href="#stampPathFav">AYOOB BAKERY · THE SHELF OF LOVES · HEARTS NEVER EXPIRE · EST 1952 ·</textPath>
                 </text>
                 <path
                   d="M60 82 C42 67 33 57 33 46 C33 37 40 31 48 31 C53 31 58 34 60 39 C62 34 67 31 72 31 C80 31 87 37 87 46 C87 57 78 67 60 82 Z"

@@ -220,9 +220,7 @@ export default function Hero() {
           </div>
 
           <p className="hero-fade" style={{ "--d": "1.1s" } as React.CSSProperties}>
-            Sourdough that sleeps for 36 hours, naan blistered on the tandoor wall,
-            croissants folded in cultured butter — all out of the oven before the
-            city opens its eyes.
+            We bring together traditional recipes, multicultural flavours, and the art of handmade baking. From familiar classics to inspired creations from around the world, every product is made with care, quality ingredients, and respect for the traditions behind it.
           </p>
 
           <div className="hero-ctas hero-fade" style={{ "--d": "1.25s" } as React.CSSProperties}>

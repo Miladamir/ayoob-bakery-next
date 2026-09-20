@@ -260,8 +260,8 @@ export default async function MenuPage() {
           )}
 
           <p className="board-note" data-reveal>
-            Prices in AUD · everything wrapped in paper, never plastic · sold-out lines
-            reset at 8:00 am.
+          Prices in AUD · everything wrapped in paper · sold-out lines reset at
+            8:00 am. 
           </p>
         </div>
       </section>

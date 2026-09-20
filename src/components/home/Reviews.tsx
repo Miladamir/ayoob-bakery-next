@@ -5,24 +5,24 @@ import { ArrowLeft, ArrowRight, Star } from "lucide-react";
 
 const REVIEWS = [
   {
-    q: "The sourdough here has ruined every other loaf in Melbourne for me. I drive past three bakeries to get here every Saturday and regret nothing.",
-    n: "Priya M. — Keysborough",
+    q: "The coconut puff pastry is unlike anything else in Melbourne. I drive past three bakeries to get here every week and regret nothing.",
+    n: "Sarah M. — Dandenong",
   },
   {
-    q: "The naan comes out warm, the bolani has a queue of regulars by 9 am, and the counter remembers your order by week two. That's an institution.",
-    n: "Hamed R. — Dandenong North",
+    q: "Their cardamom shortbread with pistachio reminds me of my grandmother's baking in Kabul. The real deal, no shortcuts.",
+    n: "Ahmed K. — Noble Park",
   },
   {
-    q: "I sent a mixed dozen to the office. It did not survive the 9 am stand-up.",
-    n: "Jess T. — Noble Park",
+    q: "I ordered the braided sesame bread for a family gathering. It disappeared before dinner even started.",
+    n: "Fatima R. — Springvale",
   },
   {
-    q: "Cardamom scrolls on Friday are worth setting an alarm for. I've started calling them my weekly bonus.",
-    n: "Marta K. — Springvale",
+    q: "The cream horns are perfect — flaky, not greasy, with just the right amount of sweetness. Better than anything I had in Europe.",
+    n: "James T. — Keysborough",
   },
   {
-    q: "Proper baklava, proper espresso, and the kind of counter chat you can't get in a chain. Grew up on this baklava.",
-    n: "Sam W. — Endeavour Hills",
+    q: "As someone who grew up eating Afghan pastries, this is the only place in Melbourne that gets it right. The khatai cookies are perfect.",
+    n: "Zahra H. — Dandenong North",
   },
 ];
 

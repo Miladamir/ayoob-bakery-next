@@ -110,7 +110,7 @@ export default function Footer() {
                 <a href="tel:+61473621594">0473 621 594</a>
               </li>
               <li>
-                <a href="mailto:hello@ayoobbakery.com.au">hello@ayoobbakery.com.au</a>
+                <a href="mailto:sales@ayoobbakerymelbourne.com.au">sales@ayoobbakerymelbourne.com.au</a>
               </li>
             </ul>
           </div>
@@ -168,7 +168,7 @@ export default function Footer() {
 
         <div className="foot-bottom">
           <span suppressHydrationWarning>&copy; {year} Ayoob Bakery Melbourne</span>
-          <span>Made with flour, fire &amp; Brunswick mornings.</span>
+          <span>Made with flour, fire &amp; Melbourne mornings.</span>
           <button
             type="button"
             className="to-top"

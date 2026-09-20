@@ -27,11 +27,11 @@ export const HOME_FAQS: FaqEntry[] = [
   },
   {
     q: "Do you have vegan or gluten-free options?",
-    a: "Always something rotating — vegan scrolls most days, a gluten-free slice on weekends, and our sourdough’s 36-hour ferment makes it gentler for many people. Ask us: we know exactly what’s in everything.",
+    a: "We have vegan options most days (ask about our coconut puff pastry made with plant-based butter), and several gluten-free cookies. All our pastries use traditional Afghan recipes with cardamom, pistachio, and coconut. Ask us: we know exactly what's in everything.",
   },
   {
-    q: "Can I freeze the bread?",
-    a: "Please do. Slice it first, freeze whatever you won’t eat in two days, then revive it in a hot oven for three minutes — it’ll taste like it just came off the stone.",
+    q: "Can I freeze the pastries?",
+    a: "Please do. Our pastries freeze beautifully. Place them in an airtight container, then reheat in a 180°C oven for 5-7 minutes — they'll taste fresh-baked.",
   },
   {
     q: "Do you deliver?",
@@ -43,7 +43,7 @@ export const HOME_FAQS: FaqEntry[] = [
   },
   {
     q: "What’s the best thing on the board?",
-    a: "Dangerous question. The diplomatic answer is the sourdough. The honest answer is whatever came out of the oven five minutes ago.",
+    a: "Dangerous question. The diplomatic answer is our cardamom shortbread. The honest answer is whatever came out of the oven five minutes ago — but the coconut puff pastry has a cult following.",
   },
 ];
 

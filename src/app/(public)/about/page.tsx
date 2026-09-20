@@ -35,7 +35,7 @@ export default async function AboutPage() {
       name: BUSINESS_NAME,
       foundingDate: "1952",
       telephone: PHONE_TEL,
-      email: "hello@ayoobbakery.com.au",
+      email: "sales@ayoobbakerymelbourne.com.au",
       sameAs: SOCIAL_PROFILES,
       address: {
         "@type": "PostalAddress",

@@ -45,7 +45,7 @@ export default function ContactSection() {
               </div>
               <div className="contact-row">
                 <span className="cr-ico"><Mail /></span>
-                <a href="mailto:hello@ayoobbakery.com.au">hello@ayoobbakery.com.au</a>
+                <a href="mailto:sales@ayoobbakerymelbourne.com.au">sales@ayoobbakerymelbourne.com.au</a>
               </div>
             </div>
 
@@ -53,7 +53,7 @@ export default function ContactSection() {
               <a className="btn btn-primary" href={MAPS_URL} target="_blank" rel="noopener noreferrer">
                 Get directions <ArrowUpRight />
               </a>
-              <a className="btn btn-ghost" href="mailto:hello@ayoobbakery.com.au">
+              <a className="btn btn-ghost" href="mailto:sales@ayoobbakerymelbourne.com.au">
                 Email us
               </a>
             </div>

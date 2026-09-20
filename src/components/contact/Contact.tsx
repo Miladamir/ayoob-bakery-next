@@ -138,7 +138,7 @@ export default function Contact() {
                   <span className="cr-ico"><Mail /></span>
                   <div className="crow-main">
                     <small>Email us</small>
-                    <a className="crow-link" href="mailto:hello@ayoobbakery.com.au">hello@ayoobbakery.com.au</a>
+                    <a className="crow-link" href="mailto:sales@ayoobbakerymelbourne.com.au">sales@ayoobbakerymelbourne.com.au</a>
                     <span className="crow-sub">Replies within one business day — usually faster.</span>
                   </div>
                 </div>
@@ -147,7 +147,7 @@ export default function Contact() {
                   <span className="cr-ico"><ChefHat /></span>
                   <div className="crow-main">
                     <small>Catering &amp; wholesale</small>
-                    <a className="crow-link" href="mailto:catering@ayoobbakery.com.au">catering@ayoobbakery.com.au</a>
+                    <a className="crow-link" href="mailto:sales@ayoobbakerymelbourne.com.au">sales@ayoobbakerymelbourne.com.au</a>
                     <span className="crow-sub">Big orders, events, cafés — 48 hours notice, please.</span>
                   </div>
                 </div>

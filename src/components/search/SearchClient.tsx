@@ -393,8 +393,8 @@ export default function SearchClient({ pool }: SearchClientProps) {
                 </div>
 
                 <p className="board-note" data-reveal>
-                  Prices in AUD · everything wrapped in paper, never plastic · sold-out
-                  lines reset at 6:30 am.
+                 Prices in AUD · everything wrapped in paper · sold-out lines reset at
+            8:00 am. 
                 </p>
               </>
             ) : (
@@ -459,8 +459,8 @@ export default function SearchClient({ pool }: SearchClientProps) {
               </div>
 
               <p className="board-note" data-reveal>
-                Prices in AUD · everything wrapped in paper, never plastic · sold-out
-                lines reset at 6:30 am.
+               Prices in AUD · everything wrapped in paper · sold-out lines reset at
+            8:00 am. 
               </p>
             </>
           )}

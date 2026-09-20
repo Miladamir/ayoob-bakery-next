@@ -472,7 +472,7 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
   };
 
   const desc =
-    product.description || product.shortDescription || "Baked this morning at Ayoob Bakery, Brunswick.";
+    product.description || product.shortDescription || "Baked this morning at Ayoob Bakery, Melbourne.";
 
   const d = (s: string) => ({ "--d": s } as React.CSSProperties);
 
@@ -724,7 +724,8 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
           </div>
 
           <p className="board-note" data-reveal>
-            Prices in AUD · everything wrapped in paper, never plastic · sold-out lines reset at 8:00 am.
+           Prices in AUD · everything wrapped in paper · sold-out lines reset at
+            8:00 am. 
           </p>
         </div>
       </section>

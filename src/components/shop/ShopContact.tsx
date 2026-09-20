@@ -36,7 +36,7 @@ export default function ShopContact() {
             </div>
             <div className="contact-row">
               <span className="cr-ico"><Mail /></span>
-              <a href="mailto:hello@ayoobbakery.com.au">hello@ayoobbakery.com.au</a>
+              <a href="mailto:sales@ayoobbakerymelbourne.com.au">sales@ayoobbakerymelbourne.com.au</a>
             </div>
 
             <div className="visit-ctas">

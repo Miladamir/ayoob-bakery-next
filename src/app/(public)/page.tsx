@@ -31,7 +31,7 @@ const jsonLd = {
   telephone: PHONE_TEL,
   foundingDate: "1952",
   sameAs: SOCIAL_PROFILES,
-  email: "hello@ayoobbakery.com.au",
+  email: "sales@ayoobbakerymelbourne.com.au",
   priceRange: "$$",
   address: {
     "@type": "PostalAddress",
@@ -141,7 +141,7 @@ export default function Home() {
             </div>
             <p className="sec-note" data-reveal style={{ "--d": ".16s" } as React.CSSProperties}>
               Everything is mixed, shaped and baked the same morning. These are the
-              ones Brunswick keeps coming back for.
+              ones Melbourne keeps coming back for.
             </p>
           </header>
 

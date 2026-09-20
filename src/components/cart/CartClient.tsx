@@ -300,7 +300,7 @@ export default function CartClient({ pool }: { pool: CartPoolProduct[] }) {
     lines.push(`Items: ${cartCount}`);
     lines.push(`Total: ${money(cartTotal)}`);
     if (note.trim()) lines.push(`Note: ${note.trim()}`);
-    lines.push("Pick-up: 312 Lygon Street, Brunswick VIC · ready in ~20 minutes");
+    lines.push("Pick-up: 312 Lygon Street, Melbourne VIC · ready in ~20 minutes");
     lines.push("Call to confirm: 0473 621 594");
     const ok = await copyText(lines.join("\n"));
     if (ok) toast(Check, okTitle, okMsg);
@@ -499,8 +499,8 @@ export default function CartClient({ pool }: { pool: CartPoolProduct[] }) {
               <div className="slip-foot">
                 <span>
                   {empty
-                    ? "Wrapped in paper, never plastic."
-                    : `${cartCount} item${plu(cartCount)} · wrapped in paper, never plastic.`}
+                    ? "wrapped in paper."
+                    : `${cartCount} item${plu(cartCount)} · wrapped in paper.`}
                 </span>
               </div>
             </div>
@@ -517,7 +517,7 @@ export default function CartClient({ pool }: { pool: CartPoolProduct[] }) {
                 <p className="sum-pick">
                   <Store />
                   <span>
-                    <b>312 Lygon Street, Brunswick</b> — ready in about 20 minutes from
+                    <b>312 Lygon Street, Melbourne</b> — ready in about 20 minutes from
                     confirmation. We&rsquo;ll have it wrapped and waiting under your name.
                   </span>
                 </p>
@@ -559,7 +559,7 @@ export default function CartClient({ pool }: { pool: CartPoolProduct[] }) {
                 <ul className="sum-trust">
                   <li><Clock /> {statusText}</li>
                   <li><Flame /> Baked this morning — never frozen, never day-old</li>
-                  <li><Package /> Wrapped in paper, never plastic</li>
+                  <li><Package /> wrapped in paper</li>
                   <li><CreditCard /> Pay at the counter — card, cash, EFTPOS</li>
                 </ul>
               </div>
@@ -572,7 +572,7 @@ export default function CartClient({ pool }: { pool: CartPoolProduct[] }) {
               <span className="g-ico"><Flame /></span>
               <div>
                 <b>Baked this morning</b>
-                <span>Mixed by hand, out of the oven from 4 am — never frozen, never day-old.</span>
+                <span>Mixed by hand, out of the oven from 8 am — never frozen, never day-old.</span>
               </div>
             </div>
             <div className="gcell">

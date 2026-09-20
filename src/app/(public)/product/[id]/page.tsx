@@ -69,7 +69,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description =
     product.shortDescription ||
     (product.description ? stripHtml(product.description).slice(0, 150) : "") ||
-    "Delicious freshly baked item from Ayoob Bakery, Brunswick.";
+    "Delicious freshly baked item from Ayoob Bakery, Melbourne.";
 
   return {
     title: product.name,

@@ -23,7 +23,7 @@ const jsonLd = {
     "@type": "Bakery",
     name: BUSINESS_NAME,
     telephone: PHONE_TEL,
-    email: "hello@ayoobbakery.com.au",
+    email: "sales@ayoobbakerymelbourne.com.au",
     sameAs: SOCIAL_PROFILES,
     address: {
       "@type": "PostalAddress",

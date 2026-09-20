@@ -137,9 +137,7 @@ export default function About({ yearsBaking }: AboutProps) {
                 Seventy years of <em>flour</em> on our hands.
               </h1>
               <p className="sh-sub" data-reveal style={d(".16s")}>
-                A tiny shop at 4 Stevenson Avenue, one secondhand stone oven, and a recipe
-                book carried from Kabul. Seventy years on, the oven hasn&rsquo;t stopped — and
-                every loaf still goes out the door the morning it was baked.
+                A tiny shop at 4 Stevenson Avenue, Dandenong North, carrying recipes from Kabul that go back generations. Seventy years of baking Afghan pastries — coconut puffs, cardamom shortbread, braided breads. Every item still goes out the door the morning it's baked.
               </p>
               <div className="sh-meta" data-reveal style={d(".24s")}>
                 <div className="sh-stat">
@@ -300,12 +298,7 @@ export default function About({ yearsBaking }: AboutProps) {
                 A shop, an oven, <em>and a stubborn idea.</em>
               </h2>
               <p>
-                We first opened the doors in 1952 with one stone deck oven and a recipe book
-                carried from Kabul. Melbourne already had bread, we were told — politely,
-                repeatedly. It didn&rsquo;t have naan blistered on a tandoor wall or sourdough
-                that slept for thirty-six hours. So we made those. Now newly reopened at
-                4 Stevenson Avenue, the oven hasn&rsquo;t stopped, the recipe book has a rubber
-                band around it, and the third generation kneads before school.
+                We first opened in 1952 with recipes carried from Kabul — cardamom shortbread, coconut puff pastries, braided sesame breads. Melbourne hadn't tasted Afghan baking like this. Now newly reopened at 4 Stevenson Avenue, Dandenong North, the recipes haven't changed, the techniques haven't changed, and the third generation still makes everything by hand.
               </p>
             </div>
           </div>

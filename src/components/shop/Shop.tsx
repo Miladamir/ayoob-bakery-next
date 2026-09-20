@@ -391,8 +391,8 @@ export default function Shop({ products, categories }: ShopProps) {
           </div>
 
           <p className="board-note" data-reveal>
-            Prices in AUD · everything wrapped in paper, never plastic · sold-out lines reset at
-            6:30 am · espresso &amp; chai poured at the counter.
+           Prices in AUD · everything wrapped in paper · sold-out lines reset at
+            8:00 am. 
           </p>
 
           {/* guarantee strip */}
@@ -401,7 +401,7 @@ export default function Shop({ products, categories }: ShopProps) {
               <span className="g-ico"><Flame /></span>
               <div>
                 <b>Baked this morning</b>
-                <span>Mixed by hand, out of the oven from 4 am — never frozen, never day-old.</span>
+                <span>Mixed by hand, out of the oven from 8 am — never frozen, never day-old.</span>
               </div>
             </div>
             <div className="gcell">
@@ -415,7 +415,7 @@ export default function Shop({ products, categories }: ShopProps) {
               <span className="g-ico"><Truck /></span>
               <div>
                 <b>Local delivery</b>
-                <span>$6 flat within 8 km of Dandenong North, free over $50, same morning.</span>
+                <span>Talk to the counter for local deliveries. </span>
               </div>
             </div>
           </div>

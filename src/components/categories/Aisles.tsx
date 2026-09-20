@@ -263,8 +263,8 @@ export default function Aisles({ aisles, totals }: AislesProps) {
   }, []);
 
   const aisleNote = hasCategories
-    ? `${totals.categories} ${totals.categories === 1 ? "shelf" : "shelves"}, one stone oven, zero freezers — every aisle leads straight through to the full board.`
-    : "One stone oven, zero freezers — the whole board is open while the aisles get stocked.";
+    ? `${totals.categories} ${totals.categories === 1 ? "shelf" : "shelves"}, traditional recipes, zero freezers — every aisle leads straight through to the full board.`
+    : "traditional recipes, zero freezers — the whole board is open while the aisles get stocked.";
 
   const d = (s: string) => ({ "--d": s } as React.CSSProperties);
 
@@ -346,7 +346,7 @@ export default function Aisles({ aisles, totals }: AislesProps) {
               <span className="g-ico"><Flame /></span>
               <div>
                 <b>Baked this morning</b>
-                <span>Mixed by hand, out of the oven from 4 am — never frozen, never day-old.</span>
+                <span>Mixed by hand, out of the oven from 8 am — never frozen, never day-old.</span>
               </div>
             </div>
             <div className="gcell">
@@ -360,7 +360,7 @@ export default function Aisles({ aisles, totals }: AislesProps) {
               <span className="g-ico"><Truck /></span>
               <div>
                 <b>Local delivery</b>
-                <span>$6 flat within 8 km of Dandenong North, free over $50, same morning.</span>
+                <span>Talk to the counter for local deliveries.</span>
               </div>
             </div>
           </div>

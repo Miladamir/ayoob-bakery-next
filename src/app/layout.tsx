@@ -22,20 +22,22 @@ if (process.env.NEXT_PUBLIC_BING_VERIFICATION) {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Ayoob Bakery — Artisan Bakery in Dandenong North, Melbourne",
+    default: "Ayoob Bakery — Afghan Bakery & Pastries in Dandenong North, Melbourne",
     template: "%s | Ayoob Bakery Melbourne",
   },
   description:
-    "Ayoob Bakery Melbourne — stone-baked sourdough, Afghan naan, butter croissants and more, fresh from Dandenong North every morning.",
+    "Ayoob Bakery Melbourne — traditional Afghan pastries, coconut puff pastry, cardamom shortbread, braided sesame bread and more, baked fresh daily in Dandenong North.",
   keywords: [
-    "bakery Melbourne",
-    "artisan bakery Dandenong North",
-    "sourdough Melbourne",
-    "Afghan naan",
-    "croissants Dandenong North",
+    "Afghan bakery Melbourne",
+    "bakery Dandenong North",
+    "Afghan pastries Melbourne",
+    "nankhatai",
+    "coconut puff pastry",
+    "cardamom shortbread",
     "Ayoob Bakery",
+    "Afghan cookies Melbourne",
+    "cream horns",
     "bakery Dandenong",
-    "patisserie Melbourne",
   ],
   authors: [{ name: "Ayoob Bakery" }],
   creator: "Ayoob Bakery",
@@ -44,9 +46,9 @@ export const metadata: Metadata = {
     locale: "en_AU",
     url: siteUrl,
     siteName: "Ayoob Bakery Melbourne",
-    title: "Ayoob Bakery — Artisan Bakery in Dandenong North, Melbourne",
+    title: "Ayoob Bakery — Afghan Bakery & Pastries in Dandenong North, Melbourne",
     description:
-      "Stone-baked sourdough, Afghan naan, butter croissants — fresh from Dandenong North every morning.",
+      "Traditional Afghan pastries — coconut puffs, cardamom shortbread, braided breads — baked fresh daily in Dandenong North.",
     images: [
       {
         url: "/images/og-image.jpg",
@@ -60,7 +62,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Ayoob Bakery Melbourne",
     description:
-      "Stone-baked sourdough, Afghan naan, butter croissants — fresh from Dandenong North every morning.",
+      "Traditional Afghan pastries — coconut puffs, cardamom shortbread, braided breads — baked fresh daily in Dandenong North.",
     images: ["/images/og-image.jpg"],
   },
   robots: {

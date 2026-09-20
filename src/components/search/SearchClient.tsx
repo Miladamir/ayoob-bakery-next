@@ -243,7 +243,7 @@ export default function SearchClient({ pool }: SearchClientProps) {
     ? "the board is being stocked"
     : hasQuery
       ? `${results.length} ${results.length === 1 ? "bake" : "bakes"} match \u201C${q.trim()}\u201D`
-      : `${pool.length} bakes · one stone oven`;
+      : `${pool.length} bakes · one oven`;
 
   const d = (s: string) => ({ "--d": s } as React.CSSProperties);
 
@@ -275,7 +275,7 @@ export default function SearchClient({ pool }: SearchClientProps) {
                   <path id="stampPathSearch" d="M60 60 m-45 0 a45 45 0 1 1 90 0 a45 45 0 1 1 -90 0" />
                 </defs>
                 <text className="mh-stamp-text">
-                  <textPath href="#stampPathSearch">AYOOB BAKERY · THE WHOLE BOARD · ONE STONE OVEN · EST 1952 ·</textPath>
+                  <textPath href="#stampPathSearch">AYOOB BAKERY · THE WHOLE BOARD · ONE OVEN · EST 1952 ·</textPath>
                 </text>
                 <g stroke="#26180E" strokeWidth="2.4" strokeLinecap="round" fill="none">
                   <path d="M60 46v30" />
@@ -294,7 +294,7 @@ export default function SearchClient({ pool }: SearchClientProps) {
               id="q"
               type="text"
               autoComplete="off"
-              placeholder="sourdough, baklava, naan…"
+              placeholder="coconut puffs, shortbread, cream horns…"
               value={q}
               onChange={(e) => setQ(e.target.value)}
               onKeyDown={onInputKey}

@@ -149,12 +149,12 @@ export default function About({ yearsBaking }: AboutProps) {
                   <span>oven — never replaced</span>
                 </div>
                 <div className="sh-stat">
-                  <b className="num" data-count="36" data-suffix="h">0</b>
-                  <span>sourdough ferment</span>
+                  <b className="num" data-count="3">0</b>
+                  <span>generations of bakers</span>
                 </div>
                 <div className="sh-stat">
                   <b className="num" data-count="9400">0</b>
-                  <span>loaves a month, by hand</span>
+                  <span>pastries a month, by hand</span>
                 </div>
                 <StatusPill />
               </div>

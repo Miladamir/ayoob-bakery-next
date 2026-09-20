@@ -268,7 +268,7 @@ export default function Shop({ products, categories }: ShopProps) {
               <input
                 id="mhQ"
                 type="text"
-                placeholder="What are you craving? sourdough, baklava, naan…"
+                placeholder="What are you craving? coconut puffs, shortbread, cream horns…"
                 autoComplete="off"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}

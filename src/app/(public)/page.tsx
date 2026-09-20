@@ -25,7 +25,7 @@ const jsonLd = {
   "@type": "Bakery",
   name: BUSINESS_NAME,
   description:
-    "Stone-baked sourdough, Afghan naan, butter croissants and more, fresh from Dandenong North every morning.",
+    "Traditional Afghan pastries — coconut puff pastries, cardamom shortbread, braided sesame bread and more, baked fresh daily in Dandenong North.",
   url: siteUrl,
   image: `${siteUrl}/images/og-image.jpg`,
   telephone: PHONE_TEL,

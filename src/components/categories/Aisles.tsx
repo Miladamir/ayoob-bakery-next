@@ -282,7 +282,7 @@ export default function Aisles({ aisles, totals }: AislesProps) {
             <div className="mh-right">
               <p className="mh-live">
                 <b>{totals.products}</b> {totals.products === 1 ? "bake" : "bakes"} ·{" "}
-                <b>{totals.categories}</b> {totals.categories === 1 ? "aisle" : "aisles"} · one stone oven
+                <b>{totals.categories}</b> {totals.categories === 1 ? "aisle" : "aisles"} · one oven
               </p>
             </div>
           </div>

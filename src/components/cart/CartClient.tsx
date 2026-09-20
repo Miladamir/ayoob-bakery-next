@@ -527,7 +527,7 @@ export default function CartClient({ pool }: { pool: CartPoolProduct[] }) {
                   className="note"
                   id="orderNote"
                   rows={2}
-                  placeholder="Slice the sourdough? Extra chutney? A name on the cake?"
+                  placeholder="Extra cardamom? A message on the cake box? A dozen cream horns?"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                 />

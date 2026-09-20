@@ -63,7 +63,7 @@ export default function ContactSection() {
             <HoursCard />
             <p className="map-note" style={{ marginTop: "1.1rem" }}>
               <Clock />
-              The board usually thins out late afternoon — the early bird gets the croissant.
+              The board usually thins out late afternoon — the early bird gets the warm tray.
             </p>
           </div>
         </div>

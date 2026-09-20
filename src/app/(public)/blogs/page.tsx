@@ -13,7 +13,7 @@ export const revalidate = 300;
 export const metadata: Metadata = {
   title: "The Bakery Journal — Stories & Recipes",
   description:
-    "Stories, recipes and behind-the-scenes moments from the Ayoob Bakery kitchen in Dandenong North — sourdough, Afghan naan and everything in between.",
+    "Stories, recipes and behind-the-scenes moments from the Ayoob Bakery kitchen in Dandenong North — Afghan pastries, traditional baking and everything in between.",
   alternates: { canonical: "/blogs" },
 };
 

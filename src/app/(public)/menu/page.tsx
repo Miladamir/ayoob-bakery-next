@@ -22,12 +22,12 @@ export const revalidate = 300;
 export const metadata: Metadata = {
   title: "Bakery Menu & Prices — Dandenong North",
   description:
-    "The full Ayoob Bakery menu with prices — sourdough, Afghan naan, baklava, croissants and more, baked fresh every morning in Dandenong North. Order for pickup.",
+    "The full Ayoob Bakery menu with prices — coconut puff pastries, cardamom shortbread, cream horns, braided breads and more, baked fresh every morning in Dandenong North. Order for pickup.",
   alternates: { canonical: "/menu" },
   openGraph: {
     title: "Bakery Menu & Prices — Dandenong North | Ayoob Bakery Melbourne",
     description:
-      "The full menu with prices — sourdough, Afghan naan, baklava and more, baked fresh daily in Dandenong North.",
+      "The full menu with prices — coconut puffs, cardamom shortbread, cream horns, braided breads and more, baked fresh daily in Dandenong North.",
     type: "website",
   },
 };

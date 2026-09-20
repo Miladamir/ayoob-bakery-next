@@ -74,7 +74,7 @@ export default async function CategoriesPage() {
 
     let description =
       (top.description || "").trim() ||
-      "Fresh from the morning bake — everything this aisle holds, straight off the stone.";
+      "Fresh from the morning bake — everything this aisle holds.";
     if (subNames.length) description += ` Inside: ${subNames.join(" · ")}.`;
 
     return {
@@ -118,7 +118,7 @@ export default async function CategoriesPage() {
     tag: "Every aisle · one oven",
     tone: "honey",
     description:
-      "Every bake on one page — breads, sweets, savoury and the counter pours, all out of the same stone oven every morning. When in doubt, browse everything.",
+      "Every bake on one page — breads, sweets, savoury and the counter pours, all out of the same oven every morning. When in doubt, browse everything.",
     count: totalProducts,
     fromPrice: globalFrom,
     pick: null,

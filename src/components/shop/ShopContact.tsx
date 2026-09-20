@@ -51,7 +51,7 @@ export default function ShopContact() {
             <HoursCard />
             <p className="map-note">
               <Clock />
-              The board usually thins out after 4 pm — the early bird gets the croissant.
+              The board usually thins out after 4 pm — the early bird gets the warm tray.
             </p>
           </div>
         </div>

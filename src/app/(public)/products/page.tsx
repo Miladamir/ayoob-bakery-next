@@ -18,7 +18,7 @@ export const revalidate = 300;
 export const metadata: Metadata = {
   title: "All Products — The Board",
   description:
-    "The whole board at Ayoob Bakery — stone-baked sourdough, Afghan naan, butter croissants and more, fresh every morning in Dandenong North. Filter, sort and fill your cart.",
+    "Browse every Afghan pastry and bake at Ayoob Bakery — coconut puffs, cardamom shortbread, cream horns, braided breads and more, fresh every morning in Dandenong North.",
   alternates: { canonical: "/products" },
 };
 

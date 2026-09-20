@@ -22,8 +22,7 @@ export default function NotFound() {
 
         <p className="nf-sub">
           The page you&rsquo;re after isn&rsquo;t on the board — it may have sold out,
-          moved shelves, or never existed. The bread, however, is exactly where
-          we left it.
+          moved shelves, or never existed. The pastries, however, are exactly where we left them.
         </p>
 
         <div className="nf-ctas">

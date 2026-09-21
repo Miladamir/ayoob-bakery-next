@@ -27,6 +27,10 @@ export default async function AboutPage() {
     "@context": "https://schema.org",
     "@type": "AboutPage",
     name: "Our Story — Ayoob Bakery Melbourne",
+    logo: {
+        "@type": "ImageObject",
+        url: `${siteUrl}/images/logo.png`,
+      },
     description:
       "First founded in 1952, newly reopened in Dandenong North — Afghan by heritage, Melbourne by heart.",
     url: `${siteUrl}/about`,

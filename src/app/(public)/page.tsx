@@ -31,6 +31,10 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Bakery",
   name: BUSINESS_NAME,
+  logo: {
+    "@type": "ImageObject",
+    url: `${siteUrl}/images/logo.png`,
+  },
   description:
     "Traditional Afghan pastries — coconut puff pastries, cardamom shortbread, braised sesame bread and more, baked fresh daily in Dandenong North.",
   url: siteUrl,

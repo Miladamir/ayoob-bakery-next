@@ -6,7 +6,7 @@ import { stripHtml } from "@/lib/format";
 import Shop from "@/components/shop/Shop";
 import ShopFaqs from "@/components/shop/ShopFaqs";
 import ShopContact from "@/components/shop/ShopContact";
-import { SITE_URL as siteUrl } from "@/lib/site";
+import { SITE_URL as siteUrl, BUSINESS_NAME } from "@/lib/site";
 import "./products.css";
 
 /* PHASE 4 — ISR: this page no longer reads searchParams (filter state
@@ -68,7 +68,25 @@ export default async function ProductsPage() {
     name: c.name,
   }));
 
-  // SEO: ItemList → Product rich results for every bake on the board
+  // SEO: ItemList → Product rich results for every bake on the board.
+  // GSC merchant-listing completeness: same complete offer as the
+  // product pages — final sale, free on-site pickup.
+  const RETURN_POLICY = {
+    "@type": "MerchantReturnPolicy",
+    applicableCountry: "AU",
+    returnPolicyCategory: "https://schema.org/MerchantReturnNotPermitted",
+  };
+  const SHIPPING = {
+    "@type": "OfferShippingDetails",
+    shippingRate: { "@type": "MonetaryAmount", value: 0, currency: "AUD" },
+    shippingDestination: { "@type": "DefinedRegion", addressCountry: "AU" },
+    deliveryTime: {
+      "@type": "ShippingDeliveryTime",
+      handlingTime: { "@type": "QuantitativeValue", minValue: 0, maxValue: 1, unitCode: "DAY" },
+      transitTime: { "@type": "QuantitativeValue", minValue: 0, maxValue: 1, unitCode: "DAY" },
+    },
+  };
+
   const jsonLd = items.length
     ? {
         "@context": "https://schema.org",
@@ -81,13 +99,18 @@ export default async function ProductsPage() {
           item: {
             "@type": "Product",
             name: p.name,
+            description: p.shortDescription || undefined,
             image: p.images[0] || undefined,
+            brand: { "@type": "Brand", name: BUSINESS_NAME },
             url: `${siteUrl}/product/${p._id}`,
             offers: {
               "@type": "Offer",
               price: (p.discount > 0 ? p.price * (1 - p.discount / 100) : p.price).toFixed(2),
               priceCurrency: "AUD",
               availability: "https://schema.org/InStock",
+              hasMerchantReturnPolicy: RETURN_POLICY,
+              shippingDetails: SHIPPING,
+              availableDeliveryMethod: "https://schema.org/OnSitePickup",
             },
           },
         })),

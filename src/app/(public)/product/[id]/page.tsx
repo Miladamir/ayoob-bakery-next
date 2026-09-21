@@ -151,6 +151,24 @@ export default async function ProductPage({ params }: Props) {
          honest default for this business */
       availability: "https://schema.org/InStock",
       url: `${siteUrl}/product/${id}`,
+      /* GSC merchant-listing completeness — honest values for a
+         counter-pickup bakery: food is final sale, pickup is free */
+      hasMerchantReturnPolicy: {
+        "@type": "MerchantReturnPolicy",
+        applicableCountry: "AU",
+        returnPolicyCategory: "https://schema.org/MerchantReturnNotPermitted",
+      },
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingRate: { "@type": "MonetaryAmount", value: 0, currency: "AUD" },
+        shippingDestination: { "@type": "DefinedRegion", addressCountry: "AU" },
+        deliveryTime: {
+          "@type": "ShippingDeliveryTime",
+          handlingTime: { "@type": "QuantitativeValue", minValue: 0, maxValue: 1, unitCode: "DAY" },
+          transitTime: { "@type": "QuantitativeValue", minValue: 0, maxValue: 1, unitCode: "DAY" },
+        },
+      },
+      availableDeliveryMethod: "https://schema.org/OnSitePickup",
     },
     ...(reviewCount > 0
       ? {

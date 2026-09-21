@@ -97,7 +97,7 @@ export default function Reviews() {
         <header className="sec-head">
           <div>
             <p className="kicker" data-reveal>
-              <span className="k-no">02</span>
+              <span className="k-no">03</span>
               <span className="k-rule" />
               <span>Word of mouth</span>
             </p>

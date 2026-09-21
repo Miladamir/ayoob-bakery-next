@@ -8,7 +8,7 @@ import "./wishlist.css";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Your Favourites — The Shelf of Loves",
+  title: "Your Favourites — The Shelf of Favorites",
   description:
     "Your favourites at Ayoob Bakery — every bake you've hearted, gathered on one shelf. Add them to your order in one tap.",
   robots: { index: false, follow: true }, // personal content — never indexed

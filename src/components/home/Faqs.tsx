@@ -24,7 +24,7 @@ export default function Faqs() {
           <header className="sec-head">
             <div>
               <p className="kicker" data-reveal>
-                <span className="k-no">03</span>
+                <span className="k-no">04</span>
                 <span className="k-rule" />
                 <span>Good questions</span>
               </p>

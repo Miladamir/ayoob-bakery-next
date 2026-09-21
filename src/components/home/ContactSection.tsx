@@ -10,7 +10,7 @@ export default function ContactSection() {
         <header className="sec-head">
           <div>
             <p className="kicker" data-reveal>
-              <span className="k-no">04</span>
+              <span className="k-no">05</span>
               <span className="k-rule" />
               <span>Contact</span>
             </p>

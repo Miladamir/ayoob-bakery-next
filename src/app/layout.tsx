@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Providers from "./providers";
 import { fraunces, instrumentSans } from "@/lib/fonts";
-import { SITE_URL as siteUrl } from "@/lib/site";
 import RouteProgressBar from "@/components/effects/RouteProgressBar";
 
 /* SEO-2 — search-engine ownership verification (meta-tag method).
@@ -20,7 +19,7 @@ if (process.env.NEXT_PUBLIC_BING_VERIFICATION) {
 }
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://ayoobbakerymelbourne.com.au"),
   title: {
     default: "Ayoob Bakery — Afghan Bakery & Pastries in Dandenong North, Melbourne",
     template: "%s | Ayoob Bakery Melbourne",
@@ -44,17 +43,18 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_AU",
-    url: siteUrl,
+    url: process.env.NEXT_PUBLIC_SITE_URL || "https://ayoobbakerymelbourne.com.au",
     siteName: "Ayoob Bakery Melbourne",
     title: "Ayoob Bakery — Afghan Bakery & Pastries in Dandenong North, Melbourne",
     description:
       "Traditional Afghan pastries — coconut puffs, cardamom shortbread, braided breads — baked fresh daily in Dandenong North.",
     images: [
       {
-        url: "/images/og-image.jpg",
+        url: "/images/og-image.jpg", // resolves to full URL via metadataBase
         width: 1200,
         height: 630,
-        alt: "Freshly baked artisan bread at Ayoob Bakery Melbourne",
+        alt: "Ayoob Bakery Melbourne - Traditional Afghan Pastries",
+        type: "image/jpeg",
       },
     ],
   },

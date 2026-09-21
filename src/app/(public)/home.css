@@ -221,3 +221,47 @@ html.js body.loaded .swash path{stroke-dashoffset:0}
   font:600 .8rem var(--ff-b);cursor:pointer;transition:.25s}
 .tagbar .tchip:hover{border-color:var(--ink);color:var(--ink)}
 .tagbar .tchip.on{border-style:solid;background:var(--ink);color:var(--cream)}
+
+/* ---------- 01 · THE WALL — every bake, in pictures ---------- */
+.wall-sec{padding-top:clamp(2.4rem,5vw,4rem)}
+.wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  grid-auto-rows:168px;gap:1.1rem;grid-auto-flow:dense}
+.wt{position:relative;display:block;border:1.5px solid var(--ink);border-radius:16px;
+  overflow:hidden;background:var(--flour2);text-decoration:none;color:var(--cream);
+  grid-row:span 2;transition:transform .35s var(--ease),box-shadow .35s var(--ease)}
+.wt--wide{grid-column:span 2}
+.wt--tall{grid-row:span 3}
+.wt:hover{transform:translateY(-4px);box-shadow:5px 6px 0 rgba(38,24,14,.9)}
+.wt:focus-visible{box-shadow:5px 6px 0 rgba(196,85,30,.55)}
+.wt-img{object-fit:cover;transition:transform .6s var(--ease)}
+.wt:hover .wt-img{transform:scale(1.06)}
+.wt-veil{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(38,24,14,0) 38%,rgba(38,24,14,.78) 92%)}
+.wt-name{position:absolute;left:1rem;right:1rem;bottom:.85rem;z-index:2;
+  display:flex;justify-content:space-between;align-items:baseline;gap:.6rem}
+.wt-name b{font:600 1rem/1.2 var(--ff-d);text-shadow:0 1px 8px rgba(38,24,14,.5)}
+.wt-name>span{font:italic 600 .95rem var(--ff-d);color:var(--honey);flex:none;white-space:nowrap}
+.wt-name i{font:600 .58rem var(--ff-b);font-style:normal;letter-spacing:.1em;
+  text-transform:uppercase;color:rgba(247,241,229,.75);margin-left:.25rem}
+.wt-noimg{position:absolute;inset:0;display:grid;place-items:center;color:rgba(38,24,14,.3)}
+.wt-noimg .lucide{width:44px;height:44px}
+.wall-note{margin-top:2rem;font:italic 500 1.02rem var(--ff-d);color:var(--ink2);text-align:center}
+.wall-note a{color:var(--honey);text-decoration:none;border-bottom:1px dotted var(--honey)}
+.wall-note a:hover{color:var(--ember);border-color:var(--ember)}
+
+/* wall loading skeleton */
+.wall-skel{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  grid-auto-rows:168px;gap:1.1rem}
+.wt-skel{border:1.5px dashed var(--line);border-radius:16px;background:var(--cream);
+  position:relative;overflow:hidden;animation:pcIn .55s var(--ease) backwards;
+  animation-delay:var(--d,0s)}
+.wt-skel::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(100deg,transparent 30%,rgba(38,24,14,.05) 50%,transparent 70%);
+  transform:translateX(-100%);animation:skel 1.4s ease-in-out infinite}
+
+@media (max-width:640px){
+  .wall,.wall-skel{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+    grid-auto-rows:120px;gap:.7rem}
+  .wt-name b{font-size:.85rem}
+  .wt-name>span{font-size:.8rem}
+}

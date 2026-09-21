@@ -227,6 +227,9 @@ export default function Hero() {
             <Link href="/products" className="btn btn-primary">
               Browse all products <ArrowRight />
             </Link>
+            <a href="#gallery" className="btn btn-ghost">
+              See the morning&rsquo;s bakes
+            </a>
           </div>
         </div>
 

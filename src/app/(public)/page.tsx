@@ -4,12 +4,19 @@ import dbConnect from "@/lib/dbConnect";
 import Product from "@/models/Product";
 import Preloader from "@/components/effects/Preloader";
 import Hero from "@/components/home/Hero";
+import Wall from "@/components/home/Wall";
 import ProductTabs from "@/components/home/ProductTabs";
 import Reviews from "@/components/home/Reviews";
 import Faqs from "@/components/home/Faqs";
 import ContactSection from "@/components/home/ContactSection";
 import { stripHtml } from "@/lib/format";
-import { SITE_URL as siteUrl, BUSINESS_NAME, PHONE_TEL, SOCIAL_PROFILES } from "@/lib/site";import "./home.css";
+import {
+  SITE_URL as siteUrl,
+  BUSINESS_NAME,
+  PHONE_TEL,
+  SOCIAL_PROFILES,
+} from "@/lib/site";
+import "./home.css";
 
 /* ISR: the homepage is prerendered and re-validated every 5 minutes.
    Admin actions already call revalidatePath('/'), so edits appear instantly. */
@@ -19,20 +26,18 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-/* Local SEO — Bakery structured data (verify the geo coordinates) */
+/* Local SEO — Bakery structured data */
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Bakery",
   name: BUSINESS_NAME,
   description:
-    "Traditional Afghan pastries — coconut puff pastries, cardamom shortbread, braided sesame bread and more, baked fresh daily in Dandenong North.",
+    "Traditional Afghan pastries — coconut puff pastries, cardamom shortbread, braised sesame bread and more, baked fresh daily in Dandenong North.",
   url: siteUrl,
   image: `${siteUrl}/images/og-image.jpg`,
   telephone: PHONE_TEL,
   foundingDate: "1952",
   sameAs: SOCIAL_PROFILES,
-  email: "sales@ayoobbakerymelbourne.com.au",
-  priceRange: "$$",
   address: {
     "@type": "PostalAddress",
     streetAddress: "4 Stevenson Ave",
@@ -41,8 +46,6 @@ const jsonLd = {
     postalCode: "3175",
     addressCountry: "AU",
   },
-  /* approximate — verify before relying on geo search (same note the
-     old coordinates carried) */
   geo: { "@type": "GeoCoordinates", latitude: -37.9644, longitude: 145.2103 },
   openingHoursSpecification: [
     {
@@ -53,14 +56,58 @@ const jsonLd = {
   ],
 };
 
-/* Server loader — real products by badge, only the fields the card needs */
+/* ---------- 01 · the wall loader ---------- */
+
+const WALL_FIELDS = "name price images unit discount badge createdAt";
+const WALL_CAP = 12;
+const WALL_RANK: Record<string, number> = { Bestseller: 0, Featured: 1, Popular: 2, New: 3 };
+
+async function WallLoader() {
+  await dbConnect();
+  const all: any[] = await Product.find({}).select(WALL_FIELDS).lean();
+
+  /* photographed bakes first (the wall is a photo gallery), then
+     badge rank, then newest — capped so the section never sprawls */
+  const ranked = all
+    .map((p) => ({ ...p, hasImage: !!(p.images && p.images[0]) }))
+    .sort((a, b) => {
+      if (a.hasImage !== b.hasImage) return a.hasImage ? -1 : 1;
+      const ra = WALL_RANK[a.badge] ?? 9;
+      const rb = WALL_RANK[b.badge] ?? 9;
+      if (ra !== rb) return ra - rb;
+      return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+    })
+    .slice(0, WALL_CAP)
+    .map((p) => ({
+      _id: String(p._id),
+      name: p.name,
+      price: p.price,
+      image: p.hasImage ? p.images[0] : null,
+      unit: p.unit,
+      discount: p.discount || 0,
+    }));
+
+  return <Wall products={ranked} total={all.length} />;
+}
+
+function WallSkeleton() {
+  return (
+    <div className="wall-skel" aria-hidden="true">
+      {[...Array(8)].map((_, i) => (
+        <div
+          className="wt-skel"
+          key={i}
+          style={{ "--d": `${i * 55}ms` } as React.CSSProperties}
+        />
+      ))}
+    </div>
+  );
+}
+
+/* ---------- 02 · the counter loader ---------- */
+
 const FIELDS = "name price images unit discount badge shortDescription description";
 
-/* PAYLOAD DIET (Phase 3): a ProductCard renders ONE image and a
-   ~110-char blurb. Ship exactly that — full descriptions and every
-   gallery image used to ride along in the RSC payload. The blurb is
-   computed here with the same fallback the card used, so the visuals
-   are byte-identical. */
 const trimForCard = (list: any[]): any[] =>
   list.map((p) => ({
     _id: String(p._id),
@@ -92,7 +139,6 @@ async function ProductTabsLoader() {
   );
 }
 
-/* Skeleton shown while the DB round-trip streams in */
 function CounterSkeleton() {
   return (
     <div aria-hidden="true">
@@ -125,13 +171,39 @@ export default function Home() {
       <Preloader />
       <Hero />
 
-      {/* ============ 01 · PRODUCTS ============ */}
-      <section id="products" className="sec">
+      {/* ============ 01 · THE WALL ============ */}
+      <section id="gallery" className="sec sec--tint wall-sec">
         <div className="wrap">
           <header className="sec-head">
             <div>
               <p className="kicker" data-reveal>
                 <span className="k-no">01</span>
+                <span className="k-rule" />
+                <span>The wall</span>
+              </p>
+              <h2 data-reveal style={{ "--d": ".08s" } as React.CSSProperties}>
+                The morning&rsquo;s bake, <em>wall to wall.</em>
+              </h2>
+            </div>
+            <p className="sec-note" data-reveal style={{ "--d": ".16s" } as React.CSSProperties}>
+              Photographed as they left the counter this morning — tap any photo for
+              ingredients, nutrition and reviews.
+            </p>
+          </header>
+
+          <Suspense fallback={<WallSkeleton />}>
+            <WallLoader />
+          </Suspense>
+        </div>
+      </section>
+
+      {/* ============ 02 · PRODUCTS ============ */}
+      <section id="products" className="sec">
+        <div className="wrap">
+          <header className="sec-head">
+            <div>
+              <p className="kicker" data-reveal>
+                <span className="k-no">02</span>
                 <span className="k-rule" />
                 <span>The counter</span>
               </p>
@@ -140,8 +212,8 @@ export default function Home() {
               </h2>
             </div>
             <p className="sec-note" data-reveal style={{ "--d": ".16s" } as React.CSSProperties}>
-              Everything is mixed, shaped and baked the same morning. These are the
-              ones Melbourne keeps coming back for.
+              Everything is mixed, shaped and baked the same morning — traditional Afghan
+              recipes, the ones Melbourne keeps coming back for.
             </p>
           </header>
 
@@ -151,7 +223,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 02 · reviews · 03 · faqs · 04 · contact */}
+      {/* 03 · reviews · 04 · faqs · 05 · contact */}
       <Reviews />
       <Faqs />
       <ContactSection />

@@ -597,7 +597,7 @@ export default function ProductDetail({ product, related }: ProductDetailProps) 
               <div className="pd-trust">
                 <span><Flame /> baked this morning</span>
                 <span><Timer /> pickup in ~20 min</span>
-                <span><Package /> paper, never plastic</span>
+                <span><Package /> wrapped in paper</span>
               </div>
             </div>
           </div>

@@ -311,7 +311,7 @@ export default function About({ yearsBaking }: AboutProps) {
           <div className="rulechips" data-reveal style={d(".08s")}>
             <span className="rchip"><Flame /> Never day-old</span>
             <span className="rchip"><Timer /> Time, spent freely</span>
-            <span className="rchip"><Package /> Paper &amp; string, never plastic</span>
+            <span className="rchip"><Package /> Paper &amp; string</span>
           </div>
         </div>
       </section>

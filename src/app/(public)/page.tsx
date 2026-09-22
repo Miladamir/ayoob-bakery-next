@@ -36,7 +36,7 @@ const jsonLd = {
     url: `${siteUrl}/images/logo.png`,
   },
   description:
-    "Traditional Afghan pastries — coconut puff pastries, cardamom shortbread, braised sesame bread and more, baked fresh daily in Dandenong North.",
+    "Traditional Afghan pastries — coconut puff pastries, cardamom shortbread, braided sesame bread and more, baked fresh daily in Dandenong North.",
   url: siteUrl,
   image: `${siteUrl}/images/og-image.jpg`,
   telephone: PHONE_TEL,
@@ -110,7 +110,10 @@ function WallSkeleton() {
 
 /* ---------- 02 · the counter loader ---------- */
 
-const FIELDS = "name price images unit discount badge shortDescription description";
+const FIELDS = "name price images unit discount badge shortDescription description ratings createdAt";
+
+/* 12 cards = 4 rows of 3 — the section's hard ceiling */
+const TAB_CAP = 12;
 
 const trimForCard = (list: any[]): any[] =>
   list.map((p) => ({
@@ -127,18 +130,33 @@ const trimForCard = (list: any[]): any[] =>
 
 async function ProductTabsLoader() {
   await dbConnect();
-  const [bestSelling, popular, newArrivals, featured] = await Promise.all([
-    Product.find({ badge: "Bestseller" }).select(FIELDS).limit(4).lean(),
-    Product.find({ badge: "Popular" }).select(FIELDS).limit(4).lean(),
-    Product.find({ badge: "New" }).select(FIELDS).limit(4).lean(),
-    Product.find({ badge: "Featured" }).select(FIELDS).limit(4).lean(),
-  ]);
+  const all: any[] = await Product.find({}).select(FIELDS).lean();
+
+  /* Each tab leads with ITS badge products, then tops up from the
+     rest of the board (ratings, then newest — newest-first for the
+     New tab) so the section always fills 3–4 rows. Capped at 12
+     (= exactly 4 rows of 3, never more). As the catalog grows past
+     12, tabs become purely badge-driven. */
+  const buildTab = (badge: string, newestFirst = false) => {
+    const primary = all.filter((p) => p.badge === badge);
+    const ids = new Set(primary.map((p) => String(p._id)));
+    const rest = all
+      .filter((p) => !ids.has(String(p._id)))
+      .sort((a, b) =>
+        newestFirst
+          ? new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+          : (b.ratings || 0) - (a.ratings || 0) ||
+            new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+      );
+    return [...primary, ...rest].slice(0, TAB_CAP);
+  };
+
   return (
     <ProductTabs
-      bestSelling={trimForCard(bestSelling)}
-      popular={trimForCard(popular)}
-      newArrivals={trimForCard(newArrivals)}
-      featured={trimForCard(featured)}
+      bestSelling={trimForCard(buildTab("Bestseller"))}
+      popular={trimForCard(buildTab("Popular"))}
+      newArrivals={trimForCard(buildTab("New", true))}
+      featured={trimForCard(buildTab("Featured"))}
     />
   );
 }
@@ -152,7 +170,7 @@ function CounterSkeleton() {
         ))}
       </div>
       <div className="prod-grid">
-        {[0, 1, 2, 3].map((i) => (
+        {[0, 1, 2, 3, 4, 5].map((i) => (
           <div
             className="pc-skel"
             key={i}

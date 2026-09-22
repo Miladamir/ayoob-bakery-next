@@ -237,8 +237,9 @@ footer{background:var(--ink);color:var(--flour2);padding:clamp(4rem,8vw,6.5rem) 
 /* art plate */
 /* art plate — the photo fills it edge-to-edge;
    dotted paper + wheat icon remain as the loading/no-image fallback */
+/* art plate — 1/.88 plate, the template's proportions */
 .pc-art{position:relative;margin:.85rem .85rem 0;background:var(--flour2);
-  border-radius:13px;aspect-ratio:1/1;
+  border-radius:13px;aspect-ratio:1/.88;
   display:grid;place-items:center;overflow:hidden}
 .pc-art-link{grid-area:1/1;place-self:stretch;display:grid;place-items:center;
   text-decoration:none;color:inherit;cursor:pointer}
@@ -394,6 +395,12 @@ footer{background:var(--ink);color:var(--flour2);padding:clamp(4rem,8vw,6.5rem) 
   /* word links + icon actions collapse into the menu */
   .nav-links,.nav-icons{display:none}
   .burger{display:block}
+/* 3-across cards — slightly larger card type to match the bigger cards */
+@media (min-width:1001px){
+  .pc-name{font-size:1.24rem}
+  .pc-desc{font-size:.88rem}
+  .pc-price b{font-size:1.4rem}
+}
 }
 @media (max-width:860px){
   .sec-head{grid-template-columns:1fr}
@@ -404,7 +411,6 @@ footer{background:var(--ink);color:var(--flour2);padding:clamp(4rem,8vw,6.5rem) 
   #toasts{right:50%;transform:translateX(50%)}
 }
 @media (max-width:560px){
-  .pc-art{aspect-ratio:1/.9}
   .pc-price b{font-size:1.22rem}
 }
 

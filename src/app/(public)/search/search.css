@@ -59,7 +59,7 @@ button.schip2{padding:.55rem 1.05rem;cursor:pointer}
 .results-sec{padding:clamp(1.6rem,3vw,2.6rem) 0 clamp(3.4rem,7vw,5.5rem)}
 .rescount{font:600 .76rem var(--ff-b);letter-spacing:.16em;text-transform:uppercase;color:var(--ink2);margin-bottom:1.4rem}
 .rescount b{color:var(--ember);font-size:1rem}
-.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(252px,1fr));gap:1.3rem}
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
 .board-note{margin-top:2.4rem;font:italic 500 1.02rem var(--ff-d);color:var(--ink2);text-align:center}
 
 /* ---------- EMPTY STATES ---------- */
@@ -91,6 +91,7 @@ button.schip2{padding:.55rem 1.05rem;cursor:pointer}
 /* ---------- RESPONSIVE ---------- */
 @media (max-width:1080px){
   .masthead{padding-top:6.5rem}
+  .cards-grid{grid-template-columns:repeat(2,1fr);gap:1.2rem}
 }
 @media (max-width:640px){
   .mh-stamp{display:none}

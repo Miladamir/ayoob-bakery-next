@@ -116,7 +116,7 @@ export default function ProductCard({
                 src={product.images[0]}
                 alt={product.name}
                 fill
-                sizes="(max-width: 560px) 88vw, (max-width: 1024px) 45vw, 300px"
+                sizes="(max-width: 560px) 88vw, (max-width: 1024px) 46vw, 420px"
                 className="pc-img"
               />
             ) : (
